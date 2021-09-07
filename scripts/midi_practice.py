@@ -4,6 +4,8 @@ from mido import MidiFile, Message, MidiFile, MidiTrack, MAX_PITCHWHEEL
 import os
 import pygame
 import json
+import numpy as np
+import pretty_midi
 
 #############
 # FUNCTIONS #
@@ -63,20 +65,101 @@ def midifile_to_dict(mid):
 
     return {
         'ticks_per_beat': mid.ticks_per_beat,
-        'tracks': tracks,
+        'tracks': tracks
     }
+
+def generate_random_midi(filepath):
+    print("GENERATED")
+    return filepath
+
+def midi_to_tensor(filepath, maxlength=720): # default maxlength is 3 minutes 
+    # ASSUMES:
+    #   - 1 track
+    #   - constant note velocity (100)
+    #   - tempo = 120bpm
+    #   - smallest note subdivision = eighth note (0.250 seconds)
+    # returns a 128 x maxlength x 1 tensor representing the midi that was input
+    tensor = np.zeros((128,maxlength,1))
+    midi = pretty_midi.PrettyMIDI(filepath)
+    if len(midi.instruments) > 1:
+        print("TOO MANY TRACKS! EMPTY TENSOR RETURNED")
+    else:
+        for instrument in midi.instruments:
+            for note in instrument.notes:
+                #print(note.start, note.end, note.pitch, note.velocity)
+                #print(note.pitch, int(note.start*4), int(note.start*4 - note.start*4))
+                #print(tensor.shape)
+                print(int(note.end*4 - note.start*4))
+                tensor[note.pitch,int(note.start*4),0] = int(note.end*4 - note.start*4)
+                print(tensor[note.pitch,int(note.start*4),0])
+    return tensor
+
+def tensor_to_midi(tensor, desired_filepath):
+    # Converts midi tensor back into midi file format
+    # ASSUMES:
+    #   - 1 track
+    #   - constant note velocity (100)
+    #   - tempo = 120bpm
+    #   - smallest note subdivision = eighth note (0.250 seconds)
+    #   - writes everything as piano 
+    # Create new midi object
+    new_mid = pretty_midi.PrettyMIDI() # type=0
+    # create a track and add it to the midi
+    piano_program = pretty_midi.instrument_name_to_program('Acoustic Grand Piano')
+    piano = pretty_midi.Instrument(program=piano_program)
+    for time in range(tensor.shape[1]):
+        for pitch in range(tensor.shape[0]):
+            if tensor[pitch,time,0] != 0:
+                print("NOTE DETECTED")
+                new_note = pretty_midi.Note(velocity=100, pitch=(pitch), start=(time/4), end=((time/4)+(tensor[pitch,time,0]/4)))
+                piano.notes.append(new_note)
+    new_mid.instruments.append(piano)
+
+    # save to .mid file 
+    new_mid.write(desired_filepath)
 
 ########################
 # FILE/DIRECTORY PATHS #
 ########################
 DATA_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\music\\midi_data\\'
+numpyfile = DATA_DIR + 'new_data\\simple_scale.mid'
 
 #####################
 # LOAD IN MIDI FILE #
 #####################
 # old file
-mid = MidiFile(DATA_DIR + 'classical_piano\\tchaikovsky\\ty_april.mid')
-ableton_mid = MidiFile(DATA_DIR + 'new_data\\ableton_midi.mid')
+#mid = MidiFile(DATA_DIR + 'classical_piano\\tchaikovsky\\ty_april.mid')
+ableton_mid = MidiFile(DATA_DIR + 'new_data\\simple_scale.mid')
+
+play_music(DATA_DIR + 'new_data\\simple_scale.mid')
+
+filepath = DATA_DIR + 'new_data\\simple_scale.mid'
+tensor = midi_to_tensor(filepath, maxlength=720) # default maxlength is 3 minutes 
+print('SUM OF ALL ELEMENTS:', np.sum(tensor))
+np.save(numpyfile, tensor)
+
+new_midi_filepath = DATA_DIR + 'new_data\\converted_scale.mid'
+tensor_to_midi(tensor, new_midi_filepath)
+# Save tensor to file 
+#print(tensor.shape)
+play_music(DATA_DIR + 'new_data\\converted_scale.mid')
+
+
+'''pretty_scale = pretty_midi.PrettyMIDI(DATA_DIR + 'new_data\\simple_scale.mid')
+print('Tempo:', pretty_scale.estimate_tempo())
+print('Endtime:', pretty_scale.get_end_time())
+print('Instruments:', pretty_scale.instruments)
+for instrument in pretty_scale.instruments:
+    for note in instrument.notes:
+        print(note)
+'''
+input("Continue...")
+#play_music(DATA_DIR + 'new_data\\one_note.mid')
+#print("NEXT")
+#play_music(DATA_DIR + 'new_data\\simple_scale.mid')
+
+#print("DONE PLAYING")
+
 
 # new midi object 
 new_mid = MidiFile() # type=0
@@ -109,11 +192,15 @@ new_mid.save(DATA_DIR + 'new_data\\one_note.mid')
 with open(DATA_DIR + 'new_data\\ableton.json', 'w') as outfile:
      json.dump(midifile_to_dict(ableton_mid), outfile, indent=2)
 
+# Save track as JSON
+with open(DATA_DIR + 'new_data\\midi_scale.json', 'w') as outfile:
+     json.dump(midifile_to_dict(ableton_mid), outfile, indent=2)
+
 
 #print(json.dumps(midifile_to_dict(new_mid), indent=2))
 
 
-play_music(DATA_DIR + 'new_data\\ableton_midi.mid')
+#play_music(DATA_DIR + 'new_data\\ableton_midi.mid')
 # Playback the midi
 play_music(DATA_DIR + 'new_data\\one_note.mid')
 print("NEXT")
