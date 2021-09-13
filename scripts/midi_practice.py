@@ -20,7 +20,6 @@ import pretty_midi
     - # of tracks: start with single track midis (only one note can play at a time, etc)
 '''
 
-
 ############################
 # STUFF TO KNOW ABOUT MIDI #
 ############################
@@ -85,7 +84,7 @@ def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
     note_lengths = [quarter_note_duration*(2**i) for i in list(range(subdivision, 0)) ]
     print("POSSIBLE NOTE LENGTHS:", note_lengths)
     last_endtime = 0
-    for note_num in range(num_notes): 
+    for _ in range(num_notes): 
         cur_pitch = notes[random.randint(0, len(notes)-1)]
         cur_note_length = note_lengths[random.randint(0, len(note_lengths)-1)]
         new_note = pretty_midi.Note(velocity=100, pitch=(cur_pitch), start=last_endtime, end=(last_endtime+cur_note_length))
@@ -156,10 +155,10 @@ simple_scale = DATA_DIR + 'simple_scale.mid'
 #mid = MidiFile(DATA_DIR + 'classical_piano\\tchaikovsky\\ty_april.mid')
 ableton_mid = MidiFile(simple_scale)
 
-random_midi = DATA_DIR + 'random_midi.mid'
+'''random_midi = DATA_DIR + 'random_midi.mid'
 generate_random_midi(random_midi, tempo=150)
 play_music(random_midi)
-print("DONE WITH RANDOM")
+print("DONE WITH RANDOM")'''
 
 play_music(simple_scale)
 
