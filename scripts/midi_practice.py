@@ -133,29 +133,35 @@ def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
 
 
 #### HAVE TO CHANGE THESE TO GO BY BEATS INSTEAD OF SECONDS!!! ####
-def midi_to_tensor(filepath, maxlength=720): # default maxlength is 3 minutes 
+def midi_to_tensor(filepath, subdiv=32): # default maxlength is 3 minutes 
     # ASSUMES:
     #   - 1 track
     #   - constant note velocity (100)
-    #   - tempo = 120bpm
-    #   - smallest note subdivision = eighth note (0.250 seconds)
+    #   - smallest note subdivision = 32nd note (0.250 seconds)
+    #   - no tempo change
     # returns a 128 x maxlength x 1 tensor representing the midi that was input
-    tensor = np.zeros((128,maxlength,1))
-    midi = pretty_midi.PrettyMIDI(filepath)
-    if len(midi.instruments) > 1:
+    midi_data = pretty_midi.PrettyMIDI(filepath)
+    tempo_changes = midi_data.get_tempo_changes() #, midi_data.estimate_tempi())
+    if len(tempo_changes[1]) > 1:
+        print("TEMPO CHANGES!") # might want to skip file in this situation
+    bpm = midi_data.get_tempo_changes()[1][0] #midi_data.estimate_tempo() # in bpm
+    bps = bpm/60
+    length = midi_data.get_end_time() # in seconds
+    tensor_length = (length/60)*bpm*subdiv # # of minutes * beats p minute * beat subdivision
+    print(bpm, bps, length, int(tensor_length))
+    tensor = np.zeros((128,int(tensor_length),1))
+    if len(midi_data.instruments) > 1:
         print("TOO MANY TRACKS! EMPTY TENSOR RETURNED")
     else:
-        for instrument in midi.instruments:
+        for instrument in midi_data.instruments:
             for note in instrument.notes:
-                #print(note.start, note.end, note.pitch, note.velocity)
-                #print(note.pitch, int(note.start*4), int(note.start*4 - note.start*4))
-                #print(tensor.shape)
-                print(int(note.end*4 - note.start*4))
-                tensor[note.pitch,int(note.start*4),0] = int(note.end*4 - note.start*4)
-                print(tensor[note.pitch,int(note.start*4),0])
-    return tensor
+                note_start = note.start * bps * subdiv
+                note_length = (note.end - note.start) * bps * subdiv
+                #print(note.start, (note.end-note.start), note_start, note_length, round(note_start), round(note_length))
+                tensor[note.pitch,int(note_start),0] = int(note_length)
+    return np.squeeze(tensor, axis=2)
 
-def tensor_to_midi(tensor, desired_filepath):
+def tensor_to_midi(tensor, desired_filepath, bpm=120, subdiv=32):
     # Converts midi tensor back into midi file format
     # ASSUMES:
     #   - 1 track
@@ -164,15 +170,14 @@ def tensor_to_midi(tensor, desired_filepath):
     #   - smallest note subdivision = eighth note (0.250 seconds)
     #   - writes everything as piano 
     # Create new midi object
+    spb = 60/bpm # seconds per beat
     new_mid = pretty_midi.PrettyMIDI() # type=0
     # create a track and add it to the midi
-    piano_program = pretty_midi.instrument_name_to_program('Acoustic Grand Piano')
-    piano = pretty_midi.Instrument(program=piano_program)
+    piano = pretty_midi.Instrument(program=1)
     for time in range(tensor.shape[1]):
         for pitch in range(tensor.shape[0]):
-            if tensor[pitch,time,0] != 0:
-                print("NOTE DETECTED")
-                new_note = pretty_midi.Note(velocity=100, pitch=(pitch), start=(time/4), end=((time/4)+(tensor[pitch,time,0]/4)))
+            if tensor[pitch,time] != 0:
+                new_note = pretty_midi.Note(velocity=100, pitch=(pitch), start=(time * (spb/subdiv)), end=((time * (spb/subdiv))+(tensor[pitch,time] * (spb/subdiv))))
                 piano.notes.append(new_note)
     new_mid.instruments.append(piano)
 
@@ -180,6 +185,8 @@ def tensor_to_midi(tensor, desired_filepath):
     new_mid.write(desired_filepath)
 
 def separate_tracks(midi_directory, target_directory):
+    # takes a directory filled with midi files, creates new midi files for each individual (NOT DRUM) track
+    # in the original files, so each output midi has a single track
     file_list = os.listdir(midi_directory)
     for file in file_list:
         try:
@@ -203,11 +210,14 @@ def separate_tracks(midi_directory, target_directory):
 ########################
 # FILE/DIRECTORY PATHS #
 ########################
-DATA_DIR = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\'
-LAKH_DATA_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\lakh\\clean_midi\\'
-SEP_MIDI_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\single_track_midis\\'
+#DATA_DIR = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\'
+#LAKH_DATA_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\lakh\\clean_midi\\'
+SEP_MIDI_DIR = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\single_track_midis\\'
+CONV_MIDI_DIR = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\converted_midis\\'
+TENSOR_MIDI_DIR = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\midi_tensors\\'
+
 #simple_scale = DATA_DIR + 'simple_scale.mid'
-dancing_queen_path = LAKH_DATA_DIR + 'ABBA\\Dancing Queen.1.mid'
+#dancing_queen_path = LAKH_DATA_DIR + 'ABBA\\Dancing Queen.1.mid'
 
 #####################
 # LOAD IN MIDI FILE #
@@ -215,17 +225,30 @@ dancing_queen_path = LAKH_DATA_DIR + 'ABBA\\Dancing Queen.1.mid'
 # old file
 #mid = MidiFile(DATA_DIR + 'classical_piano\\tchaikovsky\\ty_april.mid')
 #ableton_mid = MidiFile(simple_scale)
-separate_tracks(LAKH_DATA_DIR + 'ABBA\\', SEP_MIDI_DIR)
+#separate_tracks(LAKH_DATA_DIR + 'ABBA\\', SEP_MIDI_DIR)
 
 
-#random_midi = "C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\single_track_midis\\Does Your Mother Know_0.mid"
+'''first_midi = SEP_MIDI_DIR + "Dancing Queen_1.mid"
 #generate_random_midi(random_midi, tempo=150)
-#play_music(random_midi)
-#print("DONE WITH RANDOM")
-print("DONE")
-#play_music(dancing_queen)
-#input("CONTINUE...")
+first_tensor = midi_to_tensor(first_midi)
+print(first_tensor.shape)
+tensor_to_midi(first_tensor, CONV_MIDI_DIR + 'Dancing_Queen_1_converted.mid')
+#play_music(CONV_MIDI_DIR + 'Dancing_Queen_1_converted.mid')
+#print("DONE WITH RANDOM")'''
 
+'''file_list = os.listdir(SEP_MIDI_DIR)
+for file in file_list:
+    cur_tensor = midi_to_tensor(SEP_MIDI_DIR + '\\' + file)
+    with open(TENSOR_MIDI_DIR + file.split('.')[0] + '.npy', 'wb') as f:
+        np.save(f, cur_tensor)'''
+
+# Test some of the tensors
+with open(TENSOR_MIDI_DIR  + 'Chiquitita_3.npy', 'rb') as f:
+    test_tensor = np.load(f)
+tensor_to_midi(test_tensor, CONV_MIDI_DIR + 'Chiquitita_3_converted.mid')
+play_music(CONV_MIDI_DIR + 'Chiquitita_3_converted.mid')
+
+print("DONE")
 #numpyfile = DATA_DIR + 'simple_scale_tensor.npy'
 #tensor = midi_to_tensor(simple_scale, maxlength=720) # default maxlength is 3 minutes 
 #print('SUM OF ALL ELEMENTS:', np.sum(tensor))
