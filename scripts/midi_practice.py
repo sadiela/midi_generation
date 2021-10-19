@@ -41,6 +41,22 @@ buffer = 1024   # number of samples
 pygame.mixer.init(freq, bitsize, channels, buffer)
 pygame.mixer.music.set_volume(0.8) # optional volume 0 to 1.0
 
+def play_music(midi_filename):
+    try:
+        # use the midi file you just saved
+        #Stream music_file in a blocking manner
+        clock = pygame.time.Clock()
+        pygame.mixer.music.load(midi_filename)
+        pygame.mixer.music.play()
+        while pygame.mixer.music.get_busy():
+            clock.tick(30) # check if playback has finished
+    except KeyboardInterrupt:
+        # if user hits Ctrl/C then exit
+        # (works only in console mode)
+        pygame.mixer.music.fadeout(1000)
+        pygame.mixer.music.stop()
+        raise SystemExit
+
 def change_tempo(filepath, newfilepath,  maxlength=720, smallest_subdivision=64, target_tempo=120, previous_tempo=None): # default maxlength is 3 minutes 
     # changes tempo of midi file
     
@@ -75,22 +91,6 @@ def change_tempo(filepath, newfilepath,  maxlength=720, smallest_subdivision=64,
 
     # save to .mid file 
     new_midi.write(newfilepath)
-
-def play_music(midi_filename):
-    try:
-        # use the midi file you just saved
-        #Stream music_file in a blocking manner
-        clock = pygame.time.Clock()
-        pygame.mixer.music.load(midi_filename)
-        pygame.mixer.music.play()
-        while pygame.mixer.music.get_busy():
-            clock.tick(30) # check if playback has finished
-    except KeyboardInterrupt:
-        # if user hits Ctrl/C then exit
-        # (works only in console mode)
-        pygame.mixer.music.fadeout(1000)
-        pygame.mixer.music.stop()
-        raise SystemExit
 
 def midifile_to_dict(mid):
     tracks = []
@@ -131,6 +131,8 @@ def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
     # save to .mid file 
     new_mid.write(filepath)
 
+
+#### HAVE TO CHANGE THESE TO GO BY BEATS INSTEAD OF SECONDS!!! ####
 def midi_to_tensor(filepath, maxlength=720): # default maxlength is 3 minutes 
     # ASSUMES:
     #   - 1 track
@@ -177,36 +179,59 @@ def tensor_to_midi(tensor, desired_filepath):
     # save to .mid file 
     new_mid.write(desired_filepath)
 
+def separate_tracks(midi_directory, target_directory):
+    file_list = os.listdir(midi_directory)
+    for file in file_list:
+        open_midi = pretty_midi.PrettyMIDI(midi_directory + '\\' + file)
+        for i, instrument in enumerate(open_midi.instruments): 
+            print(i, instrument.name, instrument.program, instrument.is_drum)
+            cur_midi = pretty_midi.PrettyMIDI() # define new midi object
+            cur = pretty_midi.Instrument(program=1) # create new midi instrument
+            # copy notes from instrument to cur 
+            if not instrument.is_drum:
+                for note in instrument.notes:
+                    cur.notes.append(note)
+                # save cur as a new midi file
+                cur_midi.instruments.append(cur)
+                cur_midi.write(target_directory + file.split('.')[0] + '_'+ str(i) + '.mid')
+
+
 ########################
 # FILE/DIRECTORY PATHS #
 ########################
 DATA_DIR = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\'
-simple_scale = DATA_DIR + 'simple_scale.mid'
+LAKH_DATA_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\lakh\\clean_midi\\'
+SEP_MIDI_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\single_track_midis\\'
+#simple_scale = DATA_DIR + 'simple_scale.mid'
+dancing_queen_path = LAKH_DATA_DIR + 'ABBA\\Dancing Queen.1.mid'
 
 #####################
 # LOAD IN MIDI FILE #
 #####################
 # old file
 #mid = MidiFile(DATA_DIR + 'classical_piano\\tchaikovsky\\ty_april.mid')
-ableton_mid = MidiFile(simple_scale)
+#ableton_mid = MidiFile(simple_scale)
+#separate_tracks(LAKH_DATA_DIR + 'ABBA\\', SEP_MIDI_DIR)
 
-'''random_midi = DATA_DIR + 'random_midi.mid'
-generate_random_midi(random_midi, tempo=150)
+
+random_midi = "C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\single_track_midis\\Does Your Mother Know_0.mid"
+#generate_random_midi(random_midi, tempo=150)
 play_music(random_midi)
-print("DONE WITH RANDOM")'''
-
-play_music(simple_scale)
+#print("DONE WITH RANDOM")
+print("DONE")
+#play_music(dancing_queen)
+#input("CONTINUE...")
 
 #numpyfile = DATA_DIR + 'simple_scale_tensor.npy'
 #tensor = midi_to_tensor(simple_scale, maxlength=720) # default maxlength is 3 minutes 
 #print('SUM OF ALL ELEMENTS:', np.sum(tensor))
 #np.save(numpyfile, tensor)
 
-new_midi_filepath = DATA_DIR + 'speed_up.mid'
-change_tempo(tensor, new_midi_filepath)
+#new_midi_filepath = DATA_DIR + 'speed_up.mid'
+#change_tempo(tensor, new_midi_filepath)
 # Save tensor to file 
 #print(tensor.shape)
-play_music(new_midi_filepath)
+#play_music(new_midi_filepath)
 
 
 '''pretty_scale = pretty_midi.PrettyMIDI(DATA_DIR + 'new_data\\simple_scale.mid')
@@ -217,7 +242,8 @@ for instrument in pretty_scale.instruments:
     for note in instrument.notes:
         print(note)
 '''
-input("Continue...")
+
+'''input("Continue...")
 #play_music(DATA_DIR + 'new_data\\one_note.mid')
 #print("NEXT")
 #play_music(DATA_DIR + 'new_data\\simple_scale.mid')
@@ -286,13 +312,9 @@ print("NEXT")
 # Save first two tracks as new file: 
 #for track in mid.tracks:
 #    print(track)
-#mid.save(DATA_DIR + 'new_data\\same_midi.mid')
+#mid.save(DATA_DIR + 'new_data\\same_midi.mid')'''
 
 
 ########################
 # LISTEN TO MIDI FILES #
 ########################
-
-    
-#midi_filename = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\music\\midi_data\\classical_piano\\tchaikovsky\\ty_august.mid'
-
