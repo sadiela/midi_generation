@@ -182,18 +182,22 @@ def tensor_to_midi(tensor, desired_filepath):
 def separate_tracks(midi_directory, target_directory):
     file_list = os.listdir(midi_directory)
     for file in file_list:
-        open_midi = pretty_midi.PrettyMIDI(midi_directory + '\\' + file)
-        for i, instrument in enumerate(open_midi.instruments): 
-            print(i, instrument.name, instrument.program, instrument.is_drum)
-            cur_midi = pretty_midi.PrettyMIDI() # define new midi object
-            cur = pretty_midi.Instrument(program=1) # create new midi instrument
-            # copy notes from instrument to cur 
-            if not instrument.is_drum:
-                for note in instrument.notes:
-                    cur.notes.append(note)
-                # save cur as a new midi file
-                cur_midi.instruments.append(cur)
-                cur_midi.write(target_directory + file.split('.')[0] + '_'+ str(i) + '.mid')
+        try:
+            open_midi = pretty_midi.PrettyMIDI(midi_directory + '\\' + file)
+            for i, instrument in enumerate(open_midi.instruments): 
+                print(i, instrument.name, instrument.program, instrument.is_drum)
+                cur_midi = pretty_midi.PrettyMIDI() # define new midi object
+                cur = pretty_midi.Instrument(program=1) # create new midi instrument
+                # copy notes from instrument to cur 
+                if not instrument.is_drum:
+                    for note in instrument.notes:
+                        cur.notes.append(note)
+                    # save cur as a new midi file
+                    cur_midi.instruments.append(cur)
+                    cur_midi.write(target_directory + file.split('.')[0] + '_'+ str(i) + '.mid')
+        except Exception as e:
+            print("ERROR!", e)
+            pass
 
 
 ########################
@@ -211,12 +215,12 @@ dancing_queen_path = LAKH_DATA_DIR + 'ABBA\\Dancing Queen.1.mid'
 # old file
 #mid = MidiFile(DATA_DIR + 'classical_piano\\tchaikovsky\\ty_april.mid')
 #ableton_mid = MidiFile(simple_scale)
-#separate_tracks(LAKH_DATA_DIR + 'ABBA\\', SEP_MIDI_DIR)
+separate_tracks(LAKH_DATA_DIR + 'ABBA\\', SEP_MIDI_DIR)
 
 
-random_midi = "C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\single_track_midis\\Does Your Mother Know_0.mid"
+#random_midi = "C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\single_track_midis\\Does Your Mother Know_0.mid"
 #generate_random_midi(random_midi, tempo=150)
-play_music(random_midi)
+#play_music(random_midi)
 #print("DONE WITH RANDOM")
 print("DONE")
 #play_music(dancing_queen)
