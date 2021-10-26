@@ -225,7 +225,7 @@ class Model(nn.Module):
         return loss, x_recon, perplexity
 
 
-def tensor_to_midi(tensor, desired_filepath):
+def tensor_to_midi(tensor, desired_filepath, bpm=120, subdiv=32):
     # Converts midi tensor back into midi file format
     # ASSUMES:
     #   - 1 track
@@ -234,18 +234,18 @@ def tensor_to_midi(tensor, desired_filepath):
     #   - smallest note subdivision = eighth note (0.250 seconds)
     #   - writes everything as piano 
     # Create new midi object
+    spb = 60/bpm # seconds per beat
     new_mid = pretty_midi.PrettyMIDI() # type=0
     # create a track and add it to the midi
-    piano_program = pretty_midi.instrument_name_to_program('Acoustic Grand Piano')
-    piano = pretty_midi.Instrument(program=piano_program)
+    piano = pretty_midi.Instrument(program=1)
     for time in range(tensor.shape[1]):
         for pitch in range(tensor.shape[0]):
-            if tensor[pitch,time,0] != 0:
-                print("NOTE DETECTED")
-                new_note = pretty_midi.Note(velocity=100, pitch=(pitch), start=(time/4), end=((time/4)+(tensor[pitch,time,0]/4)))
+            if tensor[pitch,time] != 0:
+                new_note = pretty_midi.Note(velocity=100, pitch=(pitch), start=(time * (spb/subdiv)), end=((time * (spb/subdiv))+(tensor[pitch,time] * (spb/subdiv))))
                 piano.notes.append(new_note)
     new_mid.instruments.append(piano)
-        # save to .mid file 
+
+    # save to .mid file 
     new_mid.write(desired_filepath)
 
 # PLAYBACK CONFIGURATION
@@ -276,7 +276,7 @@ def play_music(midi_filename):
 def main():
     # Load model from memory
     model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=commitment_cost)
-    model.load_state_dict(torch.load(modelpath + 'model_10_25.pt'))
+    model.load_state_dict(torch.load(modelpath + 'model_10_25_2.pt'))
     model.eval()
 
     # Test on a song
