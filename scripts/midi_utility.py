@@ -145,6 +145,7 @@ def tensor_to_midi(tensor, desired_filepath, bpm=120, subdiv=32):
     for time in range(tensor.shape[1]):
         for pitch in range(tensor.shape[0]):
             if tensor[pitch,time] != 0:
+                # ADD CUTOFF FOR SHORT NOTES? 
                 new_note = pretty_midi.Note(velocity=100, pitch=(pitch), start=(time * (spb/subdiv)), end=((time * (spb/subdiv))+(tensor[pitch,time] * (spb/subdiv))))
                 piano.notes.append(new_note)
     new_mid.instruments.append(piano)

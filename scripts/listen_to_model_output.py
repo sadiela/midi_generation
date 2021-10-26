@@ -47,41 +47,59 @@ num_embeddings = 64
 
 def main():
     # Load model from memory
-    midifile = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\single_track_midis\\Money, Money, Money_0.mid'
-    #play_music(midifile)
-    cropped_midifile_path = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\scripts\\cropped_money.mid'
-    crop_midi(midifile, cropped_midifile_path, maxlength=5)
-    print("CROPPED")
-    play_music(cropped_midifile_path)
-    '''model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=commitment_cost)
-    model.load_state_dict(torch.load(modelpath + 'model_10_25_2.pt'))
+    model_dir = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\models\\model_10_25_2.pt'
+    song_dir = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\firstmodel_test\\'
+    orig_npy = song_dir + 'Gimme! Gimme! Gimme!_0.npy'
+    orig_midi = song_dir + "gimme_midi.mid"
+    cropped_midi = song_dir + 'gimme_cropped.mid'
+
+    data = np.load(orig_npy)
+    #tensor_to_midi(orig_tensor, orig_midi)
+    #crop_midi(orig_midi, cropped_midi) #, maxlength=5)
+
+    model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=commitment_cost)
+    model.load_state_dict(torch.load(model_dir))
     model.eval()
 
     # Test on a song
-    data = np.load(datapath + 'Dancing Queen_1.npy')
+    #data = np.load(datapath + 'Dancing Queen_1.npy')
     print(data.shape)
     p, n = data.shape
 
     l = 1024 # batch length
 
     data = data[:,:(data.shape[1]-(data.shape[1]%l))]
+    p, n_2 = data.shape
+    print("Cropped data shape:", data.shape)
     data = torch.tensor(data).float()
 
     chunked_data = data.view((n//l, 1, p, l))
+    print("chunked data shape", chunked_data.shape)
+
+    data_unchunked = chunked_data.view(p, n_2)
+
+    if torch.equal(data, data_unchunked):
+        print("reshaped correctly!")
+    else:
+        print("wrong")
     
     vq_loss, data_recon, perplexity = model(chunked_data)
+    recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
+    loss = recon_error + vq_loss
 
-    print('Loss:', vq_loss, '\Perplexity:', perplexity)
+    print("recon data shape:", data_recon.shape)
+    #print('Loss:', loss.item(), '\Perplexity:', perplexity)
 
-    chunked_data_np_array = chunked_data[:,:,:,10].detach().numpy()
-    tensor_to_midi(chunked_data_np_array, outpath + 'Dancing Queen_1_chunk_3_ORIGINAL.mid')
+    #chunked_data_np_array = chunked_data[:,:,:,10].detach().numpy()
+    #tensor_to_midi(chunked_data_np_array, songdir + 'gimme_recon.mid')
 
-    one_chunk = data_recon[:,:,:,10].detach().numpy() #torch.squeeze(data_recon[:,:,:,3], 1)
-    tensor_to_midi(one_chunk, outpath + 'Dancing Queen_1_chunk_3.mid')
+    #data_recon_reshaped = data_recon.view(p,n_2)
+    #one_chunk = data_recon[:,:,:,10].detach().numpy() #torch.squeeze(data_recon[:,:,:,3], 1)
+    #tensor_to_midi(data_recon_reshaped, song_dir + 'gimme_recon.mid')
 
-    play_music(outpath + 'Dancing Queen_1_chunk_3_ORIGINAL.mid')
-    print("NEW")
-    play_music(outpath + 'Dancing Queen_1_chunk_3.mid')'''
+    #play_music(outpath + 'Dancing Queen_1_chunk_3_ORIGINAL.mid')
+    #print("NEW")
+    #play_music(song_dir + 'gimme_recon.mid')
 
 if __name__ == "__main__":
     main()
