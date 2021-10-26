@@ -14,6 +14,7 @@ from vq_vae import *
 #import torchvision.datasets as datasets
 #import torchvision.transforms as transforms
 #from torchvision.utils import make_grid
+import pypianoroll
 
 import torch
 import torch.nn as nn
@@ -53,7 +54,8 @@ def main():
     orig_midi = song_dir + "gimme_midi.mid"
     cropped_midi = song_dir + 'gimme_cropped.mid'
 
-    data = np.load(orig_npy)
+    '''data = midi_to_tensor(cropped_midi)
+    #data = np.load(orig_npy)
     #tensor_to_midi(orig_tensor, orig_midi)
     #crop_midi(orig_midi, cropped_midi) #, maxlength=5)
 
@@ -75,31 +77,34 @@ def main():
 
     chunked_data = data.view((n//l, 1, p, l))
     print("chunked data shape", chunked_data.shape)
-
-    data_unchunked = chunked_data.view(p, n_2)
-
-    if torch.equal(data, data_unchunked):
-        print("reshaped correctly!")
-    else:
-        print("wrong")
     
     vq_loss, data_recon, perplexity = model(chunked_data)
     recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
     loss = recon_error + vq_loss
 
     print("recon data shape:", data_recon.shape)
+    for i in range(data_recon.shape[0]):
+        print(torch.max(data_recon[i,:,:,:]).item())
     #print('Loss:', loss.item(), '\Perplexity:', perplexity)
 
     #chunked_data_np_array = chunked_data[:,:,:,10].detach().numpy()
-    #tensor_to_midi(chunked_data_np_array, songdir + 'gimme_recon.mid')
+    unchunked_recon = data_recon.view(p, n_2).detach().numpy()
+    # Turn all negative values to 0 
+    unchunked_recon = unchunked_recon.clip(min=0) # min note length that should count
 
+    tensor_to_midi(unchunked_recon, song_dir + 'gimme_cropped_recon.mid')
+
+    print("DONE")
     #data_recon_reshaped = data_recon.view(p,n_2)
-    #one_chunk = data_recon[:,:,:,10].detach().numpy() #torch.squeeze(data_recon[:,:,:,3], 1)
     #tensor_to_midi(data_recon_reshaped, song_dir + 'gimme_recon.mid')
 
     #play_music(outpath + 'Dancing Queen_1_chunk_3_ORIGINAL.mid')
     #print("NEW")
-    #play_music(song_dir + 'gimme_recon.mid')
+    #play_music(song_dir + 'gimme_recon.mid')'''
+    multitrack = pypianoroll.read(song_dir + 'gimme_cropped.mid')
+    multitrack.plot()
+
+
 
 if __name__ == "__main__":
     main()
