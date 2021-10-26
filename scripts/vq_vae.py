@@ -1,43 +1,31 @@
+'''
+This file contains the initial VQ-VAE model clas
+'''
 ###########
 # Imports #
 ###########
-from __future__ import print_function
+#from __future__ import print_function
 
+#import matplotlib.pyplot as plt
+# from scipy.signal import savgol_filter
+#from six.moves import xrange
+#import umap
+#import pandas as pd
+#from skimage import io, transform
+#import torchvision.datasets as datasets
+#import torchvision.transforms as transforms
+#from torchvision.utils import make_grid
+#from torchvision import transforms, utils
 
-import matplotlib.pyplot as plt
 import numpy as np
-from scipy.signal import savgol_filter
-
-
-from six.moves import xrange
-
-import umap
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
 import torch.optim as optim
-
-import torchvision.datasets as datasets
-import torchvision.transforms as transforms
-from torchvision.utils import make_grid
+from torch.utils.data import Dataset, DataLoader
 
 import os
 from tqdm import tqdm
-import torch
-import pandas as pd
-#from skimage import io, transform
-import numpy as np
-import matplotlib.pyplot as plt
-from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms, utils
-
-#############
-# FILEPATHS #
-#############
-datapath = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\midi_tensors\\'
-modelpath = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\models\\'
 
 ##############################
 # MODEL/OPTIMIZER PARAMETERS #
@@ -53,11 +41,13 @@ learning_rate = 1e-3
 num_embeddings = 64
 embedding_dim = 32
 commitment_cost = 0.5
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+#####################
+# CUSTOM DATALOADER #
+#####################
 class MidiDataset(Dataset):
-    """Face Landmarks dataset."""
+    """Midi dataset."""
 
     def __init__(self, npy_file_dir):
         """
@@ -79,14 +69,7 @@ class MidiDataset(Dataset):
     def __len__(self):
         return len(self.midi_tensors)
 
-#### VARIABLE DEFINITIONS
-# n = original song length
-# m = length after encoding layer
-# l = length of batch
-# b = batch size (VARIABLE) NUMBER OF CHUNKS IN ONE SONG
-# k = number of embeddings
-# p = pitch dimension AND embedding dimension
-
+# MODEL CLASS DEFINITIONS #
 # input: p x t, t variable! p=128
 class MIDIVectorQuantizer(nn.Module):
   def __init__(self, num_embeddings=1024, embedding_dim=128, commitment_cost=0.5):
@@ -210,7 +193,7 @@ class Decoder(nn.Module):
           return x
 
 class Model(nn.Module):
-    def __init__(self, num_embeddings, embedding_dim, commitment_cost, decay=0):
+    def __init__(self, num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=commitment_cost, decay=0):
         super(Model, self).__init__()
         
         self._encoder = Encoder(1, num_hiddens)
@@ -227,11 +210,11 @@ class Model(nn.Module):
 
         return loss, x_recon, perplexity
 
-def main():
-    # load data
+
+def train_model(datapath, model, save_path, learning_rate=learning_rate):
     midi_tensor_dataset = MidiDataset(datapath)
     # declare model and optimizer
-    model = Model(num_embeddings, embedding_dim, commitment_cost).to(device)
+    #model = Model(num_embeddings, embedding_dim, commitment_cost).to(device)
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, amsgrad=False)
 
     model.float()
@@ -262,13 +245,10 @@ def main():
         train_res_recon_error.append(recon_error.item())
         train_res_perplexity.append(perplexity.item())
 
-        if (i+1) % 25 == 0:
+        if (i+1) % 50 == 0:
             print('%d iterations' % (i+1))
-            print('recon_error: %.3f' % np.mean(train_res_recon_error[-25:]))
-            print('perplexity: %.3f' % np.mean(train_res_perplexity[-25:]))
+            print('recon_error: %.3f' % np.mean(train_res_recon_error[-50:]))
+            print('perplexity: %.3f' % np.mean(train_res_perplexity[-50:]))
             print()
 
-    torch.save(model.state_dict(), modelpath + 'model_10_25_2.pt')
-
-if __name__ == "__main__":
-    main()
+    torch.save(model.state_dict(), save_path)

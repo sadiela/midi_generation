@@ -228,13 +228,15 @@ TENSOR_MIDI_DIR = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_
 #separate_tracks(LAKH_DATA_DIR + 'ABBA\\', SEP_MIDI_DIR)
 
 
-random_midi = "C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\single_track_midis\\Does Your Mother Know_0.mid"
+#random_midi = "C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\single_track_midis\\Does Your Mother Know_0.mid"
 #generate_random_midi(random_midi, tempo=150)
-play_music(random_midi)
+#play_music(random_midi)
 #print("DONE WITH RANDOM")
-print("DONE")
+#print("DONE")
 #play_music(dancing_queen)
 #input("CONTINUE...")
+
+
 
 print("DONE")
 #numpyfile = DATA_DIR + 'simple_scale_tensor.npy'
