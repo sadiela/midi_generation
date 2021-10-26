@@ -97,6 +97,10 @@ def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
     # save to .mid file 
     new_mid.write(filepath)
 
+####################################
+# FUNCTIONS FOR DATA PREPROCESSING #
+####################################
+
 def midi_to_tensor(filepath, subdiv=32): # default maxlength is 3 minutes 
     # ASSUMES:
     #   - 1 track
@@ -124,10 +128,6 @@ def midi_to_tensor(filepath, subdiv=32): # default maxlength is 3 minutes
                 #print(note.start, (note.end-note.start), note_start, note_length, round(note_start), round(note_length))
                 tensor[note.pitch,int(note_start),0] = int(note_length)
     return np.squeeze(tensor, axis=2)
-
-####################################
-# FUNCTIONS FOR DATA PREPROCESSING #
-####################################
 
 def tensor_to_midi(tensor, desired_filepath, bpm=120, subdiv=32):
     # Converts midi tensor back into midi file format
@@ -173,3 +173,19 @@ def separate_tracks(midi_directory, target_directory):
         except Exception as e:
             print("ERROR!", e)
             pass
+
+def crop_midi(filename, newfilename):
+    # cut out empty space at beginning of midi file
+    try:
+        open_midi = pretty_midi.PrettyMIDI(filename)
+        new_midi = pretty_midi.PrettyMIDI() # define new midi object
+        new_instr = pretty_midi.Instrument(program=1) # create new midi instrument
+        start_time = open_midi.instruments[0].notes[0].start  
+        for note in open_midi.instruments[0].notes: 
+            shifted_note = pretty_midi.Note(velocity=note.velocity, pitch=note.pitch, start=note.start-start_time, end=note.end-start_time)
+            new_instr.notes.append(shifted_note)
+        new_midi.instruments.append(new_instr)
+        new_midi.write(newfilename)
+    except Exception as e: 
+        print("Error", e)
+        pass
