@@ -50,7 +50,7 @@ def main():
     midifile = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\single_track_midis\\Money, Money, Money_0.mid'
     #play_music(midifile)
     cropped_midifile_path = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\scripts\\cropped_money.mid'
-    crop_midi(midifile, cropped_midifile_path)
+    crop_midi(midifile, cropped_midifile_path, maxlength=5)
     print("CROPPED")
     play_music(cropped_midifile_path)
     '''model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=commitment_cost)

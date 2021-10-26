@@ -174,16 +174,23 @@ def separate_tracks(midi_directory, target_directory):
             print("ERROR!", e)
             pass
 
-def crop_midi(filename, newfilename):
+def crop_midi(filename, newfilename, cut_beginning=True, maxlength=None):
     # cut out empty space at beginning of midi file
+    # maxlength given in seconds
     try:
         open_midi = pretty_midi.PrettyMIDI(filename)
         new_midi = pretty_midi.PrettyMIDI() # define new midi object
         new_instr = pretty_midi.Instrument(program=1) # create new midi instrument
-        start_time = open_midi.instruments[0].notes[0].start  
+        if cut_beginning:
+            start_time = open_midi.instruments[0].notes[0].start
+        else: 
+            start_time = 0 
         for note in open_midi.instruments[0].notes: 
-            shifted_note = pretty_midi.Note(velocity=note.velocity, pitch=note.pitch, start=note.start-start_time, end=note.end-start_time)
-            new_instr.notes.append(shifted_note)
+            if maxlength is not None and note.end-start_time > maxlength:
+                break
+            else: 
+                shifted_note = pretty_midi.Note(velocity=note.velocity, pitch=note.pitch, start=note.start-start_time, end=note.end-start_time)
+                new_instr.notes.append(shifted_note)
         new_midi.instruments.append(new_instr)
         new_midi.write(newfilename)
     except Exception as e: 
