@@ -1,64 +1,53 @@
+'''
+This file contains the initial VQ-VAE model clas
+'''
 ###########
 # Imports #
 ###########
-# From my other files:
-from midi_utility import *
+#from __future__ import print_function
 
-# General:
-from __future__ import print_function
+#import matplotlib.pyplot as plt
+# from scipy.signal import savgol_filter
+#from six.moves import xrange
+#import umap
+#import pandas as pd
+#from skimage import io, transform
+#import torchvision.datasets as datasets
+#import torchvision.transforms as transforms
+#from torchvision.utils import make_grid
+#from torchvision import transforms, utils
 
-
-import matplotlib.pyplot as plt
 import numpy as np
-from scipy.signal import savgol_filter
-
-
-from six.moves import xrange
-
-import umap
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
 import torch.optim as optim
-
-import torchvision.datasets as datasets
-import torchvision.transforms as transforms
-from torchvision.utils import make_grid
+from torch.utils.data import Dataset, DataLoader
 
 import os
 from tqdm import tqdm
-import torch
-import pandas as pd
-#from skimage import io, transform
-import numpy as np
-import matplotlib.pyplot as plt
-from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms, utils
 
-import random
-import sys
-from mido import MidiFile, Message, MidiFile, MidiTrack, MAX_PITCHWHEEL
-import os
-import pygame
-import json
-import numpy as np
-import pretty_midi
-
-modelpath = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\models\\'
-datapath = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\midi_tensors\\'
-outpath = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\output_data\\'
-
+##############################
+# MODEL/OPTIMIZER PARAMETERS #
+##############################
+batch_size = 256
+num_training_updates = 15000
 num_hiddens = 128
+num_residual_hiddens = 16
+num_residual_layers = 2
+l = 1024 # batch length
+decay = 0.99
+learning_rate = 1e-3
+num_embeddings = 64
 embedding_dim = 32
 commitment_cost = 0.5
-num_embeddings = 64
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
-
+#####################
+# CUSTOM DATALOADER #
+#####################
 class MidiDataset(Dataset):
-    """Face Landmarks dataset."""
+    """Midi dataset."""
 
     def __init__(self, npy_file_dir):
         """
@@ -80,14 +69,7 @@ class MidiDataset(Dataset):
     def __len__(self):
         return len(self.midi_tensors)
 
-#### VARIABLE DEFINITIONS
-# n = original song length
-# m = length after encoding layer
-# l = length of batch
-# b = batch size (VARIABLE) NUMBER OF CHUNKS IN ONE SONG
-# k = number of embeddings
-# p = pitch dimension AND embedding dimension
-
+# MODEL CLASS DEFINITIONS #
 # input: p x t, t variable! p=128
 class MIDIVectorQuantizer(nn.Module):
   def __init__(self, num_embeddings=1024, embedding_dim=128, commitment_cost=0.5):
@@ -211,7 +193,7 @@ class Decoder(nn.Module):
           return x
 
 class Model(nn.Module):
-    def __init__(self, num_embeddings, embedding_dim, commitment_cost, decay=0):
+    def __init__(self, num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=commitment_cost, decay=0):
         super(Model, self).__init__()
         
         self._encoder = Encoder(1, num_hiddens)
@@ -229,37 +211,44 @@ class Model(nn.Module):
         return loss, x_recon, perplexity
 
 
-def main():
-    # Load model from memory
-    model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=commitment_cost)
-    model.load_state_dict(torch.load(modelpath + 'model_10_25_2.pt'))
-    model.eval()
+def train_model(datapath, model, save_path, learning_rate=learning_rate):
+    midi_tensor_dataset = MidiDataset(datapath)
+    # declare model and optimizer
+    #model = Model(num_embeddings, embedding_dim, commitment_cost).to(device)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate, amsgrad=False)
 
-    # Test on a song
-    data = np.load(datapath + 'Dancing Queen_1.npy')
-    print(data.shape)
-    p, n = data.shape
+    model.float()
+    model.train()
+    train_res_recon_error = []
+    train_res_perplexity = []
 
-    l = 1024 # batch length
+    for i in tqdm(range(midi_tensor_dataset.__len__())):
+        data = midi_tensor_dataset.__getitem__(i)
+        p, n = data.shape
+        data = torch.tensor(data)
 
-    data = data[:,:(data.shape[1]-(data.shape[1]%l))]
-    data = torch.tensor(data).float()
+        data = data[:,:(data.shape[1]-(data.shape[1]%l))]
+        data = data.float()
 
-    chunked_data = data.view((n//l, 1, p, l))
-    
-    vq_loss, data_recon, perplexity = model(chunked_data)
+        chunked_data = torch.reshape(data, (n//l, 1, p, l))
+        chunked_data = chunked_data.to(device)
+        optimizer.zero_grad()
 
-    print('Loss:', vq_loss, '\Perplexity:', perplexity)
+        vq_loss, data_recon, perplexity = model(chunked_data)
+        recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
+        loss = recon_error + vq_loss
+        loss.backward()
 
-    chunked_data_np_array = chunked_data[:,:,:,10].detach().numpy()
-    tensor_to_midi(chunked_data_np_array, outpath + 'Dancing Queen_1_chunk_3_ORIGINAL.mid')
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
+        optimizer.step()
+        
+        train_res_recon_error.append(recon_error.item())
+        train_res_perplexity.append(perplexity.item())
 
-    one_chunk = data_recon[:,:,:,10].detach().numpy() #torch.squeeze(data_recon[:,:,:,3], 1)
-    tensor_to_midi(one_chunk, outpath + 'Dancing Queen_1_chunk_3.mid')
+        if (i+1) % 50 == 0:
+            print('%d iterations' % (i+1))
+            print('recon_error: %.3f' % np.mean(train_res_recon_error[-50:]))
+            print('perplexity: %.3f' % np.mean(train_res_perplexity[-50:]))
+            print()
 
-    play_music(outpath + 'Dancing Queen_1_chunk_3_ORIGINAL.mid')
-    print("NEW")
-    play_music(outpath + 'Dancing Queen_1_chunk_3.mid')
-
-if __name__ == "__main__":
-    main()
+    torch.save(model.state_dict(), save_path)
