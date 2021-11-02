@@ -15,6 +15,7 @@ import pygame # for playing midi
 import json
 import numpy as np
 import pretty_midi # midi manipulation library
+from tqdm import tqdm
 
 #####################
 # GLOBAL PARAMETERS #
@@ -98,11 +99,47 @@ def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
     # save to .mid file 
     new_mid.write(filepath)
 
+def change_tempo(filepath, newfilepath,  maxlength=720, smallest_subdivision=64, target_tempo=120, previous_tempo=None): # default maxlength is 3 minutes 
+    # changes tempo of midi file
+    
+    # get old midi 
+    midi = pretty_midi.PrettyMIDI(filepath)
+    # old tempo
+    if not previous_tempo: 
+        previous_tempo = midi.estimate_tempo()
+    beat_length = 60/previous_tempo # in seconds secs/beat
+    target_beat_length = 60/target_tempo # in seconds secs/beat
+    
+    # create new midi and instrument 
+    new_midi = pretty_midi.PrettyMIDI() # type=0
+    piano_program = pretty_midi.instrument_name_to_program('Acoustic Grand Piano')
+    piano = pretty_midi.Instrument(program=piano_program)
+    
+    # convert notes to proper tempo
+    if len(midi.instruments) > 1:
+        print("TOO MANY TRACKS! EMPTY TENSOR RETURNED")
+    else:
+        for instrument in midi.instruments:
+            for note in instrument.notes:
+
+                note_length = note.end - note.start 
+                number_of_beats = note_length/beat_length
+
+                new_start_time = note.start
+
+                new_note = pretty_midi.Note(velocity=100, pitch=note.pitch, start=note.start*(target_tempo/60)*(target_beat_length), end=(note.start+number_of_beats*target_beat_length))
+                piano.notes.append(new_note)
+    new_midi.instruments.append(piano)
+
+    # save to .mid file 
+    new_midi.write(newfilepath)
+
 ####################################
 # FUNCTIONS FOR DATA PREPROCESSING #
 ####################################
 
-def midi_to_tensor(filepath, subdiv=32): # default maxlength is 3 minutes 
+def midi_to_tensor(filepath, subdiv=32, maxnotelength=16): # default maxlength is 3 minutes 
+    # maxnotelength given in BEATS
     # ASSUMES:
     #   - 1 track
     #   - constant note velocity (100)
@@ -122,13 +159,17 @@ def midi_to_tensor(filepath, subdiv=32): # default maxlength is 3 minutes
     if len(midi_data.instruments) > 1:
         print("TOO MANY TRACKS! EMPTY TENSOR RETURNED")
     else:
-        for instrument in midi_data.instruments:
-            for note in instrument.notes:
-                note_start = note.start * bps * subdiv
-                # max note length? 
-                note_length = (note.end - note.start) * bps * subdiv
-                #print(note.start, (note.end-note.start), note_start, note_length, round(note_start), round(note_length))
-                tensor[note.pitch,int(note_start),0] = int(note_length)
+        try: 
+            for instrument in midi_data.instruments:
+                for note in instrument.notes:
+                    note_start = note.start * bps * subdiv
+                    # max note length? 
+                    note_length = (note.end - note.start) * bps * subdiv
+                    #print(note.start, (note.end-note.start), note_start, note_length, round(note_start), round(note_length))
+                    tensor[note.pitch,int(note_start),0] = int(min(note_length, subdiv*maxnotelength))
+        except Exception as e:
+            print("ERROR!", e)
+            return None
     return np.squeeze(tensor, axis=2)
 
 def tensor_to_midi(tensor, desired_filepath, bpm=120, subdiv=32):
@@ -159,7 +200,7 @@ def separate_tracks(midi_directory, target_directory):
     # takes a directory filled with midi files, creates new midi files for each individual (NOT DRUM) track
     # in the original files, so each output midi has a single track
     file_list = os.listdir(midi_directory)
-    for file in file_list:
+    for file in tqdm(file_list):
         try:
             open_midi = pretty_midi.PrettyMIDI(midi_directory + '\\' + file)
             for i, instrument in enumerate(open_midi.instruments): 
