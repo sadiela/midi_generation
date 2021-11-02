@@ -4,8 +4,8 @@ import torch
 #############
 # FILEPATHS #
 #############
-datapath = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\midi_tensors\\'
-modelpath = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\models\\'
+datapath = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\midi_tensors\\'
+modelpath = 'C:\\Users\\sadie\Documents\\BU\\fall_2021\\research\\music\\models\\model_10_25_2.pt'
 
 ##############################
 # MODEL/OPTIMIZER PARAMETERS #

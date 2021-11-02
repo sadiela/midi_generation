@@ -7,7 +7,7 @@ from vq_vae import *
 
 # General:
 #from __future__ import print_function
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 #from scipy.signal import savgol_filter
 #from six.moves import xrange
 #import umap
@@ -45,26 +45,14 @@ embedding_dim = 32
 commitment_cost = 0.5
 num_embeddings = 64
 
-
-def main():
-    # Load model from memory
-    model_dir = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\models\\model_10_25_2.pt'
-    song_dir = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\firstmodel_test\\'
-    orig_npy = song_dir + 'Gimme! Gimme! Gimme!_0.npy'
-    orig_midi = song_dir + "gimme_midi.mid"
-    cropped_midi = song_dir + 'gimme_cropped.mid'
-
-    '''data = midi_to_tensor(cropped_midi)
-    #data = np.load(orig_npy)
-    #tensor_to_midi(orig_tensor, orig_midi)
-    #crop_midi(orig_midi, cropped_midi) #, maxlength=5)
-
+def reconstruct_song(orig_tensor_path, new_midi_path, model_path, clip_val=0.01):
+    data = np.load(orig_tensor_path)
+    
     model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=commitment_cost)
-    model.load_state_dict(torch.load(model_dir))
+    model.load_state_dict(torch.load(model_path))
     model.eval()
 
     # Test on a song
-    #data = np.load(datapath + 'Dancing Queen_1.npy')
     print(data.shape)
     p, n = data.shape
 
@@ -85,25 +73,52 @@ def main():
     print("recon data shape:", data_recon.shape)
     for i in range(data_recon.shape[0]):
         print(torch.max(data_recon[i,:,:,:]).item())
-    #print('Loss:', loss.item(), '\Perplexity:', perplexity)
+    print('Loss:', loss.item(), '\Perplexity:', perplexity.item())
 
     #chunked_data_np_array = chunked_data[:,:,:,10].detach().numpy()
     unchunked_recon = data_recon.view(p, n_2).detach().numpy()
     # Turn all negative values to 0 
-    unchunked_recon = unchunked_recon.clip(min=0) # min note length that should count
+    unchunked_recon = unchunked_recon.clip(min=clip_val) # min note length that should count
 
-    tensor_to_midi(unchunked_recon, song_dir + 'gimme_cropped_recon.mid')
+    tensor_to_midi(unchunked_recon, new_midi_path)
 
-    print("DONE")
-    #data_recon_reshaped = data_recon.view(p,n_2)
-    #tensor_to_midi(data_recon_reshaped, song_dir + 'gimme_recon.mid')
+
+def main():
+    # Load model from memory
+    model_dir = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\models\\model_10_25_2.pt'
+    song_dir = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\midi_tensors\\'
+    outputs = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\listening_test\\'
+    orig_npy = song_dir + 'Gimme! Gimme! Gimme!_0.npy'
+    orig_midi = outputs + "gimme_midi.mid"
+    cropped_midi = outputs + 'gimme_cropped.mid'
+    
+    recon = pypianoroll.read('C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\single_track_midis\\Eagle_1.mid')
+    recon.plot()
+    plt.show()
+    play_music('C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\single_track_midis\\Eagle_1.mid')
+
+    # loop through midi tensors/print max value in all midi tensors ... are there nans? where? 
+    file_list = os.listdir(song_dir)
+    for file in file_list:
+        cur_tensor = np.load(song_dir + '\\' + file)
+        if cur_tensor.max() > 1000: 
+            print(file, cur_tensor.max()) # plot a histogram of these 
+    print("done")
+        
+
+    #orig_tensor = np.load(orig_npy)
+    #tensor_to_midi(orig_tensor, orig_midi)
+    #crop_midi(orig_midi, cropped_midi) #, maxlength=5)
+    #reconstruct_song(orig_npy, outputs + 'recon_2.mid', model_dir, clip_val=0.01)
 
     #play_music(outpath + 'Dancing Queen_1_chunk_3_ORIGINAL.mid')
     #print("NEW")
-    #play_music(song_dir + 'gimme_recon.mid')'''
-    multitrack = pypianoroll.read(song_dir + 'gimme_cropped.mid')
-    multitrack.plot()
-
+    #play_music(outputs + 'gimme_cropped_recon.mid')
+    #multitrack = pypianoroll.read(outputs + 'gimme_cropped.mid')
+    #multitrack.plot()
+    #recon = pypianoroll.read(outputs + 'recon_2.mid')
+    #recon.plot()
+    #plt.show()
 
 
 if __name__ == "__main__":

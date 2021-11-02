@@ -27,10 +27,14 @@ from torch.utils.data import Dataset, DataLoader
 import os
 from tqdm import tqdm
 
+# is reconstruction error going down? 
+# Run w/ more data
+# Increase # of embedding vectors? 
+# shuffle chunks? 
+
 ##############################
 # MODEL/OPTIMIZER PARAMETERS #
 ##############################
-batch_size = 256
 num_training_updates = 15000
 num_hiddens = 128
 num_residual_hiddens = 16
@@ -39,7 +43,7 @@ l = 1024 # batch length
 decay = 0.99
 learning_rate = 1e-3
 num_embeddings = 64
-embedding_dim = 32
+embedding_dim = 128
 commitment_cost = 0.5
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -129,7 +133,7 @@ class MIDIVectorQuantizer(nn.Module):
     return loss, quantized.permute(0, 2, 1).contiguous().unsqueeze(1), perplexity, encodings
 
 class Encoder(nn.Module):
-  def __init__(self, in_channels, num_hidden):
+  def __init__(self, in_channels):
         super(Encoder, self).__init__()
         self._conv_1 = nn.Conv2d(in_channels=in_channels,
                                  out_channels=8,
@@ -161,7 +165,7 @@ class Encoder(nn.Module):
           return x
 
 class Decoder(nn.Module):
-  def __init__(self, in_channels=1, num_hidden=1):
+  def __init__(self, in_channels=1):
         super(Decoder, self).__init__()
         self._conv_trans_1 = nn.ConvTranspose2d(in_channels=1,
                                  out_channels=4,
@@ -196,12 +200,12 @@ class Model(nn.Module):
     def __init__(self, num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=commitment_cost, decay=0):
         super(Model, self).__init__()
         
-        self._encoder = Encoder(1, num_hiddens)
+        self._encoder = Encoder(1)
 
         self._vq_vae = MIDIVectorQuantizer(num_embeddings, embedding_dim,
                                            commitment_cost)
-        self._decoder = Decoder(embedding_dim,
-                                num_hiddens)
+
+        self._decoder = Decoder(embedding_dim)
 
     def forward(self, x):
         z = self._encoder(x)
@@ -214,7 +218,6 @@ class Model(nn.Module):
 def train_model(datapath, model, save_path, learning_rate=learning_rate):
     midi_tensor_dataset = MidiDataset(datapath)
     # declare model and optimizer
-    #model = Model(num_embeddings, embedding_dim, commitment_cost).to(device)
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, amsgrad=False)
 
     model.float()
@@ -245,10 +248,10 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate):
         train_res_recon_error.append(recon_error.item())
         train_res_perplexity.append(perplexity.item())
 
-        if (i+1) % 50 == 0:
+        if (i+1) % 10 == 0:
             print('%d iterations' % (i+1))
-            print('recon_error: %.3f' % np.mean(train_res_recon_error[-50:]))
-            print('perplexity: %.3f' % np.mean(train_res_perplexity[-50:]))
+            print('recon_error: %.3f' % np.mean(train_res_recon_error[-10:]))
+            print('perplexity: %.3f' % np.mean(train_res_perplexity[-10:]))
             print()
 
     torch.save(model.state_dict(), save_path)

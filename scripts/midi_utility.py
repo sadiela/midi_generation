@@ -10,6 +10,7 @@ import random
 import sys
 from mido import MidiFile, Message, MidiFile, MidiTrack, MAX_PITCHWHEEL
 import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame # for playing midi
 import json
 import numpy as np
@@ -124,6 +125,7 @@ def midi_to_tensor(filepath, subdiv=32): # default maxlength is 3 minutes
         for instrument in midi_data.instruments:
             for note in instrument.notes:
                 note_start = note.start * bps * subdiv
+                # max note length? 
                 note_length = (note.end - note.start) * bps * subdiv
                 #print(note.start, (note.end-note.start), note_start, note_length, round(note_start), round(note_length))
                 tensor[note.pitch,int(note_start),0] = int(note_length)
