@@ -64,15 +64,15 @@ class MidiDataset(Dataset):
         for file in tqdm(file_list): 
           print(npy_file_dir + file)
           cur_tensor = np.load(npy_file_dir + file) #, allow_pickle=True)
-          self.midi_tensors.append({file:cur_tensor}) # each one is a dictionary now
+          self.midi_tensors.append((file,cur_tensor)) # each one is a tuple now
         #self.root_dir = root_dir
         #self.transform = transform
 
     def __getitem__(self, index):
-        return self.midi_tensors[index].values()[0]
+        return self.midi_tensors[index][1]
 
     def __getname__(self, index):
-        return self.midi_tensors[index].keys()[0]
+        return self.midi_tensors[index][0]
 
     def __len__(self):
         return len(self.midi_tensors)
