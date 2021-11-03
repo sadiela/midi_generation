@@ -138,6 +138,16 @@ def change_tempo(filepath, newfilepath,  maxlength=720, smallest_subdivision=64,
 # FUNCTIONS FOR DATA PREPROCESSING #
 ####################################
 
+def remove_special_chars(dir):
+    # removes special characters from all file names in the given directory
+    for f in tqdm(os.listdir(dir)):
+        r = re.sub(r'[^A-Za-z0-9_. ]', r'', f)
+        if( r != f): # if name is different 
+            if os.path.isfile(dir + f):
+                os.replace(dir + f, dir + r)
+            else: 
+                os.rename(dir + f, dir + r)
+
 def midi_to_tensor(filepath, subdiv=32, maxnotelength=16): # default maxlength is 3 minutes 
     # maxnotelength given in BEATS
     # ASSUMES:

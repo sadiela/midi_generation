@@ -7,6 +7,7 @@ import json
 import numpy as np
 import pretty_midi
 from tqdm import tqdm 
+import re
 
 from midi_utility import *
 
@@ -35,24 +36,22 @@ Tempo not given as bpm, given as microseconds per beat
     - when you give a delta value, you are giving time in ticks
 '''
 
-
-
 START_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\lakh\\clean_midi\\The Beatles\\'
-
 
 
 ########################
 # FILE/DIRECTORY PATHS #
 ########################
-#DATA_DIR = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\'
 #LAKH_DATA_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\lakh\\clean_midi\\'
-SEP_MIDI_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\single_track_midis\\'
-CONV_MIDI_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\converted_midis\\'
-TENSOR_MIDI_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\midi_tensors\\'
-TENSOR_MIDI_DIR_2 = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\midi_tensors_2\\'
-NORM_TENSOR_MIDI_DIR_2 = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\normed_midi_tensors_2\\'
-SEP_MIDI_DIR_CROPPED = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\single_track_midis_cropped\\'
-#'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\single_track_midis_cropped'
+DATA_DIR = '/projectnb/textconv/sadiela/midi_generation/data' #'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\'
+
+SEP_MIDI_DIR = DATA_DIR + 'midi_files/'
+SEP_MIDI_DIR_CROPPED = DATA_DIR + 'cropped_midis/'
+
+#CONV_MIDI_DIR = DATA_DIR + 'converted_midis\\'
+TENSOR_MIDI_DIR = DATA_DIR + 'midi_tensors/'
+#TENSOR_MIDI_DIR_2 = DATA_DIR + 'midi_tensors_2\\'
+NORM_TENSOR_MIDI_DIR = DATA_DIR + 'normed_midi_tensors/'
 
 # SEPARATE TRACKS
 #separate_tracks(START_DIR, SEP_MIDI_DIR)
@@ -85,17 +84,34 @@ for dir, subdir, files in os.walk(NORM_TENSOR_MIDI_DIR_2):
         os.rename(os.path.join(dir,file), os.path.join(dir, "".join(filter(lambda x:x not in bad_chars, file))))
 '''
 
-for f in tqdm(os.listdir(TENSOR_MIDI_DIR_2)):
-    r = f.replace(' ', "")
-    r_2 = r.replace("'", "")
-    if( r != f):
-        if os.path.isfile(TENSOR_MIDI_DIR_2 + f):
-            os.replace(TENSOR_MIDI_DIR_2 + f, TENSOR_MIDI_DIR_2 + r_2)
-        else: 
-            os.rename(TENSOR_MIDI_DIR_2 + f, TENSOR_MIDI_DIR_2 + r_2)
+#remove_special_chars(SEP_MIDI_DIR)
 
-#simple_scale = DATA_DIR + 'simple_scale.mid'
-#dancing_queen_path = LAKH_DATA_DIR + 'ABBA\\Dancing Queen.1.mid'
+# CROP ALL MIDIS
+'''file_list = os.listdir(SEP_MIDI_DIR)
+for file in tqdm(file_list):
+    old_name = SEP_MIDI_DIR + '\\' + file
+    new_name = SEP_MIDI_DIR_CROPPED + '\\' +  file # + file.split('.')[0] + '_cropped.mid'
+    if not os.path.exists(new_name):
+        crop_midi(old_name, new_name)'''
+
+# CONVERT MIDIS TO TENSORS
+
+#TENSOR_MIDI_DIR
+maxlength = 16*32
+file_list = os.listdir(SEP_MIDI_DIR_CROPPED)
+for file in tqdm(file_list):
+    cur_tensor = midi_to_tensor(SEP_MIDI_DIR_CROPPED + file)
+    if cur_tensor is not None: 
+        np.save(TENSOR_MIDI_DIR + file.split('.')[0] + '.npy', cur_tensor)
+        cur_tensor_normed = cur_tensor/maxlength
+        if np.count_nonzero == 0: 
+            print(cur_tensor.size, np.count_nonzero(cur_tensor)) #, np.count_nonzero(cur_tensor_normed))
+        else:
+            np.save(NORM_TENSOR_MIDI_DIR + file.split('.')[0] + '.npy', cur_tensor)
+    else:
+        "error in conversion to tensor"
+print("DONE")
+
 
 #####################
 # LOAD IN MIDI FILE #
@@ -115,8 +131,6 @@ for f in tqdm(os.listdir(TENSOR_MIDI_DIR_2)):
 #input("CONTINUE...")
 
 
-
-print("DONE")
 #numpyfile = DATA_DIR + 'simple_scale_tensor.npy'
 #tensor = midi_to_tensor(simple_scale, maxlength=720) # default maxlength is 3 minutes 
 #print('SUM OF ALL ELEMENTS:', np.sum(tensor))
