@@ -43,7 +43,7 @@ START_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_d
 # FILE/DIRECTORY PATHS #
 ########################
 #LAKH_DATA_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\lakh\\clean_midi\\'
-DATA_DIR = '/projectnb/textconv/sadiela/midi_generation/data' #'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\'
+DATA_DIR = '/projectnb/textconv/sadiela/midi_generation/data/' #'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\'
 
 SEP_MIDI_DIR = DATA_DIR + 'midi_files/'
 SEP_MIDI_DIR_CROPPED = DATA_DIR + 'cropped_midis/'

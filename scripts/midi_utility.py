@@ -20,8 +20,7 @@ from tqdm import tqdm
 #####################
 # GLOBAL PARAMETERS #
 #####################
-temp_file_dir = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\temp_files\\'
-crop_file_dir = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\cropped_midis\\'
+
 ##############
 # PLAY MUSIC #
 ##############
@@ -54,7 +53,7 @@ def play_music(midi_filename):
 def play_x_seconds(midi_filename, x, savefile=False):
     # play the first x seconds of a midi
     # starts at the time where the first notes starts
-
+    temp_file = ""
     # create temporary file and "crop"
     if savefile: 
         print("need to save")
@@ -138,16 +137,6 @@ def change_tempo(filepath, newfilepath,  maxlength=720, smallest_subdivision=64,
 # FUNCTIONS FOR DATA PREPROCESSING #
 ####################################
 
-def remove_special_chars(dir):
-    # removes special characters from all file names in the given directory
-    for f in tqdm(os.listdir(dir)):
-        r = re.sub(r'[^A-Za-z0-9_. ]', r'', f)
-        if( r != f): # if name is different 
-            if os.path.isfile(dir + f):
-                os.replace(dir + f, dir + r)
-            else: 
-                os.rename(dir + f, dir + r)
-
 def midi_to_tensor(filepath, subdiv=32, maxnotelength=16): # default maxlength is 3 minutes 
     # maxnotelength given in BEATS
     # ASSUMES:
@@ -164,7 +153,7 @@ def midi_to_tensor(filepath, subdiv=32, maxnotelength=16): # default maxlength i
     bps = bpm/60
     length = midi_data.get_end_time() # in seconds
     tensor_length = (length/60)*bpm*subdiv # # of minutes * beats p minute * beat subdivision
-    print(bpm, bps, length, int(tensor_length))
+    #print(bpm, bps, length, int(tensor_length))
     tensor = np.zeros((128,int(tensor_length),1))
     if len(midi_data.instruments) > 1:
         print("TOO MANY TRACKS! EMPTY TENSOR RETURNED")
