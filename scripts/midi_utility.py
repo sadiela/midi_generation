@@ -8,7 +8,6 @@ explore and manipulate midi data
 ###########
 import random
 import sys
-#from mido import MidiFile, Message, MidiTrack, MAX_PITCHWHEEL
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame # for playing midi
