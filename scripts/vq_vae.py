@@ -24,7 +24,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
-
+import random 
 import os
 from tqdm import tqdm
 
@@ -65,6 +65,8 @@ class MidiDataset(Dataset):
           #print(npy_file_dir + file)
           cur_tensor = np.load(npy_file_dir + file) #, allow_pickle=True)
           self.midi_tensors.append((file,cur_tensor)) # each one is a tuple now
+
+        random.shuffle(self.midi_tensors)
         #self.root_dir = root_dir
         #self.transform = transform
 
@@ -221,6 +223,7 @@ class Model(nn.Module):
 
 def train_model(datapath, model, save_path, learning_rate=learning_rate):
     midi_tensor_dataset = MidiDataset(datapath)
+
     # declare model and optimizer
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, amsgrad=False)
 
