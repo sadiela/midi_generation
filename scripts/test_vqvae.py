@@ -6,7 +6,7 @@ import yaml
 #############
 # FILEPATHS #
 #############
-datapath = '/projectnb/textconv/sadiela/midi_generation/midi_tensors/'
+datapath = '/projectnb/textconv/sadiela/midi_generation/data/midi_tensors/'
 modelpath = '/projectnb/textconv/sadiela/midi_generation/models/' #model_10_25_2.pt'
 respath = '/projectnb/textconv/sadiela/midi_generation/results/'
 
