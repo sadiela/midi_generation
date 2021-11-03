@@ -18,6 +18,7 @@ This file contains the initial VQ-VAE model clas
 #from torchvision import transforms, utils
 
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -63,12 +64,15 @@ class MidiDataset(Dataset):
         for file in tqdm(file_list): 
           print(npy_file_dir + file)
           cur_tensor = np.load(npy_file_dir + file) #, allow_pickle=True)
-          self.midi_tensors.append(cur_tensor) 
+          self.midi_tensors.append({file:cur_tensor}) # each one is a dictionary now
         #self.root_dir = root_dir
         #self.transform = transform
 
     def __getitem__(self, index):
-        return self.midi_tensors[index]
+        return self.midi_tensors[index].values()[0]
+
+    def __getname__(self, index):
+        return self.midi_tensors[index].keys()[0]
 
     def __len__(self):
         return len(self.midi_tensors)
@@ -224,8 +228,10 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate):
     model.train()
     train_res_recon_error = []
     train_res_perplexity = []
+    nanfiles = []
 
     for i in tqdm(range(midi_tensor_dataset.__len__())):
+        #name = midi_tensor_dataset.__getname__(i)
         data = midi_tensor_dataset.__getitem__(i)
         p, n = data.shape
         data = torch.tensor(data)
@@ -248,6 +254,9 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate):
         train_res_recon_error.append(recon_error.item())
         train_res_perplexity.append(perplexity.item())
 
+        if pd.isna(recon_error.item()):
+          nanfiles.append(midi_tensor_dataset.__getname__(i))
+
         if (i+1) % 10 == 0:
             print('%d iterations' % (i+1))
             print('recon_error: %.3f' % np.mean(train_res_recon_error[-10:]))
@@ -255,4 +264,4 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate):
             print()
 
     torch.save(model.state_dict(), save_path)
-    return train_res_recon_error, train_res_perplexity
+    return train_res_recon_error, train_res_perplexity, nanfiles
