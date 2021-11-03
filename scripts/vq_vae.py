@@ -237,33 +237,34 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate):
         data = torch.tensor(data)
 
         if data.shape[1] < l: 
-          pass
-        data = data[:,:(data.shape[1]-(data.shape[1]%l))]
-        data = data.float()
+          print("Too short")
+        else: 
+          data = data[:,:(data.shape[1]-(data.shape[1]%l))]
+          data = data.float()
 
-        chunked_data = torch.reshape(data, (n//l, 1, p, l))
-        chunked_data = chunked_data.to(device)
-        optimizer.zero_grad()
+          chunked_data = torch.reshape(data, (n//l, 1, p, l))
+          chunked_data = chunked_data.to(device)
+          optimizer.zero_grad()
 
-        vq_loss, data_recon, perplexity = model(chunked_data)
-        recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
-        loss = recon_error + vq_loss
-        loss.backward()
+          vq_loss, data_recon, perplexity = model(chunked_data)
+          recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
+          loss = recon_error + vq_loss
+          loss.backward()
 
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
-        optimizer.step()
-        
-        train_res_recon_error.append(recon_error.item())
-        train_res_perplexity.append(perplexity.item())
+          torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
+          optimizer.step()
+          
+          train_res_recon_error.append(recon_error.item())
+          train_res_perplexity.append(perplexity.item())
 
-        if pd.isna(recon_error.item()):
-          nanfiles.append(midi_tensor_dataset.__getname__(i))
+          if pd.isna(recon_error.item()):
+            nanfiles.append(midi_tensor_dataset.__getname__(i))
 
-        if (i+1) % 10 == 0:
-            print('%d iterations' % (i+1))
-            print('recon_error: %.3f' % np.mean(train_res_recon_error[-10:]))
-            print('perplexity: %.3f' % np.mean(train_res_perplexity[-10:]))
-            print()
+          if (i+1) % 10 == 0:
+              print('%d iterations' % (i+1))
+              print('recon_error: %.3f' % np.mean(train_res_recon_error[-10:]))
+              print('perplexity: %.3f' % np.mean(train_res_perplexity[-10:]))
+              print()
 
     torch.save(model.state_dict(), save_path)
     return train_res_recon_error, train_res_perplexity, nanfiles
