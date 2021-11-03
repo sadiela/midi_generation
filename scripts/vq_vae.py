@@ -62,7 +62,7 @@ class MidiDataset(Dataset):
         self.midi_tensors = []
         file_list = os.listdir(npy_file_dir)
         for file in tqdm(file_list): 
-          print(npy_file_dir + file)
+          #print(npy_file_dir + file)
           cur_tensor = np.load(npy_file_dir + file) #, allow_pickle=True)
           self.midi_tensors.append((file,cur_tensor)) # each one is a tuple now
         #self.root_dir = root_dir
