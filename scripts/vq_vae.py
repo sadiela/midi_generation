@@ -238,6 +238,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate):
 
         data = data[:,:(data.shape[1]-(data.shape[1]%l))]
         data = data.float()
+        print(data.size())
 
         chunked_data = torch.reshape(data, (n//l, 1, p, l))
         chunked_data = chunked_data.to(device)
