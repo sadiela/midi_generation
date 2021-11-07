@@ -1,5 +1,7 @@
 from vq_vae import *
+from gen_utility import * 
 import torch
+import yaml
 
 #############
 # FILEPATHS #
@@ -27,9 +29,15 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def main():
-    model = Model() #num_embeddings, embedding_dim, commitment_cost).to(device)
-    recon_loss, perplex = train_model(datapath, model, modelpath + 'newmodel.pt')
-
+    model = Model().to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
+    model_file = get_free_filename('model', modelpath, suffix='.pt')
+    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file)
+    # save losses to file
+    print("NUM NAN FILES:", len(nan_recon_files))
+    results={"reconstruction_error": recon_error, "perplexity": perplex, "nan_reconstruction_files": nan_recon_files}
+    savefile = get_free_filename('results', respath, suffix='.yaml')
+    with open(savefile, 'w') as outfile:
+        yaml.dump(results, outfile, default_flow_style=False)
 
 if __name__ == "__main__":
     print("START")

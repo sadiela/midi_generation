@@ -8,7 +8,6 @@ explore and manipulate midi data
 ###########
 import random
 import sys
-from mido import MidiFile, Message, MidiFile, MidiTrack, MAX_PITCHWHEEL
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame # for playing midi
@@ -20,8 +19,7 @@ from tqdm import tqdm
 #####################
 # GLOBAL PARAMETERS #
 #####################
-temp_file_dir = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\temp_files\\'
-crop_file_dir = 'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\cropped_midis\\'
+
 ##############
 # PLAY MUSIC #
 ##############
@@ -54,7 +52,7 @@ def play_music(midi_filename):
 def play_x_seconds(midi_filename, x, savefile=False):
     # play the first x seconds of a midi
     # starts at the time where the first notes starts
-
+    temp_file = ""
     # create temporary file and "crop"
     if savefile: 
         print("need to save")
@@ -154,7 +152,7 @@ def midi_to_tensor(filepath, subdiv=32, maxnotelength=16): # default maxlength i
     bps = bpm/60
     length = midi_data.get_end_time() # in seconds
     tensor_length = (length/60)*bpm*subdiv # # of minutes * beats p minute * beat subdivision
-    print(bpm, bps, length, int(tensor_length))
+    #print(bpm, bps, length, int(tensor_length))
     tensor = np.zeros((128,int(tensor_length),1))
     if len(midi_data.instruments) > 1:
         print("TOO MANY TRACKS! EMPTY TENSOR RETURNED")

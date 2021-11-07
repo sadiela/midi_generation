@@ -18,12 +18,13 @@ This file contains the initial VQ-VAE model clas
 #from torchvision import transforms, utils
 
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
-
+import random 
 import os
 from tqdm import tqdm
 
@@ -61,14 +62,19 @@ class MidiDataset(Dataset):
         self.midi_tensors = []
         file_list = os.listdir(npy_file_dir)
         for file in tqdm(file_list): 
-          print(npy_file_dir + file)
+          #print(npy_file_dir + file)
           cur_tensor = np.load(npy_file_dir + file) #, allow_pickle=True)
-          self.midi_tensors.append(cur_tensor) 
+          self.midi_tensors.append((file,cur_tensor)) # each one is a tuple now
+
+        random.shuffle(self.midi_tensors)
         #self.root_dir = root_dir
         #self.transform = transform
 
     def __getitem__(self, index):
-        return self.midi_tensors[index]
+        return self.midi_tensors[index][1]
+
+    def __getname__(self, index):
+        return self.midi_tensors[index][0]
 
     def __len__(self):
         return len(self.midi_tensors)
@@ -217,6 +223,7 @@ class Model(nn.Module):
 
 def train_model(datapath, model, save_path, learning_rate=learning_rate):
     midi_tensor_dataset = MidiDataset(datapath)
+
     # declare model and optimizer
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, amsgrad=False)
 
@@ -224,36 +231,43 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate):
     model.train()
     train_res_recon_error = []
     train_res_perplexity = []
+    nanfiles = []
 
     for i in tqdm(range(midi_tensor_dataset.__len__())):
+        #name = midi_tensor_dataset.__getname__(i)
         data = midi_tensor_dataset.__getitem__(i)
         p, n = data.shape
         data = torch.tensor(data)
 
-        data = data[:,:(data.shape[1]-(data.shape[1]%l))]
-        data = data.float()
+        if data.shape[1] < l: 
+          print("Too short")
+        else: 
+          data = data[:,:(data.shape[1]-(data.shape[1]%l))]
+          data = data.float()
 
-        chunked_data = torch.reshape(data, (n//l, 1, p, l))
-        chunked_data = chunked_data.to(device)
-        optimizer.zero_grad()
+          chunked_data = torch.reshape(data, (n//l, 1, p, l))
+          chunked_data = chunked_data.to(device)
+          optimizer.zero_grad()
 
-        vq_loss, data_recon, perplexity = model(chunked_data)
-        recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
-        loss = recon_error + vq_loss
-        loss.backward()
+          vq_loss, data_recon, perplexity = model(chunked_data)
+          recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
+          loss = recon_error + vq_loss
+          loss.backward()
 
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
-        optimizer.step()
-        
-        train_res_recon_error.append(recon_error.item())
-        train_res_perplexity.append(perplexity.item())
+          torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
+          optimizer.step()
+          
+          train_res_recon_error.append(recon_error.item())
+          train_res_perplexity.append(perplexity.item())
 
-        if (i+1) % 10 == 0:
-            print('%d iterations' % (i+1))
-            print('recon_error: %.3f' % np.mean(train_res_recon_error[-10:]))
-            print('perplexity: %.3f' % np.mean(train_res_perplexity[-10:]))
-            print()
+          if pd.isna(recon_error.item()):
+            nanfiles.append(midi_tensor_dataset.__getname__(i))
+
+          if (i+1) % 10 == 0:
+              print('%d iterations' % (i+1))
+              print('recon_error: %.3f' % np.mean(train_res_recon_error[-10:]))
+              print('perplexity: %.3f' % np.mean(train_res_perplexity[-10:]))
+              print()
 
     torch.save(model.state_dict(), save_path)
-    print(train_res_recon_error, train_res_perplexity)
-    return train_res_recon_error, train_res_perplexity 
+    return train_res_recon_error, train_res_perplexity, nanfiles
