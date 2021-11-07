@@ -4,8 +4,9 @@ import torch
 #############
 # FILEPATHS #
 #############
-datapath = '/usr3/graduate/sadiela/midi_generation/data/normed_midi_tensors_2/'
-modelpath = '/usr3/graduate/sadiela/midi_generation/models/' #model_10_25_2.pt'
+datapath = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\midi_tensors_2\\'
+modelpath = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\models\\' 
+#/usr3/graduate/sadiela/midi_generation/models/' #model_10_25_2.pt'
 
 ##############################
 # MODEL/OPTIMIZER PARAMETERS #
@@ -27,7 +28,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def main():
     model = Model() #num_embeddings, embedding_dim, commitment_cost).to(device)
-    train_model(datapath, model, modelpath + 'newmodel.pt')
+    recon_loss, perplex = train_model(datapath, model, modelpath + 'newmodel.pt')
 
 
 if __name__ == "__main__":

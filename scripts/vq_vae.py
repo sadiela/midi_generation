@@ -255,3 +255,5 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate):
             print()
 
     torch.save(model.state_dict(), save_path)
+    print(train_res_recon_error, train_res_perplexity)
+    return train_res_recon_error, train_res_perplexity 
