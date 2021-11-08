@@ -6,9 +6,9 @@ import yaml
 #############
 # FILEPATHS #
 #############
-datapath = '/projectnb/textconv/sadiela/midi_generation/data/midi_tensors/'
-modelpath = '/projectnb/textconv/sadiela/midi_generation/models/' #model_10_25_2.pt'
-respath = '/projectnb/textconv/sadiela/midi_generation/results/'
+datapath = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\midi_tensors_2\\'
+modelpath = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\models\\' 
+#/usr3/graduate/sadiela/midi_generation/models/' #model_10_25_2.pt'
 
 ##############################
 # MODEL/OPTIMIZER PARAMETERS #
