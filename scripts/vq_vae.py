@@ -27,6 +27,7 @@ from torch.utils.data import Dataset, DataLoader
 import random 
 import os
 from tqdm import tqdm
+from midi_utility import * 
 
 # is reconstruction error going down? 
 # Run w/ more data
@@ -43,8 +44,8 @@ num_residual_layers = 2
 l = 1024 # batch length
 decay = 0.99
 learning_rate = 1e-3
-num_embeddings = 64
-embedding_dim = 128
+#num_embeddings = 64
+#embedding_dim = 128
 commitment_cost = 0.5
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -203,7 +204,7 @@ class Decoder(nn.Module):
           return x
 
 class Model(nn.Module):
-    def __init__(self, num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=commitment_cost, decay=0):
+    def __init__(self, num_embeddings, embedding_dim, commitment_cost=commitment_cost, decay=0):
         super(Model, self).__init__()
         
         self._encoder = Encoder(1)

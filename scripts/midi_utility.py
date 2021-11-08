@@ -15,6 +15,9 @@ import json
 import numpy as np
 import pretty_midi # midi manipulation library
 from tqdm import tqdm
+from gen_utility import * 
+
+PROJECT_DIRECTORY = '..\\'
 
 #####################
 # GLOBAL PARAMETERS #
@@ -136,6 +139,23 @@ def change_tempo(filepath, newfilepath,  maxlength=720, smallest_subdivision=64,
 # FUNCTIONS FOR DATA PREPROCESSING #
 ####################################
 
+def midis_to_tensors(midi_dirpath, tensor_dirpath, subdiv=32, maxnotelength=16, normalize=False):
+    maxlength=maxnotelength*subdiv
+    file_list = os.listdir(midi_dirpath)
+    for file in tqdm(file_list):
+        cur_tensor = midi_to_tensor(midi_dirpath + file, subdiv=subdiv, maxnotelength=maxnotelength)
+        if cur_tensor is not None: 
+            if not normalize: 
+                np.save(tensor_dirpath + file.split('.')[0] + '.npy', cur_tensor)
+            else: 
+                cur_tensor_normed = cur_tensor/maxlength
+                if np.count_nonzero == 0: 
+                    print(cur_tensor.size, np.count_nonzero(cur_tensor)) #, np.count_nonzero(cur_tensor_normed))
+                else:
+                    np.save(tensor_dirpath + file.split('.')[0] + '.npy', cur_tensor_normed)
+        else:
+            "error in conversion to tensor"
+
 def midi_to_tensor(filepath, subdiv=32, maxnotelength=16): # default maxlength is 3 minutes 
     # maxnotelength given in BEATS
     # ASSUMES:
@@ -169,6 +189,14 @@ def midi_to_tensor(filepath, subdiv=32, maxnotelength=16): # default maxlength i
             print("ERROR!", e)
             return None
     return np.squeeze(tensor, axis=2)
+
+def tensors_to_midis(tensor_dir, midi_dir, bpm=120, subdiv=32): 
+    # takes a directory of tensors and converts them to midis
+    file_list = os.listdir(tensor_dir)
+    for file in tqdm(file_list):
+        cur_tensor = np.load(tensor_dir + '\\' + file)
+        tensor_to_midi(cur_tensor, midi_dir + '\\' + file.split('.')[0] + '.mid')
+        
 
 def tensor_to_midi(tensor, desired_filepath, bpm=120, subdiv=32):
     # Converts midi tensor back into midi file format
@@ -215,6 +243,18 @@ def separate_tracks(midi_directory, target_directory):
         except Exception as e:
             print("ERROR!", e)
             pass
+
+# Crop all midis in a directory 
+def crop_midis(dirname, new_dirname, cut_beginning=True, maxlength=None, remove_special=True): 
+    file_list = os.listdir(dirname)
+    for file in tqdm(file_list):
+        old_name = dirname + '\\' + file
+        if remove_special: 
+            new_name = new_dirname + '\\' + re.sub(r'[^A-Za-z0-9_. ]', r'', file) #remove_special_chars(file) # + file.split('.')[0] + '_cropped.mid'
+        else:
+            new_name = new_dirname + '\\' + file
+        #if not os.path.exists(new_name):
+        crop_midi(old_name, new_name, cut_beginning=cut_beginning, maxlength=maxlength)
 
 def crop_midi(filename, newfilename, cut_beginning=True, maxlength=None):
     # cut out empty space at beginning of midi file

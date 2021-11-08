@@ -1,6 +1,6 @@
 import re  
 import os
-import tqdm
+from tqdm import tqdm
 from pathlib import Path
 
 # General utility functions (mostly for file management)
