@@ -36,16 +36,25 @@ import sys
 from mido import MidiFile, Message, MidiFile, MidiTrack, MAX_PITCHWHEEL
 
 
-modelpath = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\models\\'
-datapath = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\midi_tensors\\'
-outpath = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\output_data\\'
+modelpath = PROJECT_DIRECTORY + 'models\\'
+datapath = PROJECT_DIRECTORY + 'midi_data\\new_data\\midi_tensors\\'
+outpath = PROJECT_DIRECTORY + 'midi_data\\output_data\\'
 
 num_hiddens = 128
 embedding_dim = 32
 commitment_cost = 0.5
 num_embeddings = 64
 
-def reconstruct_song(orig_tensor_path, new_midi_path, model_path, clip_val=0.01):
+def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0):
+    file_list = os.listdir(tensor_dir)
+    for file in tqdm(file_list):
+        cur_tensor = reconstruct_song(orig_tensor_dir + '\\' + file, model_path, clip_val=clip_val)
+        # save tensor
+        np.save(new_tensor_dir + file.split('.')[0] + '_conv.npy', cur_tensor)
+        # convert to midi and save midi 
+        tensor_to_midi(cur_tensor, new_midi_dir + '\\' + file.split('.')[0] + '.mid')
+
+def reconstruct_song(orig_tensor_path, model_path, clip_val=0):
     data = np.load(orig_tensor_path)
     
     model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=commitment_cost)
@@ -80,22 +89,23 @@ def reconstruct_song(orig_tensor_path, new_midi_path, model_path, clip_val=0.01)
     # Turn all negative values to 0 
     unchunked_recon = unchunked_recon.clip(min=clip_val) # min note length that should count
 
-    tensor_to_midi(unchunked_recon, new_midi_path)
+    #tensor_to_midi(unchunked_recon, new_midi_path)
 
+    return unchunked_recon
 
 def main():
     # Load model from memory
-    model_dir = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\models\\model_10_25_2.pt'
-    song_dir = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\midi_tensors\\'
-    outputs = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\listening_test\\'
+    model_dir = PROJECT_DIRECTORY + 'models\\model_10_25_2.pt'
+    song_dir = PROJECT_DIRECTORY + 'midi_data\\new_data\\midi_tensors\\'
+    outputs = PROJECT_DIRECTORY + 'midi_data\\new_data\\listening_test\\'
     orig_npy = song_dir + 'Gimme! Gimme! Gimme!_0.npy'
     orig_midi = outputs + "gimme_midi.mid"
     cropped_midi = outputs + 'gimme_cropped.mid'
     
-    recon = pypianoroll.read('C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\single_track_midis\\Eagle_1.mid')
+    recon = pypianoroll.read(PROJECT_DIRECTORY + 'midi_data\\single_track_midis\\Eagle_1.mid')
     recon.plot()
     plt.show()
-    play_music('C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\single_track_midis\\Eagle_1.mid')
+    play_music(PROJECT_DIRECTORY + 'midi_data\\single_track_midis\\Eagle_1.mid')
 
     # loop through midi tensors/print max value in all midi tensors ... are there nans? where? 
     file_list = os.listdir(song_dir)

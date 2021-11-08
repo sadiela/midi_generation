@@ -57,17 +57,14 @@ NORM_TENSOR_MIDI_DIR = DATA_DIR + 'normed_midi_tensors/'
 #separate_tracks(START_DIR, SEP_MIDI_DIR)
 
 # CROP EMPTY STARTS & CONVERT TO TENSORS
-'''file_list = os.listdir(SEP_MIDI_DIR)
-for file in tqdm(file_list):
-    old_name = SEP_MIDI_DIR + '\\' + file
-    new_name = SEP_MIDI_DIR_CROPPED + '\\' + file.split('.')[0] + '_cropped.mid'
-    if not os.path.exists(TENSOR_MIDI_DIR_2 + file.split('.')[0] + '_cropped.npy'):
-        crop_midi(old_name, new_name)
-        cur_tensor = midi_to_tensor(new_name)
-        if cur_tensor is not None: 
-            np.save(TENSOR_MIDI_DIR_2 + file.split('.')[0] + '_cropped.npy', cur_tensor)
-        else:
-            "error in conversion to tensor"'''
+def preprocessing(input_midi_dir, separated=False, cropped=False):
+    if not separated: 
+        separate_tracks(input_midi_dir, outdir)
+    if not cropped: 
+        crop_midis(SEP_MIDI_DIR, SEP_MIDI_DIR_CROPPED)
+    # convert to tensors
+    midis_to_tensors(midi_dirpath, tensor_dirpath, subdiv=32, maxnotelength=16, normalize=False)
+    
 
 # Normalize midi tensors
 '''maxlength = 16*32
@@ -84,32 +81,8 @@ for dir, subdir, files in os.walk(NORM_TENSOR_MIDI_DIR_2):
         os.rename(os.path.join(dir,file), os.path.join(dir, "".join(filter(lambda x:x not in bad_chars, file))))
 '''
 
-#remove_special_chars(SEP_MIDI_DIR)
-
-# CROP ALL MIDIS
-'''file_list = os.listdir(SEP_MIDI_DIR)
-for file in tqdm(file_list):
-    old_name = SEP_MIDI_DIR + '\\' + file
-    new_name = SEP_MIDI_DIR_CROPPED + '\\' +  file # + file.split('.')[0] + '_cropped.mid'
-    if not os.path.exists(new_name):
-        crop_midi(old_name, new_name)'''
-
-# CONVERT MIDIS TO TENSORS
 
 #TENSOR_MIDI_DIR
-'''maxlength = 16*32
-file_list = os.listdir(SEP_MIDI_DIR_CROPPED)
-for file in tqdm(file_list):
-    cur_tensor = midi_to_tensor(SEP_MIDI_DIR_CROPPED + file)
-    if cur_tensor is not None: 
-        np.save(TENSOR_MIDI_DIR + file.split('.')[0] + '.npy', cur_tensor)
-        cur_tensor_normed = cur_tensor/maxlength
-        if np.count_nonzero == 0: 
-            print(cur_tensor.size, np.count_nonzero(cur_tensor)) #, np.count_nonzero(cur_tensor_normed))
-        else:
-            np.save(NORM_TENSOR_MIDI_DIR + file.split('.')[0] + '.npy', cur_tensor)
-    else:
-        "error in conversion to tensor"'''
 
 # LOAD AND PLOT DATA FROM YAML FILE
 print("DONE")

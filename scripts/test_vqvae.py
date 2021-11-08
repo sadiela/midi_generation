@@ -6,8 +6,8 @@ import yaml
 #############
 # FILEPATHS #
 #############
-datapath = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\midi_tensors_2\\'
-modelpath = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\models\\' 
+datapath = PROJECT_DIRECTORY + 'midi_data\\new_data\\midi_tensors_2\\'
+modelpath = PROJECT_DIRECTORY + 'models\\' 
 #/usr3/graduate/sadiela/midi_generation/models/' #model_10_25_2.pt'
 
 ##############################
