@@ -97,7 +97,7 @@ for file in tqdm(file_list):
 # CONVERT MIDIS TO TENSORS
 
 #TENSOR_MIDI_DIR
-maxlength = 16*32
+'''maxlength = 16*32
 file_list = os.listdir(SEP_MIDI_DIR_CROPPED)
 for file in tqdm(file_list):
     cur_tensor = midi_to_tensor(SEP_MIDI_DIR_CROPPED + file)
@@ -109,7 +109,9 @@ for file in tqdm(file_list):
         else:
             np.save(NORM_TENSOR_MIDI_DIR + file.split('.')[0] + '.npy', cur_tensor)
     else:
-        "error in conversion to tensor"
+        "error in conversion to tensor"'''
+
+# LOAD AND PLOT DATA FROM YAML FILE
 print("DONE")
 
 
