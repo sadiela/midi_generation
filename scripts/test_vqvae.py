@@ -37,7 +37,7 @@ def main():
     results={"reconstruction_error": recon_error, "perplexity": perplex, "nan_reconstruction_files": nan_recon_files}
     savefile = get_free_filename('results', respath, suffix='.yaml')
     with open(savefile, 'w') as outfile:
-        yaml.dump(results, savefile, default_flow_style=False)
+        yaml.dump(results, outfile, default_flow_style=False)
 
 if __name__ == "__main__":
     print("START")
