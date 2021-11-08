@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 #import torchvision.transforms as transforms
 #from torchvision.utils import make_grid
 import pypianoroll
-
+import yaml
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -95,7 +95,7 @@ def reconstruct_song(orig_tensor_path, model_path, clip_val=0):
 
 def main():
     # Load model from memory
-    model_dir = PROJECT_DIRECTORY + 'models\\model_10_25_2.pt'
+    '''model_dir = PROJECT_DIRECTORY + 'models\\model_10_25_2.pt'
     song_dir = PROJECT_DIRECTORY + 'midi_data\\new_data\\midi_tensors\\'
     outputs = PROJECT_DIRECTORY + 'midi_data\\new_data\\listening_test\\'
     orig_npy = song_dir + 'Gimme! Gimme! Gimme!_0.npy'
@@ -113,7 +113,7 @@ def main():
         cur_tensor = np.load(song_dir + '\\' + file)
         if cur_tensor.max() > 1000: 
             print(file, cur_tensor.max()) # plot a histogram of these 
-    print("done")
+    print("done")'''
         
 
     #orig_tensor = np.load(orig_npy)
@@ -127,8 +127,17 @@ def main():
     #multitrack = pypianoroll.read(outputs + 'gimme_cropped.mid')
     #multitrack.plot()
     #recon = pypianoroll.read(outputs + 'recon_2.mid')
-    #recon.plot()
-    #plt.show()
+    # Load yaml data
+    yaml_path = '..\\results\\results-2.yaml'
+    with open(yaml_path) as file: 
+        res_dic = yaml.load(file) #, Loader=yaml.FullLoader)
+    plt.plot(res_dic['reconstruction_error'])
+    plt.title("Reconstruction Error")
+    plt.show()
+
+    plt.plot(res_dic['perplexity'])
+    plt.title("Perplexity")
+    plt.show()
 
 
 if __name__ == "__main__":
