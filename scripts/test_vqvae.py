@@ -1,4 +1,4 @@
-from music.scripts.midi_utility import PROJECT_DIRECTORY
+from midi_utility import PROJECT_DIRECTORY
 from vq_vae import *
 from gen_utility import * 
 import torch
