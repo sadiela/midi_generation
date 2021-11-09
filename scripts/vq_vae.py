@@ -27,7 +27,7 @@ from torch.utils.data import Dataset, DataLoader
 import random 
 import os
 from tqdm import tqdm
-from midi_utility import * 
+#from midi_utility import * 
 
 # is reconstruction error going down? 
 # Run w/ more data

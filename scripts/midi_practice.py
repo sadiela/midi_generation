@@ -8,6 +8,7 @@ import numpy as np
 import pretty_midi
 from tqdm import tqdm 
 import re
+from glob import glob
 
 from midi_utility import *
 
@@ -37,15 +38,15 @@ Tempo not given as bpm, given as microseconds per beat
 '''
 
 START_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\lakh\\clean_midi\\The Beatles\\'
-
+#:\Users\sadie\Documents\BU\fall_2021\research\music\midi_data\single_track_midis
 
 ########################
 # FILE/DIRECTORY PATHS #
 ########################
 #LAKH_DATA_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\lakh\\clean_midi\\'
-DATA_DIR = '/projectnb/textconv/sadiela/midi_generation/data/' #'C:\\Users\\sadie\\Documents\\fall2021\\research\\music\\midi_generation\\data\\'
+DATA_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\' # '/projectnb/textconv/sadiela/midi_generation/data/' #
 
-SEP_MIDI_DIR = DATA_DIR + 'midi_files/'
+SEP_MIDI_DIR = DATA_DIR + 'single_track_midis\\'
 SEP_MIDI_DIR_CROPPED = DATA_DIR + 'cropped_midis/'
 
 #CONV_MIDI_DIR = DATA_DIR + 'converted_midis\\'
@@ -54,6 +55,12 @@ TENSOR_MIDI_DIR = DATA_DIR + 'midi_tensors/'
 NORM_TENSOR_MIDI_DIR = DATA_DIR + 'normed_midi_tensors/'
 
 # SEPARATE TRACKS
+# Go through all directories in lakh folder
+TOP_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\lakh\\clean_midi\\'
+subdirs = [x[0] for x in os.walk(TOP_DIR)]
+for subdir in subdirs: 
+    print(subdir.split('\\')[-1])
+    separate_tracks(subdir, SEP_MIDI_DIR)
 #separate_tracks(START_DIR, SEP_MIDI_DIR)
 
 # CROP EMPTY STARTS & CONVERT TO TENSORS
