@@ -7,7 +7,7 @@ import yaml
 #############
 # FILEPATHS #
 #############
-datapath = PROJECT_DIRECTORY + 'midi_data/new_data/midi_tensors/'
+datapath = PROJECT_DIRECTORY + 'data/midi_tensors/'
 modelpath = PROJECT_DIRECTORY + 'models'
 respath = PROJECT_DIRECTORY + 'results'
 #/usr3/graduate/sadiela/midi_generation/models/' #model_10_25_2.pt'
