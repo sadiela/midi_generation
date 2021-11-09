@@ -198,7 +198,7 @@ def separate_tracks(midi_directory, target_directory):
     # takes a directory filled with midi files, creates new midi files for each individual (NOT DRUM) track
     # in the original files, so each output midi has a single track
     file_list = os.listdir(midi_directory)
-    for file in tqdm(file_list):
+    for file in file_list: #tqdm(file_list):
         try:
             open_midi = pretty_midi.PrettyMIDI(midi_directory + '\\' + file)
             for i, instrument in enumerate(open_midi.instruments): 
@@ -211,7 +211,10 @@ def separate_tracks(midi_directory, target_directory):
                         cur.notes.append(note)
                     # save cur as a new midi file
                     cur_midi.instruments.append(cur)
-                    cur_midi.write(target_directory + file.split('.')[0] + '_'+ str(i) + '.mid')
+                    if not os.path.exists(target_directory + file.split('.')[0] + '_'+ str(i) + '.mid'):
+                        cur_midi.write(target_directory + file.split('.')[0] + '_'+ str(i) + '.mid')
+                    else:
+                        print(file.split('.')[0] + '_'+ str(i) + '.mid EXISTS!')
         except Exception as e:
             print("ERROR!", e)
             pass
