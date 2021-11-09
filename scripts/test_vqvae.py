@@ -1,3 +1,4 @@
+from music.scripts.midi_utility import PROJECT_DIRECTORY
 from vq_vae import *
 from gen_utility import * 
 import torch
@@ -6,8 +7,9 @@ import yaml
 #############
 # FILEPATHS #
 #############
-datapath = PROJECT_DIRECTORY + 'midi_data\\new_data\\midi_tensors_2\\'
-modelpath = PROJECT_DIRECTORY + 'models\\'
+datapath = PROJECT_DIRECTORY + 'midi_data/new_data/midi_tensors/'
+modelpath = PROJECT_DIRECTORY + 'models/'
+respath = PROJECT_DIRECTORY + 'results/'
 #/usr3/graduate/sadiela/midi_generation/models/' #model_10_25_2.pt'
 
 ##############################

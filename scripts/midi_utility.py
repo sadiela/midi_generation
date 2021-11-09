@@ -17,7 +17,7 @@ import pretty_midi # midi manipulation library
 from tqdm import tqdm
 from gen_utility import * 
 
-PROJECT_DIRECTORY = '..\\'
+PROJECT_DIRECTORY = '../'
 
 #####################
 # GLOBAL PARAMETERS #
