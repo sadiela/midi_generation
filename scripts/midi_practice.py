@@ -47,30 +47,31 @@ START_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_d
 DATA_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\' # '/projectnb/textconv/sadiela/midi_generation/data/' #
 
 SEP_MIDI_DIR = DATA_DIR + 'single_track_midis\\'
-SEP_MIDI_DIR_CROPPED = DATA_DIR + 'cropped_midis/'
+SEP_MIDI_DIR_CROPPED = DATA_DIR + 'single_track_midis\\'
 
 #CONV_MIDI_DIR = DATA_DIR + 'converted_midis\\'
-TENSOR_MIDI_DIR = DATA_DIR + 'midi_tensors/'
+TENSOR_MIDI_DIR = DATA_DIR + 'full_dataset_midis\\'
 #TENSOR_MIDI_DIR_2 = DATA_DIR + 'midi_tensors_2\\'
-NORM_TENSOR_MIDI_DIR = DATA_DIR + 'normed_midi_tensors/'
+NORM_TENSOR_MIDI_DIR = DATA_DIR + 'full_dataset_midis_normalized\\'
 
 # SEPARATE TRACKS
 # Go through all directories in lakh folder
-TOP_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\lakh\\clean_midi\\'
+'''TOP_DIR = 'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\lakh\\clean_midi\\'
 subdirs = [x[0] for x in os.walk(TOP_DIR)]
 for subdir in subdirs: 
     print(subdir.split('\\')[-1])
-    separate_tracks(subdir, SEP_MIDI_DIR)
+    separate_tracks(subdir, SEP_MIDI_DIR)'''
 #separate_tracks(START_DIR, SEP_MIDI_DIR)
 
 # CROP EMPTY STARTS & CONVERT TO TENSORS
-def preprocessing(input_midi_dir, separated=False, cropped=False):
+def preprocessing(input_midi_dir, out_dir, midi_dir, separated=False, cropped=False):
     if not separated: 
-        separate_tracks(input_midi_dir, outdir)
+        separate_tracks(input_midi_dir, out_dir)
     if not cropped: 
-        crop_midis(SEP_MIDI_DIR, SEP_MIDI_DIR_CROPPED)
+        crop_midis(input_midi_dir, out_dir)
     # convert to tensors
-    midis_to_tensors(midi_dirpath, tensor_dirpath, subdiv=32, maxnotelength=16, normalize=False)
+    midis_to_tensors(out_dir, midi_dir, subdiv=32, maxnotelength=16, normalize=False)   
+
     
 
 # Normalize midi tensors
@@ -92,6 +93,24 @@ for dir, subdir, files in os.walk(NORM_TENSOR_MIDI_DIR_2):
 #TENSOR_MIDI_DIR
 
 # LOAD AND PLOT DATA FROM YAML FILE
+print("Cropping midi files:")
+maxlength = 16*32
+file_list = os.listdir(SEP_MIDI_DIR_CROPPED)
+for file in tqdm(file_list):
+    # convert to tensor
+    tensor = midi_to_tensor(SEP_MIDI_DIR_CROPPED + file)
+    # normalize tensor
+    try:
+        normed_tensor = tensor/maxlength
+        # save tensors
+        np.save(TENSOR_MIDI_DIR + file, tensor)
+        np.save(NORM_TENSOR_MIDI_DIR + file, tensor)
+    except Exception as e:
+        print("ERROR:", e)
+        pass
+
+# zip these and send to SCC
+print("Converting to midis")
 print("DONE")
 
 
