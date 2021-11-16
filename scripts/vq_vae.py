@@ -269,7 +269,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
           if pd.isna(recon_error.item()):
             nanfiles.append(midi_tensor_dataset.__getname__(i))
 
-          if (i+1) % 10 == 0:
+          if (i+1) % 100 == 0:
               print('%d iterations' % (i+1))
               print('recon_error: %.3f' % np.mean(train_res_recon_error[-10:]))
               print('perplexity: %.3f' % np.mean(train_res_perplexity[-10:]))
