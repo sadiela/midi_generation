@@ -251,11 +251,11 @@ def separate_tracks(midi_directory, target_directory):
 def crop_midis(dirname, new_dirname, cut_beginning=True, maxlength=None, remove_special=True): 
     file_list = os.listdir(dirname)
     for file in tqdm(file_list):
-        old_name = dirname + '\\' + file
+        old_name = dirname + file
         if remove_special: 
-            new_name = new_dirname + '\\' + re.sub(r'[^A-Za-z0-9_. ]', r'', file) #remove_special_chars(file) # + file.split('.')[0] + '_cropped.mid'
+            new_name = new_dirname + re.sub(r'[^A-Za-z0-9_. ]', r'', file) #remove_special_chars(file) # + file.split('.')[0] + '_cropped.mid'
         else:
-            new_name = new_dirname + '\\' + file
+            new_name = new_dirname + file
         #if not os.path.exists(new_name):
         crop_midi(old_name, new_name, cut_beginning=cut_beginning, maxlength=maxlength)
 

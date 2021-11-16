@@ -74,5 +74,5 @@ if __name__ == "__main__":
     modeldir = args['modeldir']
     outdir = args['outdir']
     
-    test(datadir, modeldir, outdir, mse_loss)
+    test(datadir, outdir, modeldir, mse_loss)
     print("All done!")
