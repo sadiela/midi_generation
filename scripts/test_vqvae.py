@@ -7,7 +7,7 @@ import yaml
 #############
 # FILEPATHS #
 #############
-datapath = PROJECT_DIRECTORY + 'data/midi_tensors/'
+datapath = PROJECT_DIRECTORY + 'data/normed_midi_tensors/'
 modelpath = PROJECT_DIRECTORY + 'models'
 respath = PROJECT_DIRECTORY + 'results'
 #/usr3/graduate/sadiela/midi_generation/models/' #model_10_25_2.pt'
@@ -31,6 +31,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def main():
+    print("RUNNING ON NORMALIZED TENSORS")
     # i think num embeddings was 64 before? 
     model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=0.5).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
     model_file = get_free_filename('model', modelpath, suffix='.pt')

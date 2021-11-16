@@ -8,12 +8,6 @@ from vq_vae import *
 # General:
 #from __future__ import print_function
 import matplotlib.pyplot as plt
-#from scipy.signal import savgol_filter
-#from six.moves import xrange
-#import umap
-#import torchvision.datasets as datasets
-#import torchvision.transforms as transforms
-#from torchvision.utils import make_grid
 import pypianoroll
 import yaml
 import torch
@@ -33,7 +27,7 @@ from torchvision import transforms, utils
 
 import random
 import sys
-from mido import MidiFile, Message, MidiFile, MidiTrack, MAX_PITCHWHEEL
+#from mido import MidiFile, Message, MidiFile, MidiTrack, MAX_PITCHWHEEL
 
 
 modelpath = PROJECT_DIRECTORY + 'models\\'
@@ -41,12 +35,13 @@ datapath = PROJECT_DIRECTORY + 'midi_data\\new_data\\midi_tensors\\'
 outpath = PROJECT_DIRECTORY + 'midi_data\\output_data\\'
 
 num_hiddens = 128
-embedding_dim = 32
+embedding_dim = 128
 commitment_cost = 0.5
-num_embeddings = 64
+num_embeddings = 1024
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0):
-    file_list = os.listdir(tensor_dir)
+    file_list = os.listdir(orig_tensor_dir)
     for file in tqdm(file_list):
         cur_tensor = reconstruct_song(orig_tensor_dir + '\\' + file, model_path, clip_val=clip_val)
         # save tensor
@@ -57,8 +52,8 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
 def reconstruct_song(orig_tensor_path, model_path, clip_val=0):
     data = np.load(orig_tensor_path)
     
-    model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=commitment_cost)
-    model.load_state_dict(torch.load(model_path))
+    model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=commitment_cost)
+    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
     model.eval()
 
     # Test on a song
@@ -84,7 +79,6 @@ def reconstruct_song(orig_tensor_path, model_path, clip_val=0):
         print(torch.max(data_recon[i,:,:,:]).item())
     print('Loss:', loss.item(), '\Perplexity:', perplexity.item())
 
-    #chunked_data_np_array = chunked_data[:,:,:,10].detach().numpy()
     unchunked_recon = data_recon.view(p, n_2).detach().numpy()
     # Turn all negative values to 0 
     unchunked_recon = unchunked_recon.clip(min=clip_val) # min note length that should count
@@ -93,24 +87,67 @@ def reconstruct_song(orig_tensor_path, model_path, clip_val=0):
 
     return unchunked_recon
 
+def show_result_graphs(yaml_name):
+    with open(yaml_name) as file: 
+        res_dic = yaml.load(file) #, Loader=yaml.FullLoader)
+    plt.plot(res_dic['reconstruction_error'])
+    plt.title("Reconstruction Error")
+    plt.show()
+
+    plt.plot(res_dic['perplexity'])
+    plt.title("Perplexity")
+    plt.show()
+
 def main():
     # Load model from memory
-    '''model_dir = PROJECT_DIRECTORY + 'models\\model_10_25_2.pt'
-    song_dir = PROJECT_DIRECTORY + 'midi_data\\new_data\\midi_tensors\\'
-    outputs = PROJECT_DIRECTORY + 'midi_data\\new_data\\listening_test\\'
-    orig_npy = song_dir + 'Gimme! Gimme! Gimme!_0.npy'
-    orig_midi = outputs + "gimme_midi.mid"
-    cropped_midi = outputs + 'gimme_cropped.mid'
+    model_path = PROJECT_DIRECTORY + 'models\\model-14.pt'
+    orig_tensor_dir = PROJECT_DIRECTORY + 'midi_data\\new_data\\listening_test\\originals\\'
+    new_tensor_dir = PROJECT_DIRECTORY + 'midi_data\\new_data\\listening_test\\new\\'
+    new_midi_dir =  PROJECT_DIRECTORY + 'midi_data\\new_data\\listening_test\\new_midi\\'
+    old_midi_dir = PROJECT_DIRECTORY + 'midi_data\\new_data\\listening_test\\old_midi\\'
+    #orig_npy = song_dir + 'Gimme! Gimme! Gimme!_0.npy'
+    #orig_midi = outputs + "gimme_midi.mid"
+    #cropped_midi = outputs + 'gimme_cropped.mid'
+    #reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0)
+
+    #tensors_to_midis(orig_tensor_dir, old_midi_dir)
     
-    recon = pypianoroll.read(PROJECT_DIRECTORY + 'midi_data\\single_track_midis\\Eagle_1.mid')
-    recon.plot()
-    plt.show()
-    play_music(PROJECT_DIRECTORY + 'midi_data\\single_track_midis\\Eagle_1.mid')
+    '''print("PLOT")
+    file_list = os.listdir(old_midi_dir)
+    for file in file_list:
+        recon = pypianoroll.read(old_midi_dir + file)
+        try: 
+            recon.trim(0, 64*recon.resolution)
+        except:
+            print("passed")
+        recon.plot()
+        plt.title(file)
+        plt.show()
+
+    print("RECONSTRUCTED:")
+    file_list = os.listdir(new_midi_dir)
+    for file in file_list:
+        try:
+            recon = pypianoroll.read(new_midi_dir + file)
+        except:
+            pass
+        try:
+            recon.trim(0, 64*recon.resolution)
+        except:
+            print("passed", file)
+        recon.plot()
+        plt.title(file)
+        plt.show()'''
+
+    print("S")
+    play_music(new_midi_dir + 'Andante,Andante_8_cropped.mid')
+    print("DONE")
+
 
     # loop through midi tensors/print max value in all midi tensors ... are there nans? where? 
-    file_list = os.listdir(song_dir)
+    '''file_list = os.listdir(orig_tensor_dir)
     for file in file_list:
-        cur_tensor = np.load(song_dir + '\\' + file)
+        cur_tensor = np.load(orig_tensor_dir + '\\' + file)
         if cur_tensor.max() > 1000: 
             print(file, cur_tensor.max()) # plot a histogram of these 
     print("done")'''
@@ -127,17 +164,10 @@ def main():
     #multitrack = pypianoroll.read(outputs + 'gimme_cropped.mid')
     #multitrack.plot()
     #recon = pypianoroll.read(outputs + 'recon_2.mid')
-    # Load yaml data
-    yaml_path = '..\\results\\results-2.yaml'
-    with open(yaml_path) as file: 
-        res_dic = yaml.load(file) #, Loader=yaml.FullLoader)
-    plt.plot(res_dic['reconstruction_error'])
-    plt.title("Reconstruction Error")
-    plt.show()
-
-    plt.plot(res_dic['perplexity'])
-    plt.title("Perplexity")
-    plt.show()
+    
+    # PLOT RESULTS 
+    #yaml_name = '..\\results\\results-2.yaml'
+    #show_result_graphs(yaml_name)
 
 
 if __name__ == "__main__":
