@@ -128,7 +128,9 @@ class MIDIVectorQuantizer(nn.Module):
 
      # Loss
     e_latent_loss = F.mse_loss(quantized.detach(), inputs)
+    # e_latent_loss = F.l1_loss(quantized.detach(), inputs)
     q_latent_loss = F.mse_loss(quantized, inputs.detach())
+    # q_latent_loss = F.l1_loss(quantized, inputs.detach())
     loss = q_latent_loss + self._commitment_cost * e_latent_loss
     
     quantized = inputs + (quantized - inputs).detach() # backprop through delta
@@ -222,7 +224,7 @@ class Model(nn.Module):
         return loss, x_recon, perplexity
 
 
-def train_model(datapath, model, save_path, learning_rate=learning_rate):
+def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_loss=True):
     midi_tensor_dataset = MidiDataset(datapath)
 
     # declare model and optimizer
@@ -251,7 +253,10 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate):
           optimizer.zero_grad()
 
           vq_loss, data_recon, perplexity = model(chunked_data)
-          recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
+          if mse_loss:
+            recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
+          else:
+            recon_error = F.l1_loss(data_recon, chunked_data)
           loss = recon_error + vq_loss
           loss.backward()
 
