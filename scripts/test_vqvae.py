@@ -42,6 +42,7 @@ def test(datapath, resultspath, modelpath, mse_loss):
     print("NUM NAN FILES:", len(nan_recon_files))
     results={"reconstruction_error": recon_error, "perplexity": perplex, "nan_reconstruction_files": nan_recon_files}
     savefile = get_free_filename('results', resultspath, suffix='.yaml')
+    print("SAVING FILE TO:", savefile)
     with open(savefile, 'w') as outfile:
         yaml.dump(results, outfile, default_flow_style=False)
 
@@ -67,10 +68,11 @@ if __name__ == "__main__":
 
     args = vars(parser.parse_args())
     print("ARGS:", args)
-    input("Continue...")
+    #input("Continue...")
     mse_loss = args['lossfunction'] # True or false
     datadir = args['datadir']
     modeldir = args['modeldir']
     outdir = args['outdir']
     
     test(datadir, modeldir, outdir, mse_loss)
+    print("All done!")
