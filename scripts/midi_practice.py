@@ -93,7 +93,7 @@ for dir, subdir, files in os.walk(NORM_TENSOR_MIDI_DIR_2):
 #TENSOR_MIDI_DIR
 
 # LOAD AND PLOT DATA FROM YAML FILE
-print("Cropping midi files:")
+'''print("Cropping midi files:")
 maxlength = 16*32
 file_list = os.listdir(SEP_MIDI_DIR_CROPPED)
 for file in tqdm(file_list):
@@ -107,7 +107,9 @@ for file in tqdm(file_list):
         np.save(NORM_TENSOR_MIDI_DIR + file, tensor)
     except Exception as e:
         print("ERROR:", e)
-        pass
+        pass'''
+
+
 
 # zip these and send to SCC
 print("Converting to midis")
