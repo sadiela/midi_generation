@@ -73,7 +73,12 @@ def preprocessing(input_midi_dir, out_dir, midi_dir, separated=False, cropped=Fa
     midis_to_tensors(out_dir, midi_dir, subdiv=32, maxnotelength=16, normalize=False)   
 
     
+print("CROPPING MIDIS:")
+input_midi_dir = '/projectnb/textconv/sadiela/midi_generation/data/all_midi_files/'
+output_midi_dir = '/projectnb/textconv/sadiela/midi_generation/data/all_midi_files_cropped/'
+crop_midis(input_midi_dir, output_midi_dir)
 
+print("DONE")
 # Normalize midi tensors
 '''maxlength = 16*32
 file_list = os.listdir(TENSOR_MIDI_DIR_2)
