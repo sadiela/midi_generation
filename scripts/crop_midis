@@ -1,0 +1,21 @@
+#!/bin/bash -l
+
+# Set project
+#$ -P textconv
+#$ -o cropping_midis.txt
+#$ -m ea
+#$ -j y
+#$ -V
+# Request 4 cpus
+
+#$ -pe omp 4
+
+# Request 1 gpu
+#$ -l gpus=1
+
+# Spec min gpu compute compatibility
+#$ -l gpu_c=6
+
+module load python3/3.8.6
+module load pytorch/1.8.1
+python3 midi_practice.py -l

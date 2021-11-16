@@ -2,7 +2,7 @@ import random
 import sys
 #from mido import MidiFile, Message, MidiFile, MidiTrack, MAX_PITCHWHEEL
 import os
-import pygame
+#import pygame
 import json
 import numpy as np
 import pretty_midi
