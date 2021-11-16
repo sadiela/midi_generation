@@ -10,14 +10,14 @@ import random
 import sys
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-import pygame # for playing midi
+#import pygame # for playing midi
 import json
 import numpy as np
 import pretty_midi # midi manipulation library
 from tqdm import tqdm
 from gen_utility import * 
 
-PROJECT_DIRECTORY = '..\\'
+PROJECT_DIRECTORY = '../'
 
 #####################
 # GLOBAL PARAMETERS #
@@ -32,7 +32,7 @@ bitsize = -16   # unsigned 16 bit
 channels = 2  # 1 is mono, 2 is stereo
 buffer = 1024   # number of samples
 
-def play_music(midi_filename):
+'''def play_music(midi_filename):
     pygame.mixer.init(freq, bitsize, channels, buffer)
     pygame.mixer.music.set_volume(0.8) # optional volume 0 to 1.0
     # plays an entire midi file
@@ -66,6 +66,7 @@ def play_x_seconds(midi_filename, x, savefile=False):
     play_music(temp_file)
 
     # delete temp file
+'''
 
 def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
     # GENERATE A RANDOM MIDI AND SAVE TO A FILE
