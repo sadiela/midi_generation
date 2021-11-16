@@ -92,10 +92,12 @@ def show_result_graphs(yaml_name):
         res_dic = yaml.load(file) #, Loader=yaml.FullLoader)
     plt.plot(res_dic['reconstruction_error'])
     plt.title("Reconstruction Error")
+    plt.xlabel("Iteration")
     plt.show()
 
     plt.plot(res_dic['perplexity'])
     plt.title("Perplexity")
+    plt.xlabel("Iteration")
     plt.show()
 
 def main():
@@ -139,10 +141,10 @@ def main():
         plt.title(file)
         plt.show()'''
 
-    print("S")
+    '''print("S")
     play_music(new_midi_dir + 'Andante,Andante_8_cropped.mid')
     print("DONE")
-
+    '''
 
     # loop through midi tensors/print max value in all midi tensors ... are there nans? where? 
     '''file_list = os.listdir(orig_tensor_dir)
@@ -166,8 +168,8 @@ def main():
     #recon = pypianoroll.read(outputs + 'recon_2.mid')
     
     # PLOT RESULTS 
-    #yaml_name = '..\\results\\results-2.yaml'
-    #show_result_graphs(yaml_name)
+    yaml_name = '..\\results\\norm_results.yaml'
+    show_result_graphs(yaml_name)
 
 
 if __name__ == "__main__":

@@ -18,4 +18,4 @@
 
 module load python3/3.8.6
 module load pytorch/1.8.1
-python3 test_vqvae.py
+python3 test_vqvae.py -l
