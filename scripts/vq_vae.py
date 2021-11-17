@@ -234,6 +234,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
     model.train()
     train_res_recon_error = []
     train_res_perplexity = []
+    total_loss = []
     nanfiles = []
 
     for i in tqdm(range(midi_tensor_dataset.__len__())):
@@ -263,6 +264,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
           torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
           optimizer.step()
           
+          total_loss.append(loss.item())
           train_res_recon_error.append(recon_error.item())
           train_res_perplexity.append(perplexity.item())
 
@@ -271,8 +273,9 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
 
           if (i+1) % 100 == 0:
               print('%d iterations' % (i+1))
-              print('recon_error: %.3f' % np.mean(train_res_recon_error[-10:]))
-              print('perplexity: %.3f' % np.mean(train_res_perplexity[-10:]))
+              print('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
+              print('total_loss: %3f' % np.mean(total_loss[-100:]))
+              print('perplexity: %.3f' % np.mean(train_res_perplexity[-100:]))
               print()
 
     torch.save(model.state_dict(), save_path)
