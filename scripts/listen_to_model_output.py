@@ -168,7 +168,7 @@ def main():
     #recon = pypianoroll.read(outputs + 'recon_2.mid')
     
     # PLOT RESULTS 
-    yaml_name = '..\\results\\norm_results.yaml'
+    yaml_name = '..\\results\\results-2.yaml'
     show_result_graphs(yaml_name)
 
 
