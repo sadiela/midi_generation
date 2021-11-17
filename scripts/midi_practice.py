@@ -73,12 +73,20 @@ def preprocessing(input_midi_dir, out_dir, midi_dir, separated=False, cropped=Fa
     midis_to_tensors(out_dir, midi_dir, subdiv=32, maxnotelength=16, normalize=False)   
 
     
-print("CROPPING MIDIS:")
-input_midi_dir = '/projectnb/textconv/sadiela/midi_generation/data/all_midi_files/'
-output_midi_dir = '/projectnb/textconv/sadiela/midi_generation/data/all_midi_files_cropped/'
-crop_midis(input_midi_dir, output_midi_dir)
+#print("CROPPING MIDIS:")
+#input_midi_dir = '/projectnb/textconv/sadiela/midi_generation/data/all_midi_files/'
+#output_midi_dir = '/projectnb/textconv/sadiela/midi_generation/data/all_midi_files_cropped/'
+#crop_midis(input_midi_dir, output_midi_dir)
 
+midi_dir = '/projectnb/textconv/sadiela/midi_generation/data/all_midi_files_cropped/'
+tensor_dir = '/projectnb/textconv/sadiela/midi_generation/data/all_midi_tensors/'
+normed_tensor_dir = '/projectnb/textconv/sadiela/midi_generation/data/all_midi_tensors_normed/'
+print("Converting to tensors")
+midis_to_tensors(midi_dir, tensor_dir)
+print("Normalizing tensors")
+normalize_tensors(tensor_dir, normed_tensor_dir)
 print("DONE")
+
 # Normalize midi tensors
 '''maxlength = 16*32
 file_list = os.listdir(TENSOR_MIDI_DIR_2)
@@ -114,11 +122,6 @@ for file in tqdm(file_list):
         print("ERROR:", e)
         pass'''
 
-
-
-# zip these and send to SCC
-print("Converting to midis")
-print("DONE")
 
 
 #####################
@@ -195,14 +198,6 @@ for i in range(30):
 # Save new midi file
 new_mid.save(DATA_DIR + 'new_data\\one_note.mid')
 
-# Save track as JSON
-#with open(DATA_DIR + 'new_data\\ableton.json', 'w') as outfile:
-#     json.dump(midifile_to_dict(ableton_mid), outfile, indent=2)
-
-# Save track as JSON
-#with open(DATA_DIR + 'new_data\\midi_scale.json', 'w') as outfile:
-#     json.dump(midifile_to_dict(ableton_mid), outfile, indent=2)
-
 
 #print(json.dumps(midifile_to_dict(new_mid), indent=2))
 
@@ -230,8 +225,3 @@ print("NEXT")
 #for track in mid.tracks:
 #    print(track)
 #mid.save(DATA_DIR + 'new_data\\same_midi.mid')'''
-
-
-########################
-# LISTEN TO MIDI FILES #
-########################

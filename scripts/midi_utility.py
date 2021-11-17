@@ -139,6 +139,18 @@ def change_tempo(filepath, newfilepath,  maxlength=720, smallest_subdivision=64,
 # FUNCTIONS FOR DATA PREPROCESSING #
 ####################################
 
+def normalize_tensors(orig_tensors, new_dir, subdiv=32, maxnotelength=16):
+    maxlength=maxnotelength*subdiv
+    file_list = os.listdir(orig_tensors)
+    for file in tqdm(file_list):
+        cur_tensor = np.load(orig_tensors + file)
+        cur_tensor_normed = cur_tensor/maxlength
+        if np.count_nonzero == 0: 
+            print(cur_tensor.size, np.count_nonzero(cur_tensor)) #, np.count_nonzero(cur_tensor_normed))
+        else:
+            np.save(new_dir + file.split('.')[0] + '_norm' + '.npy', cur_tensor_normed)
+
+
 def midis_to_tensors(midi_dirpath, tensor_dirpath, subdiv=32, maxnotelength=16, normalize=False):
     maxlength=maxnotelength*subdiv
     file_list = os.listdir(midi_dirpath)
