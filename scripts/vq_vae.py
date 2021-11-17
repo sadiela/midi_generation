@@ -61,6 +61,7 @@ class MidiDataset(Dataset):
             npy_file_dir (string): Path to the npy file directory
         """
         self.midi_tensors = []
+        self.shuffled = None
         file_list = os.listdir(npy_file_dir)
         for file in tqdm(file_list): 
           #print(npy_file_dir + file)
@@ -79,6 +80,28 @@ class MidiDataset(Dataset):
 
     def __len__(self):
         return len(self.midi_tensors)
+
+    def shuffle_data(self, l):
+      # Let # of tensors = n
+      # each tensor is pxl_i, where l_i is the length of the nth tensor
+      # when we chunk the data, it becomes (l_i//l = s_i) x 1 x p x l 
+      # so we want a big (sum(s_i)) x 1 x p x l tensor. 
+      # Then we want to shuffle along axis=0 so two adjacent pxl guys aren't 
+      # necessarily from the same song
+      cur_tensor = self.__getitem__(0)
+      cur_data = torch.tensor(cur_tensor)
+      cur_data = cur_data[:,:(cur_data.shape[1]-(cur_data.shape[1]%l))]
+      cur_data = cur_data.float()
+      full_chunked = torch.reshape(cur_data, (n//l, 1, p, l)) 
+      for i in tqdm(range(self.__len__())):
+        cur_tensor = self.__getitem__(i) # get the data
+        cur_data = torch.tensor(cur_tensor)
+        cur_data = cur_data[:,:(cur_data.shape[1]-(cur_data.shape[1]%l))]
+        cur_data = cur_data.float()
+        cur_chunked = torch.reshape(cur_data, (n//l, 1, p, l))
+        full_chunked = torch.cat((full_chunked, cur_chunked), dim=0)
+      idx = torch.randperm(full_chunked.shape[0])
+      self.shuffled = full_chunked[idx].view(full_chunked.size())
 
 # MODEL CLASS DEFINITIONS #
 # input: p x t, t variable! p=128
