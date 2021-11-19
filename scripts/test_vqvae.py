@@ -9,7 +9,7 @@ import time
 #############
 # FILEPATHS #
 #############
-datpath = PROJECT_DIRECTORY + 'data/normed_midi_tensors/'
+datpath = PROJECT_DIRECTORY + 'data/all_midi_tensors/'
 modpath = PROJECT_DIRECTORY + 'models'
 respath = PROJECT_DIRECTORY + 'results'
 #/usr3/graduate/sadiela/midi_generation/models/' #model_10_25_2.pt'
@@ -36,12 +36,12 @@ def test(datapath, resultspath, modelpath, mse_loss):
     print("RUNNING ON NORMALIZED TENSORS")
     # i think num embeddings was 64 before? 
     model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=0.5).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
-    model_file = get_free_filename('model', modelpath, suffix='.pt')
+    model_file = get_free_filename('model_all', modelpath, suffix='.pt')
     recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, mse_loss=mse_loss)
     # save losses to file
     print("NUM NAN FILES:", len(nan_recon_files))
     results={"reconstruction_error": recon_error, "perplexity": perplex, "nan_reconstruction_files": nan_recon_files}
-    savefile = get_free_filename('results', resultspath, suffix='.yaml')
+    savefile = get_free_filename('results_all', resultspath, suffix='.yaml')
     print("SAVING FILE TO:", savefile)
     with open(savefile, 'w') as outfile:
         yaml.dump(results, outfile, default_flow_style=False)
