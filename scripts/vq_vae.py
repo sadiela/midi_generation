@@ -272,6 +272,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
     for i, data in tqdm(enumerate(training_data)):
         #name = midi_tensor_dataset.__getname__(i)
         # s x p x 1 x l
+        data = data.to(device)
 
         print('TRAIN:')
         vq_loss, data_recon, perplexity = model(data)
