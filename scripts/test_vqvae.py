@@ -9,9 +9,9 @@ import time
 #############
 # FILEPATHS #
 #############
-datpath = '..\\midi_data\\full_dataset_midis_normalized\\' #PROJECT_DIRECTORY + 'data/all_midi_tensors/'
-modpath = "."#PROJECT_DIRECTORY + 'models'
-respath = "." #PROJECT_DIRECTORY + 'results'
+datpath = PROJECT_DIRECTORY + 'data/all_midi_tensors/' # '..\\midi_data\\full_dataset_midis_normalized\\'
+modpath = PROJECT_DIRECTORY + 'models'
+respath = PROJECT_DIRECTORY + 'results'
 #/usr3/graduate/sadiela/midi_generation/models/' #model_10_25_2.pt'
 
 ##############################
