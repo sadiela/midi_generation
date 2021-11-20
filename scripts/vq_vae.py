@@ -18,6 +18,7 @@ This file contains the initial VQ-VAE model clas
 #from torchvision import transforms, utils
 
 import numpy as np
+from numpy.core.numeric import full
 import pandas as pd
 import torch
 import torch.nn as nn
@@ -42,6 +43,7 @@ num_hiddens = 128
 num_residual_hiddens = 16
 num_residual_layers = 2
 l = 1024 # batch length
+p=128
 decay = 0.99
 learning_rate = 1e-3
 #num_embeddings = 64
@@ -55,53 +57,40 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class MidiDataset(Dataset):
     """Midi dataset."""
 
-    def __init__(self, npy_file_dir):
+    def __init__(self, npy_file_dir, l=1024):
         """
         Args:
             npy_file_dir (string): Path to the npy file directory
         """
-        self.midi_tensors = []
-        self.shuffled = None
         file_list = os.listdir(npy_file_dir)
-        for file in tqdm(file_list): 
-          #print(npy_file_dir + file)
-          cur_tensor = np.load(npy_file_dir + file) #, allow_pickle=True)
-          self.midi_tensors.append((file,cur_tensor)) # each one is a tuple now
-
-        random.shuffle(self.midi_tensors)
-        #self.root_dir = root_dir
-        #self.transform = transform
+        self.l = l
+        self.paths = [ npy_file_dir + file for file in file_list]
+        
+        #self.batch_file_paths = set()
 
     def __getitem__(self, index):
-        return self.midi_tensors[index][1]
+        # choose random file path from directory (not already chosen), chunk it 
+        cur_tensor = np.load(self.paths[index]) #, allow_pickle=True)
+        p, l_i = cur_tensor.shape
+        cur_data = torch.tensor(cur_tensor)
+        # make sure divisible by l 
+        if cur_data.shape[1] < self.l: 
+          print(self.paths[index], "too short")
+          padded = torch.zeros((p, self.l))
+          padded[:,0:l_i] = cur_data
+          l_i=l
+        else: 
+          padded = cur_data[:,:(cur_data.shape[1]-(cur_data.shape[1]%self.l))]
+        padded = padded.float()
+        cur_chunked = torch.reshape(padded, (l_i//self.l, 1, p, self.l)) 
+        return cur_chunked
 
     def __getname__(self, index):
-        return self.midi_tensors[index][0]
+        return self.paths[index]
 
     def __len__(self):
-        return len(self.midi_tensors)
+        return len(self.paths)
 
-    def shuffle_data(self, l):
-      # Let # of tensors = n
-      # each tensor is pxl_i, where l_i is the length of the nth tensor
-      # when we chunk the data, it becomes (l_i//l = s_i) x 1 x p x l 
-      # so we want a big (sum(s_i)) x 1 x p x l tensor. 
-      # Then we want to shuffle along axis=0 so two adjacent pxl guys aren't 
-      # necessarily from the same song
-      cur_tensor = self.__getitem__(0)
-      cur_data = torch.tensor(cur_tensor)
-      cur_data = cur_data[:,:(cur_data.shape[1]-(cur_data.shape[1]%l))]
-      cur_data = cur_data.float()
-      full_chunked = torch.reshape(cur_data, (n//l, 1, p, l)) 
-      for i in tqdm(range(self.__len__())):
-        cur_tensor = self.__getitem__(i) # get the data
-        cur_data = torch.tensor(cur_tensor)
-        cur_data = cur_data[:,:(cur_data.shape[1]-(cur_data.shape[1]%l))]
-        cur_data = cur_data.float()
-        cur_chunked = torch.reshape(cur_data, (n//l, 1, p, l))
-        full_chunked = torch.cat((full_chunked, cur_chunked), dim=0)
-      idx = torch.randperm(full_chunked.shape[0])
-      self.shuffled = full_chunked[idx].view(full_chunked.size())
 
 # MODEL CLASS DEFINITIONS #
 # input: p x t, t variable! p=128
@@ -246,8 +235,17 @@ class Model(nn.Module):
 
         return loss, x_recon, perplexity
 
+def collate_fn(data, collate_shuffle=True):
+  # data is a list of tensors
+  # concatenate and shuffle all list items
+  full_list = torch.cat(data, 0)
+  if collate_shuffle:
+    idx = torch.randperm(full_list.shape[0])
+    return  full_list[idx].view(full_list.size())
+  else:
+    return full_list
 
-def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_loss=True):
+def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_loss=True, bs=50):
     midi_tensor_dataset = MidiDataset(datapath)
 
     # declare model and optimizer
@@ -260,46 +258,46 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
     total_loss = []
     nanfiles = []
 
-    for i in tqdm(range(midi_tensor_dataset.__len__())):
+    training_data = DataLoader(midi_tensor_dataset, collate_fn=collate_fn, batch_size=bs, shuffle=True)
+
+      # Let # of tensors = n
+      # each tensor is pxl_i, where l_i is the length of the nth tensor
+      # when we chunk the data, it becomes (l_i//l = s_i) x 1 x p x l 
+      # so we want a big (sum(s_i)) x 1 x p x l tensor. 
+      # Then we want to shuffle along axis=0 so two adjacent pxl guys aren't 
+      # necessarily from the same song
+
+    print("Device:" , device)
+
+    for i, data in tqdm(enumerate(training_data)):
         #name = midi_tensor_dataset.__getname__(i)
-        data = midi_tensor_dataset.__getitem__(i)
-        p, n = data.shape
-        data = torch.tensor(data)
+        # s x p x 1 x l
 
-        if data.shape[1] < l: 
-          print("Too short")
-        else: 
-          data = data[:,:(data.shape[1]-(data.shape[1]%l))]
-          data = data.float()
+        print('TRAIN:')
+        vq_loss, data_recon, perplexity = model(data)
+        if mse_loss:
+          recon_error = F.mse_loss(data_recon, data) #/ data_variance
+        else:
+          recon_error = F.l1_loss(data_recon, data)
+        loss = recon_error + vq_loss
+        loss.backward()
+        print("backpropagated")
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
+        optimizer.step()
+        
+        total_loss.append(loss.item())
+        train_res_recon_error.append(recon_error.item())
+        train_res_perplexity.append(perplexity.item())
 
-          chunked_data = torch.reshape(data, (n//l, 1, p, l))
-          chunked_data = chunked_data.to(device)
-          optimizer.zero_grad()
+        if pd.isna(recon_error.item()):
+          nanfiles.append(midi_tensor_dataset.__getname__(i))
 
-          vq_loss, data_recon, perplexity = model(chunked_data)
-          if mse_loss:
-            recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
-          else:
-            recon_error = F.l1_loss(data_recon, chunked_data)
-          loss = recon_error + vq_loss
-          loss.backward()
-
-          torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
-          optimizer.step()
-          
-          total_loss.append(loss.item())
-          train_res_recon_error.append(recon_error.item())
-          train_res_perplexity.append(perplexity.item())
-
-          if pd.isna(recon_error.item()):
-            nanfiles.append(midi_tensor_dataset.__getname__(i))
-
-          if (i+1) % 100 == 0:
-              print('%d iterations' % (i+1))
-              print('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
-              print('total_loss: %3f' % np.mean(total_loss[-100:]))
-              print('perplexity: %.3f' % np.mean(train_res_perplexity[-100:]))
-              print()
+        if (i+1) % 100 == 0:
+            print('%d iterations' % (i+1))
+            print('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
+            print('total_loss: %3f' % np.mean(total_loss[-100:]))
+            print('perplexity: %.3f' % np.mean(train_res_perplexity[-100:]))
+            print()
 
     torch.save(model.state_dict(), save_path)
     return train_res_recon_error, train_res_perplexity, nanfiles

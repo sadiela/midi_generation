@@ -9,9 +9,9 @@ import time
 #############
 # FILEPATHS #
 #############
-datpath = PROJECT_DIRECTORY + 'data/all_midi_tensors/'
-modpath = PROJECT_DIRECTORY + 'models'
-respath = PROJECT_DIRECTORY + 'results'
+datpath = '..\\midi_data\\full_dataset_midis_normalized\\' #PROJECT_DIRECTORY + 'data/all_midi_tensors/'
+modpath = "."#PROJECT_DIRECTORY + 'models'
+respath = "." #PROJECT_DIRECTORY + 'results'
 #/usr3/graduate/sadiela/midi_generation/models/' #model_10_25_2.pt'
 
 ##############################
@@ -31,9 +31,7 @@ commitment_cost = 0.5
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
 def test(datapath, resultspath, modelpath, mse_loss):
-    print("RUNNING ON NORMALIZED TENSORS")
     # i think num embeddings was 64 before? 
     model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=0.5).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
     model_file = get_free_filename('model_all', modelpath, suffix='.pt')
