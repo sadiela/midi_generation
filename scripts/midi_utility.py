@@ -9,9 +9,9 @@ explore and manipulate midi data
 import random
 import sys
 import os
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame # for playing midi
-import json
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+#import json
 import numpy as np
 import pretty_midi # midi manipulation library
 from tqdm import tqdm
