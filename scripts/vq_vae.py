@@ -245,7 +245,7 @@ def collate_fn(data, collate_shuffle=True):
   else:
     return full_list
 
-def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_loss=True, bs=50):
+def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_loss=True, bs=10):
     midi_tensor_dataset = MidiDataset(datapath)
 
     # declare model and optimizer
