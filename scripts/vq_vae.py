@@ -75,7 +75,7 @@ class MidiDataset(Dataset):
         cur_data = torch.tensor(cur_tensor)
         # make sure divisible by l 
         if cur_data.shape[1] < self.l: 
-          print(self.paths[index], "too short")
+          #print(self.paths[index], "too short")
           padded = torch.zeros((p, self.l))
           padded[:,0:l_i] = cur_data
           l_i=l
@@ -245,7 +245,7 @@ def collate_fn(data, collate_shuffle=True):
   else:
     return full_list
 
-def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_loss=True, bs=50):
+def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_loss=True, bs=10):
     midi_tensor_dataset = MidiDataset(datapath)
 
     # declare model and optimizer
@@ -269,12 +269,12 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
 
     print("Device:" , device)
 
-    for i, data in tqdm(enumerate(training_data)):
+    for i, data in enumerate(training_data):
         #name = midi_tensor_dataset.__getname__(i)
         # s x p x 1 x l
         data = data.to(device)
 
-        print('TRAIN:')
+        #print('TRAIN:')
         vq_loss, data_recon, perplexity = model(data)
         if mse_loss:
           recon_error = F.mse_loss(data_recon, data) #/ data_variance
@@ -282,7 +282,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
           recon_error = F.l1_loss(data_recon, data)
         loss = recon_error + vq_loss
         loss.backward()
-        print("backpropagated")
+        #print("backpropagated")
         torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
         optimizer.step()
         
