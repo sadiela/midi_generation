@@ -95,7 +95,7 @@ class MidiDataset(Dataset):
       full_chunked = torch.reshape(cur_data, (n//l, 1, p, l)) 
       for i in tqdm(range(self.__len__())):
         cur_tensor = self.__getitem__(i) # get the data
-        cur_data = torch.tensor(cur_tensor)
+        cur_data = torch.tensor(cur_tensor)`  `
         cur_data = cur_data[:,:(cur_data.shape[1]-(cur_data.shape[1]%l))]
         cur_data = cur_data.float()
         cur_chunked = torch.reshape(cur_data, (n//l, 1, p, l))
