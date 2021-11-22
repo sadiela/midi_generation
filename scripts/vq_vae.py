@@ -75,7 +75,7 @@ class MidiDataset(Dataset):
         cur_data = torch.tensor(cur_tensor)
         # make sure divisible by l 
         if cur_data.shape[1] < self.l: 
-          print(self.paths[index], "too short")
+          #print(self.paths[index], "too short")
           padded = torch.zeros((p, self.l))
           padded[:,0:l_i] = cur_data
           l_i=l
@@ -274,7 +274,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
         # s x p x 1 x l
         data = data.to(device)
 
-        print('TRAIN:')
+        #print('TRAIN:')
         vq_loss, data_recon, perplexity = model(data)
         if mse_loss:
           recon_error = F.mse_loss(data_recon, data) #/ data_variance
@@ -282,7 +282,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
           recon_error = F.l1_loss(data_recon, data)
         loss = recon_error + vq_loss
         loss.backward()
-        print("backpropagated")
+        #print("backpropagated")
         torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
         optimizer.step()
         
