@@ -5,13 +5,15 @@ import torch
 import yaml
 import argparse
 import time
+from pathlib import Path
 
 #############
 # FILEPATHS #
 #############
-datpath = PROJECT_DIRECTORY + 'data/all_midi_tensors/' # '..\\midi_data\\full_dataset_midis_normalized\\'
-modpath = PROJECT_DIRECTORY + 'models'
-respath = PROJECT_DIRECTORY + 'results'
+#data_folder = Path("source_data/text_files/")
+datpath = PROJECT_DIRECTORY / 'data' / 'all_midi_tensors'  # '..\\midi_data\\full_dataset_midis_normalized\\'
+modpath = PROJECT_DIRECTORY / 'models'
+respath = PROJECT_DIRECTORY / 'results'
 #/usr3/graduate/sadiela/midi_generation/models/' #model_10_25_2.pt'
 
 ##############################
