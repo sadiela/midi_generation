@@ -48,8 +48,7 @@ decay = 0.99
 learning_rate = 1e-3
 #num_embeddings = 64
 #embedding_dim = 128
-commitment_cost = 0.5
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#commitment_cost = 0.5
 
 #####################
 # CUSTOM DATALOADER #
@@ -64,7 +63,7 @@ class MidiDataset(Dataset):
         """
         file_list = os.listdir(npy_file_dir)
         self.l = l
-        self.paths = [ npy_file_dir + file for file in file_list]
+        self.paths = [ npy_file_dir / file for file in file_list]
         
         #self.batch_file_paths = set()
 
@@ -218,7 +217,7 @@ class Decoder(nn.Module):
           return x
 
 class Model(nn.Module):
-    def __init__(self, num_embeddings, embedding_dim, commitment_cost=commitment_cost, decay=0):
+    def __init__(self, num_embeddings, embedding_dim, commitment_cost, decay=0):
         super(Model, self).__init__()
         
         self._encoder = Encoder(1)
@@ -246,6 +245,8 @@ def collate_fn(data, collate_shuffle=True):
     return full_list
 
 def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_loss=True, bs=10):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     midi_tensor_dataset = MidiDataset(datapath)
 
     # declare model and optimizer
@@ -270,9 +271,11 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
     print("Device:" , device)
 
     for i, data in enumerate(training_data):
+        print("TRAINING")
         #name = midi_tensor_dataset.__getname__(i)
         # s x p x 1 x l
         data = data.to(device)
+        print('TENSOR SIZE:', data.shape)
 
         #print('TRAIN:')
         vq_loss, data_recon, perplexity = model(data)
