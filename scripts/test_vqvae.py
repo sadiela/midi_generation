@@ -22,11 +22,11 @@ respath = PROJECT_DIRECTORY / 'results'
 ##############################
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def test(datapath, resultspath, modelpath, fstub, mse_loss, batchsize):
+def test(datapath, resultspath, modelpath, fstub, mse_loss, batchsize=10, normalize=False):
     # i think num embeddings was 64 before? 
     model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=0.5).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
     model_file = get_free_filename('model_' + fstub, modelpath, suffix='.pt')
-    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, mse_loss=mse_loss, bs=batchsize)
+    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, mse_loss=mse_loss, bs=batchsize, normalize=normalize)
     # save losses to file
     print("NUM NAN FILES:", len(nan_recon_files))
     results={"reconstruction_error": recon_error, "perplexity": perplex, "nan_reconstruction_files": nan_recon_files}
@@ -43,7 +43,9 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--datadir', help='Path to training tensor data.', default=datpath)
     parser.add_argument('-m', '--modeldir', help='Path to desired model directory', default=modpath)
     parser.add_argument('-o', '--outdir', help='Path to desired model directory', default=respath)
-    parser.add_argument('-n', '--resname', help='Result and model stub', default="")
+    parser.add_argument('-r', '--resname', help='Result and model stub', default="")
+    parser.add_argument('-n', '--normalize', dest='norm', action='store_const', const=True, 
+                        default=False, help='whether or not to normalize the tensors')
     parser.add_argument('-b', '--batchsize', help='Number of songs in a batch', default=10)
     # run a single label experiment by default, if --multi flag is added, run a multilabel experiment!
     parser.add_argument('-l','--lossfunc', dest='lossfunction', action='store_const', const=False,
@@ -66,6 +68,7 @@ if __name__ == "__main__":
     fstub = args['resname']
     outdir = args['outdir']
     batchsize = int(args['batchsize'])
+    normalize = args['norm']
     
-    test(datadir, outdir, modeldir, fstub, mse_loss, batchsize)
+    test(datadir, outdir, modeldir, fstub, mse_loss, batchsize, normalize)
     print("All done! TOTAL TIME:", str(time.time()-prog_start))
