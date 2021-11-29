@@ -78,3 +78,4 @@ if __name__ == "__main__":
     
     test(datadir, outdir, modeldir, fstub, mse_loss)
     print("All done!")
+    ### NEED TO TEST PATHLIB !!!
