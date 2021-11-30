@@ -28,6 +28,7 @@ from torch.utils.data import Dataset, DataLoader
 import random 
 import os
 from tqdm import tqdm
+import pickle
 #from midi_utility import * 
 
 # is reconstruction error going down? 
@@ -48,8 +49,7 @@ decay = 0.99
 learning_rate = 1e-3
 #num_embeddings = 64
 #embedding_dim = 128
-commitment_cost = 0.5
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#commitment_cost = 0.5
 
 #####################
 # CUSTOM DATALOADER #
@@ -57,22 +57,31 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class MidiDataset(Dataset):
     """Midi dataset."""
 
-    def __init__(self, npy_file_dir, l=1024):
+    def __init__(self, npy_file_dir, l=1024, sparse=False, norm=False):
         """
         Args:
             npy_file_dir (string): Path to the npy file directory
         """
         file_list = os.listdir(npy_file_dir)
         self.l = l
-        self.paths = [ npy_file_dir + file for file in file_list]
+        self.norm = norm 
+        self.maxlength = 16*32
+        self.sparse = sparse
+        self.paths = [ npy_file_dir / file for file in file_list]
         
         #self.batch_file_paths = set()
 
     def __getitem__(self, index):
         # choose random file path from directory (not already chosen), chunk it 
-        cur_tensor = np.load(self.paths[index]) #, allow_pickle=True)
+        if self.sparse:
+          pickled_tensor = pickle.load(self.paths[index])
+          cur_tensor = pickled_tensor.toarray()
+        else:
+          cur_tensor = np.load(self.paths[index]) #, allow_pickle=True)
         p, l_i = cur_tensor.shape
         cur_data = torch.tensor(cur_tensor)
+        if self.norm:
+          cur_data = cur_data / self.maxlength 
         # make sure divisible by l 
         if cur_data.shape[1] < self.l: 
           #print(self.paths[index], "too short")
@@ -218,7 +227,7 @@ class Decoder(nn.Module):
           return x
 
 class Model(nn.Module):
-    def __init__(self, num_embeddings, embedding_dim, commitment_cost=commitment_cost, decay=0):
+    def __init__(self, num_embeddings, embedding_dim, commitment_cost, decay=0):
         super(Model, self).__init__()
         
         self._encoder = Encoder(1)
@@ -245,8 +254,10 @@ def collate_fn(data, collate_shuffle=True):
   else:
     return full_list
 
-def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_loss=True, bs=10):
-    midi_tensor_dataset = MidiDataset(datapath)
+def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_loss=True, bs=10, normalize=False):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    midi_tensor_dataset = MidiDataset(datapath, norm=normalize)
 
     # declare model and optimizer
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, amsgrad=False)
@@ -268,11 +279,16 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
       # necessarily from the same song
 
     print("Device:" , device)
+    max_tensor_size= 0 
 
     for i, data in enumerate(training_data):
         #name = midi_tensor_dataset.__getname__(i)
         # s x p x 1 x l
         data = data.to(device)
+        cursize = torch.numel(data)
+        if cursize > max_tensor_size:
+          max_tensor_size = cursize
+          print("NEW MAX BATCH SIZE:", max_tensor_size)
 
         #print('TRAIN:')
         vq_loss, data_recon, perplexity = model(data)
