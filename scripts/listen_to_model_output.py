@@ -16,7 +16,6 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import torch.optim as optim
 
-
 import os
 from tqdm import tqdm
 #import pandas as pd
@@ -27,12 +26,13 @@ from torchvision import transforms, utils
 
 import random
 import sys
+from pathlib import Path
 #from mido import MidiFile, Message, MidiFile, MidiTrack, MAX_PITCHWHEEL
 
 
-modelpath = PROJECT_DIRECTORY + 'models\\'
-datapath = PROJECT_DIRECTORY + 'midi_data\\new_data\\midi_tensors\\'
-outpath = PROJECT_DIRECTORY + 'midi_data\\output_data\\'
+modelpath = PROJECT_DIRECTORY / 'models'
+datapath = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'midi_tensors'
+outpath = PROJECT_DIRECTORY / 'midi_data' / 'output_data'
 
 num_hiddens = 128
 embedding_dim = 128
@@ -168,7 +168,7 @@ def main():
     #recon = pypianoroll.read(outputs + 'recon_2.mid')
     
     # PLOT RESULTS 
-    yaml_name = '..\\results\\results-2.yaml'
+    yaml_name = Path('../results/results_all-0.yaml')
     show_result_graphs(yaml_name)
 
 

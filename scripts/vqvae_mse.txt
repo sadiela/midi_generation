@@ -1,0 +1,426 @@
+START
+ARGS: {'datadir': PosixPath('../data/all_midi_tensors'), 'modeldir': PosixPath('../models'), 'outdir': PosixPath('../results'), 'resname': 'mse', 'norm': False, 'batchsize': 10, 'lossfunction': True, 'loglevel': 'WARNING'}
+file exists
+file exists
+no file
+Device: cuda
+NEW MAX BATCH SIZE: 15073280
+NEW MAX BATCH SIZE: 20316160
+NEW MAX BATCH SIZE: 22282240
+100 iterations
+recon_error: 0.795
+total_loss: 0.817072
+perplexity: 3.295
+
+200 iterations
+recon_error: 0.752
+total_loss: 0.951527
+perplexity: 4.571
+
+300 iterations
+recon_error: 0.744
+total_loss: 18.141723
+perplexity: 5.114
+
+NEW MAX BATCH SIZE: 26345472
+400 iterations
+recon_error: 0.674
+total_loss: 46.410385
+perplexity: 4.887
+
+500 iterations
+recon_error: 0.744
+total_loss: 76.038545
+perplexity: 4.790
+
+600 iterations
+recon_error: 0.672
+total_loss: 77.140495
+perplexity: 4.534
+
+NEW MAX BATCH SIZE: 35258368
+700 iterations
+recon_error: 0.753
+total_loss: 105.072091
+perplexity: 4.343
+
+800 iterations
+recon_error: 0.746
+total_loss: 113.876427
+perplexity: 4.512
+
+900 iterations
+recon_error: 0.721
+total_loss: 124.755924
+perplexity: 4.163
+
+1000 iterations
+recon_error: 0.627
+total_loss: 112.263416
+perplexity: 3.720
+
+1100 iterations
+recon_error: 0.666
+total_loss: 140.890641
+perplexity: 2.759
+
+1200 iterations
+recon_error: 0.657
+total_loss: 135.513958
+perplexity: 2.610
+
+1300 iterations
+recon_error: 0.654
+total_loss: 129.075127
+perplexity: 2.554
+
+1400 iterations
+recon_error: 0.599
+total_loss: 114.426386
+perplexity: 2.492
+
+1500 iterations
+recon_error: 0.633
+total_loss: 111.597423
+perplexity: 2.487
+
+1600 iterations
+recon_error: 0.679
+total_loss: 123.515949
+perplexity: 2.448
+
+1700 iterations
+recon_error: 0.724
+total_loss: 148.762995
+perplexity: 2.257
+
+1800 iterations
+recon_error: 0.667
+total_loss: 130.017271
+perplexity: 2.271
+
+1900 iterations
+recon_error: 0.656
+total_loss: 134.040458
+perplexity: 2.251
+
+2000 iterations
+recon_error: 0.675
+total_loss: 148.715725
+perplexity: 2.157
+
+2100 iterations
+recon_error: 0.662
+total_loss: 150.763593
+perplexity: 2.165
+
+2200 iterations
+recon_error: 0.637
+total_loss: 154.040237
+perplexity: 2.081
+
+2300 iterations
+recon_error: 0.658
+total_loss: 150.681711
+perplexity: 2.239
+
+2400 iterations
+recon_error: 0.789
+total_loss: 204.501189
+perplexity: 2.048
+
+2500 iterations
+recon_error: 0.645
+total_loss: 166.203525
+perplexity: 2.022
+
+2600 iterations
+recon_error: 0.627
+total_loss: 167.604596
+perplexity: 1.955
+
+2700 iterations
+recon_error: 0.610
+total_loss: 153.505576
+perplexity: 1.957
+
+2800 iterations
+recon_error: 0.688
+total_loss: 177.570747
+perplexity: 1.951
+
+2900 iterations
+recon_error: 0.709
+total_loss: 206.600831
+perplexity: 1.909
+
+3000 iterations
+recon_error: 0.740
+total_loss: 213.077037
+perplexity: 1.880
+
+3100 iterations
+recon_error: 0.740
+total_loss: 129.390306
+perplexity: 2.382
+
+3200 iterations
+recon_error: 0.734
+total_loss: 150.883586
+perplexity: 2.522
+
+3300 iterations
+recon_error: 0.670
+total_loss: 141.781418
+perplexity: 2.392
+
+3400 iterations
+recon_error: 0.684
+total_loss: 163.397815
+perplexity: 1.958
+
+3500 iterations
+recon_error: 0.645
+total_loss: 175.269449
+perplexity: 1.826
+
+3600 iterations
+recon_error: 0.669
+total_loss: 179.462377
+perplexity: 1.808
+
+3700 iterations
+recon_error: 0.724
+total_loss: 194.772227
+perplexity: 1.774
+
+3800 iterations
+recon_error: 0.774
+total_loss: 187.905908
+perplexity: 1.755
+
+3900 iterations
+recon_error: 0.664
+total_loss: 88.238381
+perplexity: 2.552
+
+4000 iterations
+recon_error: 0.737
+total_loss: 141.410508
+perplexity: 2.830
+
+4100 iterations
+recon_error: 0.663
+total_loss: 106.060202
+perplexity: 2.284
+
+4200 iterations
+recon_error: 0.647
+total_loss: 92.483397
+perplexity: 2.623
+
+4300 iterations
+recon_error: 0.622
+total_loss: 108.885809
+perplexity: 2.579
+
+4400 iterations
+recon_error: 0.656
+total_loss: 109.068361
+perplexity: 2.197
+
+4500 iterations
+recon_error: 0.695
+total_loss: 94.877063
+perplexity: 2.266
+
+4600 iterations
+recon_error: 0.697
+total_loss: 107.390623
+perplexity: 2.234
+
+4700 iterations
+recon_error: 0.586
+total_loss: 78.508454
+perplexity: 2.066
+
+4800 iterations
+recon_error: 0.666
+total_loss: 95.850060
+perplexity: 2.013
+
+4900 iterations
+recon_error: 0.714
+total_loss: 104.069423
+perplexity: 2.205
+
+5000 iterations
+recon_error: 0.615
+total_loss: 87.008542
+perplexity: 1.933
+
+5100 iterations
+recon_error: 0.671
+total_loss: 95.360512
+perplexity: 1.969
+
+5200 iterations
+recon_error: 0.705
+total_loss: 102.118148
+perplexity: 1.919
+
+5300 iterations
+recon_error: 0.616
+total_loss: 84.737311
+perplexity: 1.877
+
+5400 iterations
+recon_error: 0.682
+total_loss: 103.880675
+perplexity: 1.942
+
+5500 iterations
+recon_error: 0.655
+total_loss: 88.098597
+perplexity: 1.869
+
+5600 iterations
+recon_error: 0.676
+total_loss: 102.770712
+perplexity: 1.668
+
+5700 iterations
+recon_error: 0.576
+total_loss: 83.287694
+perplexity: 1.603
+
+NEW MAX BATCH SIZE: 38141952
+5800 iterations
+recon_error: 0.623
+total_loss: 95.256711
+perplexity: 1.595
+
+5900 iterations
+recon_error: 0.638
+total_loss: 102.919555
+perplexity: 1.592
+
+6000 iterations
+recon_error: 0.702
+total_loss: 114.328799
+perplexity: 1.580
+
+6100 iterations
+recon_error: 0.731
+total_loss: 137.330953
+perplexity: 1.576
+
+6200 iterations
+recon_error: 0.615
+total_loss: 97.541066
+perplexity: 1.510
+
+6300 iterations
+recon_error: 0.671
+total_loss: 119.312782
+perplexity: 1.561
+
+6400 iterations
+recon_error: 0.626
+total_loss: 105.127732
+perplexity: 1.522
+
+6500 iterations
+recon_error: 0.656
+total_loss: 120.351957
+perplexity: 1.559
+
+6600 iterations
+recon_error: 0.661
+total_loss: 118.939196
+perplexity: 1.546
+
+6700 iterations
+recon_error: 0.636
+total_loss: 114.211438
+perplexity: 1.528
+
+6800 iterations
+recon_error: 0.663
+total_loss: 134.930545
+perplexity: 1.534
+
+6900 iterations
+recon_error: 0.694
+total_loss: 142.559099
+perplexity: 1.548
+
+7000 iterations
+recon_error: 0.657
+total_loss: 138.619032
+perplexity: 1.530
+
+7100 iterations
+recon_error: 0.690
+total_loss: 158.595068
+perplexity: 1.528
+
+7200 iterations
+recon_error: 0.611
+total_loss: 120.640428
+perplexity: 1.515
+
+7300 iterations
+recon_error: 0.650
+total_loss: 129.667199
+perplexity: 1.517
+
+7400 iterations
+recon_error: 0.639
+total_loss: 143.023441
+perplexity: 1.513
+
+7500 iterations
+recon_error: 0.636
+total_loss: 133.631525
+perplexity: 1.556
+
+7600 iterations
+recon_error: 0.666
+total_loss: 143.075078
+perplexity: 1.510
+
+7700 iterations
+recon_error: 0.671
+total_loss: 146.243322
+perplexity: 1.567
+
+7800 iterations
+recon_error: 0.653
+total_loss: 152.486348
+perplexity: 1.558
+
+7900 iterations
+recon_error: 0.643
+total_loss: 137.863273
+perplexity: 1.589
+
+8000 iterations
+recon_error: 0.628
+total_loss: 142.787577
+perplexity: 1.581
+
+8100 iterations
+recon_error: 0.674
+total_loss: 161.535188
+perplexity: 1.597
+
+8200 iterations
+recon_error: 0.594
+total_loss: 133.991206
+perplexity: 1.597
+
+NUM NAN FILES: 0
+no file
+SAVING FILE TO: ../results/results_mse-2021-11-280.yaml
+All done! TOTAL TIME: 15642.74112534523

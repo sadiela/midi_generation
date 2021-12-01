@@ -2,10 +2,11 @@
 
 # Set project
 #$ -P textconv
-#$ -o vqvaerun.txt
+#$ -o vqvae_mse.txt
 #$ -m ea
 #$ -j y
 #$ -V
+#$ -l h_rt=24:00:00
 # Request 4 cpus
 
 #$ -pe omp 4
@@ -16,6 +17,8 @@
 # Spec min gpu compute compatibility
 #$ -l gpu_c=6
 
-module load python3/3.8.6
-module load pytorch/1.8.1
-python3 test_vqvae.py
+
+module load miniconda
+conda activate py3
+
+python3 test_vqvae.py -r 'mse'

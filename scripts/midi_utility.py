@@ -9,15 +9,16 @@ explore and manipulate midi data
 import random
 import sys
 import os
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 #import pygame # for playing midi
-import json
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import numpy as np
 import pretty_midi # midi manipulation library
 from tqdm import tqdm
 from gen_utility import * 
+from pathlib import Path
 
-PROJECT_DIRECTORY = '../'
+PROJECT_DIRECTORY = Path('..')
+#data_folder = Path("source_data/text_files/")
 
 #####################
 # GLOBAL PARAMETERS #
@@ -51,20 +52,19 @@ buffer = 1024   # number of samples
         pygame.mixer.music.stop()
         raise SystemExit
 
-# COMPLETE IMPLEMENTATION!!!! #
-def play_x_seconds(midi_filename, x, savefile=False):
+def play_x_seconds(midi_filename, x=10, savefile=False):
     # play the first x seconds of a midi
     # starts at the time where the first notes starts
-    temp_file = ""
+    temp_filename = "TEMP_MIDI.MID"
     # create temporary file and "crop"
+    crop_midi(midi_filename, temp_filename, cut_beginning=True, maxlength=x)
+    play_music(temp_filename)
+    #load midi 
     if savefile: 
         print("need to save")
     else: 
         print("delete file when done")
-
-    # play temp file
-    play_music(temp_file)
-
+        os.remove(temp_filename)
     # delete temp file
 '''
 

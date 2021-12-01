@@ -1,14 +1,17 @@
 import re  
 import os
 from tqdm import tqdm
+from datetime import datetime
 from pathlib import Path
+
+#datetime.today().strftime('%Y-%m-%d')
 
 # General utility functions (mostly for file management)
 def get_free_filename(stub, directory, suffix=''):
     counter = 0
     while True:
-        file_candidate = '{}/{}-{}{}'.format(
-            str(directory), stub, counter, suffix)
+        file_candidate = '{}/{}-{}{}{}'.format(
+            str(directory), stub, datetime.today().strftime('%Y-%m-%d'), counter, suffix)
         if Path(file_candidate).exists():
             print("file exists")
             counter += 1
