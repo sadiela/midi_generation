@@ -2,7 +2,7 @@
 
 # Set project
 #$ -P textconv
-#$ -o vqvaerunall.txt
+#$ -o vqvae_mse_norm.txt
 #$ -m ea
 #$ -j y
 #$ -V
