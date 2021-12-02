@@ -260,7 +260,7 @@ def collate_fn(data, collate_shuffle=True):
   else:
     return full_list
 
-def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_loss=True, bs=10, normalize=False):
+def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_loss=True, bs=10, normalize=False, quantize=True):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     midi_tensor_dataset = MidiDataset(datapath, norm=normalize)
@@ -309,8 +309,12 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
         optimizer.step()
         
         total_loss.append(loss.item())
-        train_res_recon_error.append(recon_error.item())
-        train_res_perplexity.append(perplexity.item())
+        if quantize:
+          train_res_recon_error.append(recon_error.item())
+          train_res_perplexity.append(perplexity.item())
+        else:
+          total_loss.append(loss)
+          train_res_perplexity.append(perplexity)
 
         if pd.isna(recon_error.item()):
           nanfiles.append(midi_tensor_dataset.__getname__(i))
