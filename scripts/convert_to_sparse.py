@@ -5,7 +5,7 @@ import os
 from scipy import sparse 
 import pickle
 from tqdm import tqdm
-
+ 
 tensor_dir = Path('../data/all_midi_tensors') # all_midi_tensors_normed
 sparse_dir = Path('../data/all_midi_tensors_sparse')
 

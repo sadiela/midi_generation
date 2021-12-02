@@ -22,9 +22,9 @@ respath = PROJECT_DIRECTORY / 'results'
 ##############################
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def test(datapath, resultspath, modelpath, fstub, mse_loss, batchsize=10, normalize=False):
+def test(datapath, resultspath, modelpath, fstub, mse_loss, batchsize=10, normalize=False, quantize=True):
     # i think num embeddings was 64 before? 
-    model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=0.5).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
+    model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
     model_file = get_free_filename('model_' + fstub, modelpath, suffix='.pt')
     recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, mse_loss=mse_loss, bs=batchsize, normalize=normalize)
     # save losses to file
@@ -50,6 +50,8 @@ if __name__ == "__main__":
     # run a single label experiment by default, if --multi flag is added, run a multilabel experiment!
     parser.add_argument('-l','--lossfunc', dest='lossfunction', action='store_const', const=False,
                         default=True, help="True=mse, false=l1")
+    parser.add_argument('-q', '--quantize', dest='quant', action='store_const', const=False,
+                        default=True, help="True=VQVAE, false=VAE")
     #parser.add_argument('-n', '--nfolds', help='number of folds to use in cross validation', default=1) # make default 1?
     #parser.add_argument('-f', '--fullres', help='generate full result file.', dest='result',
     #                    action='store_const', const='full', default='summary')
@@ -69,6 +71,7 @@ if __name__ == "__main__":
     outdir = args['outdir']
     batchsize = int(args['batchsize'])
     normalize = args['norm']
+    quantize = args['quant']
     
-    test(datadir, outdir, modeldir, fstub, mse_loss, batchsize, normalize)
+    test(datadir, outdir, modeldir, fstub, mse_loss, batchsize, normalize, quantize)
     print("All done! TOTAL TIME:", str(time.time()-prog_start))

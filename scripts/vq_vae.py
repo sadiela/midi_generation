@@ -227,7 +227,7 @@ class Decoder(nn.Module):
           return x
 
 class Model(nn.Module):
-    def __init__(self, num_embeddings, embedding_dim, commitment_cost, decay=0):
+    def __init__(self, num_embeddings, embedding_dim, commitment_cost, quantize=True, decay=0):
         super(Model, self).__init__()
         
         self._encoder = Encoder(1)
@@ -237,12 +237,18 @@ class Model(nn.Module):
 
         self._decoder = Decoder(embedding_dim)
 
+        self.quantize = quantize
+
     def forward(self, x):
         z = self._encoder(x)
-        loss, quantized, perplexity, _ = self._vq_vae(z)
-        x_recon = self._decoder(quantized)
+        if self.quantize: 
+          loss, quantized, perplexity, _ = self._vq_vae(z)
+          x_recon = self._decoder(quantized)
 
-        return loss, x_recon, perplexity
+          return loss, x_recon, perplexity
+        else:
+          x_recon = self._decoder(z)
+          return 0, x_recon, 0
 
 def collate_fn(data, collate_shuffle=True):
   # data is a list of tensors
@@ -309,7 +315,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
         if pd.isna(recon_error.item()):
           nanfiles.append(midi_tensor_dataset.__getname__(i))
 
-        if (i+1) % 100 == 0:
+        if (i+1) % 200 == 0:
             print('%d iterations' % (i+1))
             print('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
             print('total_loss: %3f' % np.mean(total_loss[-100:]))
