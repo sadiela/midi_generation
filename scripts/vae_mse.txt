@@ -1,0 +1,26 @@
+START
+ARGS: {'datadir': PosixPath('../data/all_midi_tensors'), 'modeldir': PosixPath('../models'), 'outdir': PosixPath('../results'), 'resname': 'vaemse-', 'norm': False, 'batchsize': 10, 'lossfunction': True, 'quant': False, 'loglevel': 'WARNING'}
+no file
+Device: cuda
+NEW MAX BATCH SIZE: 10747904
+Traceback (most recent call last):
+  File "test_vqvae.py", line 76, in <module>
+    test(datadir, outdir, modeldir, fstub, mse_loss, batchsize, normalize, quantize)
+  File "test_vqvae.py", line 29, in test
+    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, mse_loss=mse_loss, bs=batchsize, normalize=normalize)
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/vq_vae.py", line 313, in train_model
+    train_res_perplexity.append(perplexity.item())
+AttributeError: 'int' object has no attribute 'item'
+START
+ARGS: {'datadir': PosixPath('../data/all_midi_tensors'), 'modeldir': PosixPath('../models'), 'outdir': PosixPath('../results'), 'resname': 'vaemse-', 'norm': False, 'batchsize': 10, 'lossfunction': True, 'quant': False, 'loglevel': 'WARNING'}
+no file
+Device: cuda
+NEW MAX BATCH SIZE: 9830400
+Traceback (most recent call last):
+  File "test_vqvae.py", line 76, in <module>
+    test(datadir, outdir, modeldir, fstub, mse_loss, batchsize, normalize, quantize)
+  File "test_vqvae.py", line 29, in test
+    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, mse_loss=mse_loss, bs=batchsize, normalize=normalize)
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/vq_vae.py", line 314, in train_model
+    train_res_perplexity.append(perplexity.item())
+AttributeError: 'int' object has no attribute 'item'
