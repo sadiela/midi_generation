@@ -260,10 +260,10 @@ def collate_fn(data, collate_shuffle=True):
   else:
     return full_list
 
-def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_loss=True, bs=10, normalize=False, quantize=True):
+def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_loss=True, bs=10, normalize=False, quantize=True, sparse=False):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    midi_tensor_dataset = MidiDataset(datapath, norm=normalize)
+    midi_tensor_dataset = MidiDataset(datapath, norm=normalize, sparse=sparse)
 
     # declare model and optimizer
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, amsgrad=False)
@@ -322,8 +322,8 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
         if (i+1) % 200 == 0:
             print('%d iterations' % (i+1))
             print('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
-            print('total_loss: %3f' % np.mean(total_loss[-100:]))
-            print('perplexity: %.3f' % np.mean(train_res_perplexity[-100:]))
+            #print('total_loss: %3f' % np.mean(total_loss[-100:]))
+            #print('perplexity: %.3f' % np.mean(train_res_perplexity[-100:]))
             print()
 
     torch.save(model.state_dict(), save_path)

@@ -22,11 +22,11 @@ respath = PROJECT_DIRECTORY / 'results'
 ##############################
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def test(datapath, resultspath, modelpath, fstub, mse_loss, batchsize=10, normalize=False, quantize=True):
+def test(datapath, resultspath, modelpath, fstub, mse_loss, batchsize=10, normalize=False, quantize=True, sparse=False):
     # i think num embeddings was 64 before? 
     model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
     model_file = get_free_filename('model_' + fstub, modelpath, suffix='.pt')
-    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, mse_loss=mse_loss, bs=batchsize, normalize=normalize, quantize=quantize)
+    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, mse_loss=mse_loss, bs=batchsize, normalize=normalize, quantize=quantize, sparse=sparse)
     # save losses to file
     print("NUM NAN FILES:", len(nan_recon_files))
     results={"reconstruction_error": recon_error, "perplexity": perplex, "nan_reconstruction_files": nan_recon_files}
@@ -60,6 +60,8 @@ if __name__ == "__main__":
     # IMPLEMENT THIS!
     #parser.add_argument('-l' '--labels', dest='print_labels', action='store_const', const=True, default=False,
     #                    help='Print missed labels')
+    parser.add_argument('-s', '--sparse', dest='sparse', action='store_const', const=True, 
+                        default=False, help='whether or not to tensors are sparse')
 
     args = vars(parser.parse_args())
     print("ARGS:", args)
@@ -69,9 +71,10 @@ if __name__ == "__main__":
     modeldir = args['modeldir']
     fstub = args['resname']
     outdir = args['outdir']
+    sparse = args['sparse']
     batchsize = int(args['batchsize'])
     normalize = args['norm']
     quantize = args['quant']
     
-    test(datadir, outdir, modeldir, fstub, mse_loss, batchsize, normalize, quantize)
+    test(datadir, outdir, modeldir, fstub, mse_loss, batchsize, normalize, quantize, sparse)
     print("All done! TOTAL TIME:", str(time.time()-prog_start))
