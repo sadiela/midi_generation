@@ -5,8 +5,8 @@ Results from last semester indicate that L2 loss is not suitable for the midi VA
 
 We propose a dynamic programming algorithm, similar to the Wagner-Fischer algorithm for computing the edit distance between strings. We must account for the following operations: 
 
-1. **Deletion:** deleting one or multiple notes
-2. **Insertion:** inserting one or multiple notes
+1. **Deletion:** deleting one or multiple notes at a given time step
+2. **Insertion:** inserting one or multiple notes at a given time step 
 3. **Substitution:** substituting one or more notes for one or more other notes
 4. **Pitch shift:** shifting all notes up or down by a certain number of pitches
 
@@ -24,3 +24,7 @@ Eventually, we also need to find some kind of differentiable approximation to ou
 **Open Questions**:
 1. How can we make our algorithm differentiable? 
 2. How can we make sure note position is prioritized over note length? 
+4. How does this problem reduce to finding the highest-scoring path between the start and end node on a DAG? 
+
+
+### Entry 1/11/2022
