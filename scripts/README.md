@@ -24,7 +24,15 @@ Eventually, we also need to find some kind of differentiable approximation to ou
 **Open Questions**:
 1. How can we make our algorithm differentiable? 
 2. How can we make sure note position is prioritized over note length? 
-4. How does this problem reduce to finding the highest-scoring path between the start and end node on a DAG? 
+3. How does this problem reduce to finding the highest-scoring path between the start and end node on a DAG? 
+4. How can we test our "loss function"?
 
 
 ### Entry 1/11/2022
+
+- Shift somewhat expensive, but cheaper than shifting individual notes or adding/subtracting
+- Work with synthetic MIDI tensors for testing 
+- New evaluation function? Use DP loss as evaluation if confident
+- Code for simpler DP problem for understanding
+
+### Entry 1/14/2022
