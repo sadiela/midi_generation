@@ -37,9 +37,50 @@ def diffable_knapsack():
     return 0
 
 
-def diffable_recursion(j,theta): 
-    if j==1: # j is the first node 
+def grad_dp(theta, v, gamma):
+    q = np.zeros(theta.shape)
+    print(q.shape)
+    for i in range(theta.shape[0]):
+        l_i = theta[:,i] + v
+        q[:,i] = np.exp(l_i/gamma)/np.sum(np.exp(l_i/gamma))
+
+    E = np.zeros(theta.shape)
+
+def diffable_recursion(j,theta, gamma=1):
+    N = theta.shape[0] 
+    e_bar = np.zeros(N)
+    e_bar[N-1]=1
+    v = np.zeros(N)
+    q = np.zeros((N,N))
+    E = np.zeros((N,N))
+    for i in range(2, N):
+        parent_indices = np.where(theta[:,j]>np.NINF)[0]
+        u = u =np.asarray([theta[idx,j] + v[idx] for idx in parent_indices])
+        v[i] = gamma * np.log10(np.sum(np.exp(u/gamma)))
+        for idx in parent_indices:
+            q[i,parent_indices] = np.exp(u/gamma)/np.sum(np.exp(u/gamma))
+    for j in range(N-1,1):
+        children_indices = np.where(theta[j,:]>np.NINF)[0]
+        for i in children_indices:
+            E[i,j] = q[i,j]*e_bar[i]
+            e_bar[j] += E[i,j]
+
+    return v[N], E
+
+def diffable_recursion(j,theta, gamma=1): 
+    if j==0: # j is the first node 
         return 0
+
+    else: 
+        # get list of parents of j --> parents of j are all non-infinite
+        parent_indices = np.where(theta[:,j]>np.NINF)[0]
+        #print("PARENTS:", parent_indices)
+        # all edges that exist of the form (i,j)
+        u =np.asarray([theta[idx,j] + recursive_formula(idx,theta) for idx in parent_indices])
+        #print("U vector:", u)
+        answer = gamma * np.log10(np.sum(np.exp(u/gamma)))
+        #print(j, answer)
+        return answer
 
 def recursive_formula(j, theta): 
     # we assume we have the edge representation of the graph theta (i,j) (parent,child)
@@ -52,12 +93,11 @@ def recursive_formula(j, theta):
     #    nodes in our graph (31 for us I think?)
     else: 
         # get list of parents of j --> parents of j are all non-infinite
-        theta[:,j] # jth column, indices of non-infinite edges will represent parents (the nodes we can come from)
         parent_indices = np.where(theta[:,j]>np.NINF)[0]
-        print("PARENTS:", parent_indices)
+        #print("PARENTS:", parent_indices)
         # all edges that exist of the form (i,j)
         answer = max([theta[idx,j] + recursive_formula(idx,theta) for idx in parent_indices]) 
-        print(j, answer)
+        #print(j, answer)
         return answer
 
 
@@ -107,6 +147,11 @@ theta = np.array([
   
 
 print(recursive_formula(16,theta))
+gammas = [ 0.1, 0.5, 1, 10, 15, 25]
+for g in gammas:
+    print("GAMMA =", g)
+    print(diffable_recursion(16, theta, gamma=g))
+
 
 # Driver program to test above function
 '''val = [6, 10, 12, 8]
