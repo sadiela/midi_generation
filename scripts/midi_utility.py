@@ -233,7 +233,7 @@ def tensor_to_midi(tensor, desired_filepath, bpm=120, subdiv=32):
     new_mid.instruments.append(piano)
 
     # save to .mid file 
-    new_mid.write(desired_filepath)
+    new_mid.write(str(desired_filepath))
 
 def separate_tracks(midi_directory, target_directory):
     # takes a directory filled with midi files, creates new midi files for each individual (NOT DRUM) track

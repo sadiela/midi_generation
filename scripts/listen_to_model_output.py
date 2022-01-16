@@ -33,24 +33,50 @@ from pathlib import Path
 modelpath = PROJECT_DIRECTORY / 'models'
 datapath = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'midi_tensors'
 outpath = PROJECT_DIRECTORY / 'midi_data' / 'output_data'
+respath = PROJECT_DIRECTORY / 'results'
 
 num_hiddens = 128
 embedding_dim = 128
 commitment_cost = 0.5
 num_embeddings = 1024
+maxlength = 16*32
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0):
+def save_graphs(midi_path, save_path):
+    print('saving pianoroll images/')
+    file_list = os.listdir(midi_path)
+    for file in tqdm(file_list):
+        try:
+            recon = pypianoroll.read(midi_path / file)
+        except:
+            pass
+        try:
+            recon.trim(0, 64*recon.resolution)
+        except:
+            print("passed", file)
+        recon.plot()
+        plt.title(file)
+        # FIX!
+        plt.savefig(str(save_path) + '\\' + str(file.split('.')[0] + '.png'))
+
+def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False):
+    res_string = "RECON ERRORS!\n"
     file_list = os.listdir(orig_tensor_dir)
     for file in tqdm(file_list):
-        cur_tensor = reconstruct_song(orig_tensor_dir + '\\' + file, model_path, clip_val=clip_val)
+        cur_tensor, loss, recon_err, zero_recon = reconstruct_song(orig_tensor_dir / file, model_path, clip_val=clip_val, norm=norm)
+        res_string += str(file) + ' recon error: ' + str(recon_err.item()) + ' loss: ' + str(loss.item()) + ' zero recon:' + str(zero_recon.item()) + '\n'
         # save tensor
-        np.save(new_tensor_dir + file.split('.')[0] + '_conv.npy', cur_tensor)
+        #np.save(new_tensor_dir / str(file.split('.')[0] + '_conv.npy'), cur_tensor)
         # convert to midi and save midi 
-        tensor_to_midi(cur_tensor, new_midi_dir + '\\' + file.split('.')[0] + '.mid')
+        #tensor_to_midi(cur_tensor, new_midi_dir / str(file.split('.')[0] + '.mid'))
+        input("continue...")
+    with open(new_midi_dir / 'recon_info.txt', 'w') as outfile:
+        outfile.write(res_string)
 
-def reconstruct_song(orig_tensor_path, model_path, clip_val=0):
+def reconstruct_song(orig_tensor_path, model_path, clip_val=0, norm=False):
     data = np.load(orig_tensor_path)
+    if norm:
+        data = data / maxlength
     
     model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=commitment_cost)
     model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
@@ -69,12 +95,15 @@ def reconstruct_song(orig_tensor_path, model_path, clip_val=0):
 
     chunked_data = data.view((n//l, 1, p, l))
     print("chunked data shape", chunked_data.shape)
+    print(data)
     
     vq_loss, data_recon, perplexity = model(chunked_data)
     recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
+    zero_recon = F.mse_loss(torch.zeros(n//l, 1, p, l), chunked_data)
     loss = recon_error + vq_loss
 
     print("recon data shape:", data_recon.shape)
+    print(data_recon)
     for i in range(data_recon.shape[0]):
         print(torch.max(data_recon[i,:,:,:]).item())
     print('Loss:', loss.item(), '\Perplexity:', perplexity.item())
@@ -83,9 +112,11 @@ def reconstruct_song(orig_tensor_path, model_path, clip_val=0):
     # Turn all negative values to 0 
     unchunked_recon = unchunked_recon.clip(min=clip_val) # min note length that should count
 
+    if norm: # unnormalize!
+        unchunked_recon = unchunked_recon * maxlength
     #tensor_to_midi(unchunked_recon, new_midi_path)
 
-    return unchunked_recon
+    return unchunked_recon, loss, recon_error, zero_recon
 
 def show_result_graphs(yaml_name):
     with open(yaml_name) as file: 
@@ -102,15 +133,66 @@ def show_result_graphs(yaml_name):
 
 def main():
     # Load model from memory
-    model_path = PROJECT_DIRECTORY + 'models\\model-14.pt'
-    orig_tensor_dir = PROJECT_DIRECTORY + 'midi_data\\new_data\\listening_test\\originals\\'
-    new_tensor_dir = PROJECT_DIRECTORY + 'midi_data\\new_data\\listening_test\\new\\'
-    new_midi_dir =  PROJECT_DIRECTORY + 'midi_data\\new_data\\listening_test\\new_midi\\'
-    old_midi_dir = PROJECT_DIRECTORY + 'midi_data\\new_data\\listening_test\\old_midi\\'
+    ### MODELS ###
+    mse_model_path = PROJECT_DIRECTORY / 'models' / 'model_mse-2021-11-282.pt'
+    mae_model_path = PROJECT_DIRECTORY / 'models' / 'model_mae-2021-11-280.pt'
+    msenorm_model_path = PROJECT_DIRECTORY / 'models' / 'model_msenorm-2021-11-280.pt'
+    maenorm_model_path = PROJECT_DIRECTORY / 'models' / 'model_maenorm-2021-11-280.pt'
+
+    ### TENSORS ###
+    orig_tensor = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'originals'
+    mse_tensor = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'mse_tensor'
+    mae_tensor = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'mae_tensor'
+    msenorm_tensor = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'msenorm_tensor'
+    maenorm_tensor = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'maenorm_tensor'
+
+    ### MIDIS ###
+    old_midi = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'old_midi'
+    mse_midi = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'mse_midi'
+    mae_midi = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'mae_midi'
+    msenorm_midi = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'msenorm_midi'
+    maenorm_midi = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'maenorm_midi'
+
+    ### PIANOROLLS ###
+    orig_pianorolls = PROJECT_DIRECTORY / 'results' / 'original_midi_pianorolls'
+    mse_res = PROJECT_DIRECTORY / 'results' / 'mse_midi_pianorolls'
+    mae_res = PROJECT_DIRECTORY / 'results' / 'mae_midi_pianorolls'
+    msenorm_res = PROJECT_DIRECTORY / 'results' / 'msenorm_midi_pianorolls'
+    maenorm_res = PROJECT_DIRECTORY / 'results' / 'maenorm_midi_pianorolls'
+
+    # Save original pianoroll images
+    print("Saving og pianorolls")
+    #save_graphs(old_midi, orig_pianorolls)
+
+    # Reconstruct songs in accordance to each model
+    print("Reconstructing")
+    reconstruct_songs(orig_tensor, mse_tensor, mse_midi, mse_model_path, clip_val=0)
+    print("Reconstructing")
+    reconstruct_songs(orig_tensor, mae_tensor, mae_midi, mae_model_path, clip_val=0)
+    print("Reconstructing")
+    reconstruct_songs(orig_tensor, msenorm_tensor, msenorm_midi, msenorm_model_path, clip_val=0, norm=True)
+    print("Reconstructing")
+    reconstruct_songs(orig_tensor, maenorm_tensor, maenorm_midi, maenorm_model_path, clip_val=0, norm=True)
+
+    # save midis for each reconstruction
+    print("Saving new pianorolls")
+    #save_graphs(mse_midi, mse_res)
+    #save_graphs(mae_midi, mae_res)
+    #save_graphs(msenorm_midi, msenorm_res)
+    #save_graphs(maenorm_midi, maenorm_res)
+
+    print("DONE!")
+
+    '''results={"reconstruction_error": recon_error, "perplexity": perplex, "nan_reconstruction_files": nan_recon_files}
+    savefile = get_free_filename('results_' + fstub, resultspath, suffix='.yaml')
+    print("SAVING FILE TO:", savefile)
+    with open(savefile, 'w') as outfile:
+        yaml.dump(results, outfile, default_flow_style=False)'''
+
+
     #orig_npy = song_dir + 'Gimme! Gimme! Gimme!_0.npy'
     #orig_midi = outputs + "gimme_midi.mid"
     #cropped_midi = outputs + 'gimme_cropped.mid'
-    #reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0)
 
     #tensors_to_midis(orig_tensor_dir, old_midi_dir)
     
@@ -122,21 +204,6 @@ def main():
             recon.trim(0, 64*recon.resolution)
         except:
             print("passed")
-        recon.plot()
-        plt.title(file)
-        plt.show()
-
-    print("RECONSTRUCTED:")
-    file_list = os.listdir(new_midi_dir)
-    for file in file_list:
-        try:
-            recon = pypianoroll.read(new_midi_dir + file)
-        except:
-            pass
-        try:
-            recon.trim(0, 64*recon.resolution)
-        except:
-            print("passed", file)
         recon.plot()
         plt.title(file)
         plt.show()'''
@@ -168,8 +235,16 @@ def main():
     #recon = pypianoroll.read(outputs + 'recon_2.mid')
     
     # PLOT RESULTS 
-    yaml_name = Path('../results/results_all-0.yaml')
-    show_result_graphs(yaml_name)
+    #yaml_name1 = Path('../results/results_mae-2021-11-280.yaml')
+    #yaml_name2 = Path('../results/results_mse-2021-11-280.yaml')
+    #yaml_name3 = Path('../results/results_maenorm-2021-11-280.yaml')
+    #yaml_name4 = Path('../results/results_msenorm-2021-11-290.yaml')
+
+    #show_result_graphs(yaml_name1)
+    #show_result_graphs(yaml_name2)
+    #show_result_graphs(yaml_name3)
+    #show_result_graphs(yaml_name4)
+
 
 
 if __name__ == "__main__":
