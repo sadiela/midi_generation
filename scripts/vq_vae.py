@@ -100,7 +100,6 @@ class MidiDataset(Dataset):
     def __len__(self):
         return len(self.paths)
 
-
 # MODEL CLASS DEFINITIONS #
 # input: p x t, t variable! p=128
 class MIDIVectorQuantizer(nn.Module):
@@ -227,7 +226,7 @@ class Decoder(nn.Module):
           return x
 
 class Model(nn.Module):
-    def __init__(self, num_embeddings, embedding_dim, commitment_cost, decay=0):
+    def __init__(self, num_embeddings, embedding_dim, commitment_cost, decay=0, noquantize=False):
         super(Model, self).__init__()
         
         self._encoder = Encoder(1)
@@ -237,7 +236,14 @@ class Model(nn.Module):
 
         self._decoder = Decoder(embedding_dim)
 
+        self.noquantize=noquantize
+
     def forward(self, x):
+      if self.noquantize:
+        z = self._encoder(x)
+        x_recon = self._decoder(z)
+        return 0, x_recon, 0
+      else: 
         z = self._encoder(x)
         loss, quantized, perplexity, _ = self._vq_vae(z)
         x_recon = self._decoder(quantized)
@@ -296,7 +302,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
           recon_error = F.mse_loss(data_recon, data) #/ data_variance
         else:
           recon_error = F.l1_loss(data_recon, data)
-        loss = recon_error + vq_loss
+        loss = recon_error + vq_loss # will be 0 if no quantization
         loss.backward()
         #print("backpropagated")
         torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
