@@ -21,4 +21,5 @@
 module load miniconda
 conda activate py3
 
-python3 test_vqvae.py -l -n -r 'maenorm' 
+python3 ../test_vqvae.py -l -n -r 'maenorm' 
+

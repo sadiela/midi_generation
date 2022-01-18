@@ -1,6 +1,6 @@
 ''' 
 This file contains general functions that can be used to 
-explore and manipulate midi data
+explore and manipulate midi data as well as preprocessing functions
 '''
 
 ###########
@@ -16,6 +16,7 @@ import pretty_midi # midi manipulation library
 from tqdm import tqdm
 from gen_utility import * 
 from pathlib import Path
+from scipy import sparse
 
 PROJECT_DIRECTORY = Path('..')
 #data_folder = Path("source_data/text_files/")
@@ -101,6 +102,8 @@ def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
     # save to .mid file 
     new_mid.write(filepath)
 
+
+#### DON'T THINK THIS IS BEING USED ANYMORE...###
 def change_tempo(filepath, newfilepath,  maxlength=720, smallest_subdivision=64, target_tempo=120, previous_tempo=None): # default maxlength is 3 minutes 
     # changes tempo of midi file
     
@@ -294,3 +297,17 @@ def crop_midi(filename, newfilename, cut_beginning=True, maxlength=None):
     except Exception as e: 
         print("Error", e)
         pass
+
+
+def convert_to_sparse(tensor_dir, sparse_dir, del_tensor_dir=False):
+    file_list = os.listdir(tensor_dir)
+    for f in tqdm(file_list): 
+        cur_arr = np.load(tensor_dir / f)
+        sparse_arr = scipy.sparse.csr_matrix(cur_arr)
+        with open(sparse_dir / f, 'wb') as outfile:
+                pickle.dump(sparse_arr, outfile)
+    # Delete tensor_dir to save space
+    if del_tensor_dir: 
+        for f in os.listdir(tensor_dir):
+            os.remove(os.path.join(tensor_dir, f))
+    print("DONE!")

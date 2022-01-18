@@ -1,3 +1,10 @@
+''' file for analyzing trained model results
+- Reconstruct midis using model: reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False)
+- Save midi reconstructions: save_graphs(midi_path, save_path)
+- Plot loss/perplexity for a model: show_result_graphs(yaml_name)
+- Listen to midi reconstructions: play_music(midi_filename)
+'''
+
 ###########
 # Imports #
 ###########
@@ -60,14 +67,18 @@ def save_graphs(midi_path, save_path):
         plt.savefig(str(save_path) + '\\' + str(file.split('.')[0] + '.png'))
 
 def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False):
+    res_string = "RECON ERRORS!\n"
     file_list = os.listdir(orig_tensor_dir)
     for file in tqdm(file_list):
         cur_tensor, loss, recon_err, zero_recon = reconstruct_song(orig_tensor_dir / file, model_path, clip_val=clip_val, norm=norm)
-        print(str(file), 'recon error:', recon_err.item(), 'loss:', loss.item(), 'zero recon:', zero_recon.item())
+        res_string += str(file) + ' recon error: ' + str(recon_err.item()) + ' loss: ' + str(loss.item()) + ' zero recon:' + str(zero_recon.item()) + '\n'
         # save tensor
-        np.save(new_tensor_dir / str(file.split('.')[0] + '_conv.npy'), cur_tensor)
+        #np.save(new_tensor_dir / str(file.split('.')[0] + '_conv.npy'), cur_tensor)
         # convert to midi and save midi 
-        tensor_to_midi(cur_tensor, new_midi_dir / str(file.split('.')[0] + '.mid'))
+        #tensor_to_midi(cur_tensor, new_midi_dir / str(file.split('.')[0] + '.mid'))
+        input("continue...")
+    with open(new_midi_dir / 'recon_info.txt', 'w') as outfile:
+        outfile.write(res_string)
 
 def reconstruct_song(orig_tensor_path, model_path, clip_val=0, norm=False):
     data = np.load(orig_tensor_path)
@@ -91,6 +102,7 @@ def reconstruct_song(orig_tensor_path, model_path, clip_val=0, norm=False):
 
     chunked_data = data.view((n//l, 1, p, l))
     print("chunked data shape", chunked_data.shape)
+    print(data)
     
     vq_loss, data_recon, perplexity = model(chunked_data)
     recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
@@ -98,6 +110,7 @@ def reconstruct_song(orig_tensor_path, model_path, clip_val=0, norm=False):
     loss = recon_error + vq_loss
 
     print("recon data shape:", data_recon.shape)
+    print(data_recon)
     for i in range(data_recon.shape[0]):
         print(torch.max(data_recon[i,:,:,:]).item())
     print('Loss:', loss.item(), '\Perplexity:', perplexity.item())
@@ -161,16 +174,19 @@ def main():
     # Reconstruct songs in accordance to each model
     print("Reconstructing")
     reconstruct_songs(orig_tensor, mse_tensor, mse_midi, mse_model_path, clip_val=0)
+    print("Reconstructing")
     reconstruct_songs(orig_tensor, mae_tensor, mae_midi, mae_model_path, clip_val=0)
+    print("Reconstructing")
     reconstruct_songs(orig_tensor, msenorm_tensor, msenorm_midi, msenorm_model_path, clip_val=0, norm=True)
+    print("Reconstructing")
     reconstruct_songs(orig_tensor, maenorm_tensor, maenorm_midi, maenorm_model_path, clip_val=0, norm=True)
 
     # save midis for each reconstruction
     print("Saving new pianorolls")
-    save_graphs(mse_midi, mse_res)
-    save_graphs(mae_midi, mae_res)
-    save_graphs(msenorm_midi, msenorm_res)
-    save_graphs(maenorm_midi, maenorm_res)
+    #save_graphs(mse_midi, mse_res)
+    #save_graphs(mae_midi, mae_res)
+    #save_graphs(msenorm_midi, msenorm_res)
+    #save_graphs(maenorm_midi, maenorm_res)
 
     print("DONE!")
 
@@ -235,7 +251,6 @@ def main():
     #show_result_graphs(yaml_name2)
     #show_result_graphs(yaml_name3)
     #show_result_graphs(yaml_name4)
-
 
 
 if __name__ == "__main__":
