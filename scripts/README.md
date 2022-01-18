@@ -38,14 +38,19 @@ Eventually, we also need to find some kind of differentiable approximation to ou
 ### Entry 1/18/2022
 
 To Do: 
-* Set up logging (instead of print statements) to go with verbosity command line flag
+* Set up logging (instead of print statements) to go with verbosity command line flag (DONE)
 * High level explanation of VQ-VAE algorithm
 * Deep dive into algorithm architecture
+    * Model diagram
 * Outline parts of the architecture that can be experimented with and what needs to stay the same
 * Successful run of VAE (no quantization)
-* Get two recursive implementations of knapsack DP to match answers
-* Documentation/organization of all scripts
+* Get two recursive implementations of knapsack DP to match answers --> DONE(?)
+* Documentation/organization of all scripts (MOSTLY DONE)
+    * vq_vae deep dive still left
 * Add Yichen to textconv project
+* First tasks for Yichen (DONE)
 * Decide how/where we want Yichen to work on the SCC... clone another copy of the repo? 
 * Create a baby dataset for testing (3 songs?)
-* Create clean data preprocessing pipeline
+* Create a medium-sized dataset for Yichen (50 songs?)
+* Create clean data preprocessing pipeline (DONE)
+    * Add more command line arguments
