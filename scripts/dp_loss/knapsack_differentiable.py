@@ -36,16 +36,6 @@ def construct_graph(W, wt, val, n):
 def diffable_knapsack():
     return 0
 
-
-def grad_dp(theta, v, gamma):
-    q = np.zeros(theta.shape)
-    print(q.shape)
-    for i in range(theta.shape[0]):
-        l_i = theta[:,i] + v
-        q[:,i] = np.exp(l_i/gamma)/np.sum(np.exp(l_i/gamma))
-
-    E = np.zeros(theta.shape)
-
 def diffable_recursion(theta, gamma=1):
     N = theta.shape[0] 
     e_bar = np.zeros(N)
@@ -58,12 +48,12 @@ def diffable_recursion(theta, gamma=1):
         #print("Parents:", parent_indices)
         u = np.asarray([theta[idx,i] + v[idx] for idx in parent_indices])
         #print(i, u)
-        v[i] = gamma * np.log10(np.sum(np.exp(u/gamma)))
+        v[i] = gamma * np.log(np.sum(np.exp(u/gamma)))
         q_vals = np.exp(u/gamma)/np.sum(np.exp(u/gamma))
         #print(u, q_vals)
         for k, idx in enumerate(parent_indices):
             q[i,idx] = q_vals[k]
-    for j in range(N-1,1):
+    for j in range(N-1,0, -1):
         children_indices = np.where(theta[j,:]>np.NINF)[0]
         for i in children_indices:
             E[i,j] = q[i,j]*e_bar[i]
@@ -74,46 +64,37 @@ def diffable_recursion(theta, gamma=1):
 def diffable_recursion_1(j,theta, gamma=1): 
     if j==0: # j is the first node 
         return 0
-
     else: 
         # get list of parents of j --> parents of j are all non-infinite
         parent_indices = np.where(theta[:,j]>np.NINF)[0]
         #print("PARENTS:", parent_indices)
         # all edges that exist of the form (i,j)
-        u =np.asarray([theta[idx,j] + recursive_formula(idx,theta) for idx in parent_indices])
+        u =np.asarray([theta[idx,j] + diffable_recursion_1(idx,theta) for idx in parent_indices])
         #print(j, u)
-        #print("U vector:", u)
-        answer = gamma * np.log10(np.sum(np.exp(u/gamma)))
-        #print(j, answer)
+        answer = gamma * np.log(np.sum(np.exp(u/gamma))) # this is v_j
         return answer
 
-def recursive_formula(j, theta): 
+def exact_recursive_formula(j, theta): 
     # we assume we have the edge representation of the graph theta (i,j) (parent,child)
     # base case
     if j==0 or np.where(theta[:,j]>np.NINF)[0].size==0: # j is the first node or has no parents
         return 0
 
-    # recursive step
-    #    This will go all the way up to (W+1)x(n+1) + 1, the total # of
-    #    nodes in our graph (31 for us I think?)
     else: 
-        # get list of parents of j --> parents of j are all non-infinite
+        # get list of parents of j --> parents of j are all >-infinity
         parent_indices = np.where(theta[:,j]>np.NINF)[0]
-        #print("PARENTS:", parent_indices)
-        # all edges that exist of the form (i,j)
-        answer = max([theta[idx,j] + recursive_formula(idx,theta) for idx in parent_indices]) 
-        #print(j, answer)
+
+        # just get the max length path
+        answer = max([theta[idx,j] + exact_recursive_formula(idx,theta) for idx in parent_indices]) 
         return answer
 
 
 def knapSack(W, wt, val, n):
     K = np.zeros((n+1, W+1)) #[[0 for x in range(W + 1)] for x in range(n + 1)]
-
     print(K.shape) # K is (# of items + 1) x (total possible weight) in dimension
 
     # K[i][j] = the max profit possible considering items from 0 to i and
     #           the total weight limit as j 
-  
     # Build table K[][] in bottom up manner
     for i in range(n + 1):
         for w in range(W + 1):
@@ -127,41 +108,47 @@ def knapSack(W, wt, val, n):
     print(K)
     return K[n][W]
 
-
+if __name__ == "__main__":
+    print("start")
 # check algorithm is working by 
-theta = np.array([
-    [1      ,0      ,0      ,0      ,0,      np.NINF,6,      np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
-    [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      np.NINF,6,      np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
-    [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
-    [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
-    [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      9,      np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
-    [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      9,      np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
-    [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      9,      np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
-    [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
-    [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      np.NINF,np.NINF,10,     np.NINF],
-    [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      np.NINF,np.NINF,np.NINF],
-    [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      np.NINF,np.NINF],
-    [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      np.NINF],
-    [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0      ],
-    [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0      ],
-    [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0      ],
-    [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0      ],
-    [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
+    theta = np.array([
+        [1      ,0      ,0      ,0      ,0,      np.NINF,6,      np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
+        [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      np.NINF,6,      np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
+        [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
+        [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
+        [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      9,      np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
+        [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      9,      np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
+        [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      9,      np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
+        [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
+        [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      np.NINF,np.NINF,10,     np.NINF],
+        [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      np.NINF,np.NINF,np.NINF],
+        [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      np.NINF,np.NINF],
+        [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0,      np.NINF],
+        [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0      ],
+        [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0      ],
+        [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0      ],
+        [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,0      ],
+        [np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF,np.NINF],
+    ])
 
-])
-  
-print(diffable_recursion_1(16,theta))
-v, E = diffable_recursion(theta)
-print(v)
-'''gammas = [ 0.1, 0.5, 1, 10, 15, 25]
-for g in gammas:
-    print("GAMMA =", g)
-    print(diffable_recursion(16, theta, gamma=g))'''
+    print("ACTUAL RESULT")
+    val = [6, 9, 10]
+    wt = [2, 1, 3]
+    W = 3 # maximum weight
+    n = len(val)
+    print(knapSack(W, wt, val, n))
 
+    print(exact_recursive_formula(16,theta))
 
-# Driver program to test above function
-'''val = [6, 10, 12, 8]
-wt = [4, 2, 2, 1]
-W = 5 # maximum weight
-n = len(val)
-print(knapSack(W, wt, val, n))'''
+    print("\nAPPROXIMATIONS:")
+    
+    gammas = [ 0.1, 0.5, 1, 10, 15, 25]
+    for g in gammas:
+        print("GAMMA =", g)
+        print(diffable_recursion_1(16, theta, gamma=g))
+        print(diffable_recursion(theta, gamma=g)[0])
+
+    v, E = diffable_recursion(theta, gamma=0.5)
+    print(E)
+    print(np.where(E!=0))
+    # gradient values very small
