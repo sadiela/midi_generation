@@ -110,6 +110,7 @@ class MIDIVectorQuantizer(nn.Module):
     self._embedding.weight.data.uniform_(-1/self._num_embeddings, 1/self._num_embeddings) # randomize embeddings to start
 
   def forward(self, inputs):
+    logging.info("MIDI VECTOR QUANTIZER FORWARD PASS")
     # PASS ONE SONG AT A TIME
     # inputting convolved midi tensors
     # batch dependent on song length, train one song at a time 
@@ -124,12 +125,12 @@ class MIDIVectorQuantizer(nn.Module):
     input_shape = inputs.shape 
     flat_input = inputs.view(-1, self._embedding_dim)
     #(bxl)xp
-    #print(flat_input, flat_input.shape)
+    logging.debug(flat_input, flat_input.shape)
 
     distances = (torch.sum(flat_input**2, dim=1, keepdim=True) 
                     + torch.sum(self._embedding.weight**2, dim=1)
                     - 2 * torch.matmul(flat_input, self._embedding.weight.t()))
-    #print("DISTANCES", distances, distances.shape)
+    logging.debug("DISTANCES: %s %s", str(distances), str(distances.shape))
 
     # Encoding
     encoding_indices = torch.argmin(distances, dim=1).unsqueeze(1)
@@ -140,7 +141,7 @@ class MIDIVectorQuantizer(nn.Module):
     
     # Quantize and unflatten
     quantized = torch.matmul(encodings, self._embedding.weight).view(input_shape)
-    #print(quantized, quantized.shape)
+    logging.quantized(str(quantized) + str(quantized.shape))
 
      # Loss
     e_latent_loss = F.mse_loss(quantized.detach(), inputs)
@@ -284,7 +285,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
       # Then we want to shuffle along axis=0 so two adjacent pxl guys aren't 
       # necessarily from the same song
 
-    print("Device:" , device)
+    logging.info("Device: %s" , device)
     max_tensor_size= 0 
 
     for i, data in enumerate(training_data):
@@ -294,7 +295,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
         cursize = torch.numel(data)
         if cursize > max_tensor_size:
           max_tensor_size = cursize
-          print("NEW MAX BATCH SIZE:", max_tensor_size)
+          logging.info("NEW MAX BATCH SIZE: %d", max_tensor_size)
 
         #print('TRAIN:')
         vq_loss, data_recon, perplexity = model(data)
@@ -320,11 +321,11 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
           nanfiles.append(midi_tensor_dataset.__getname__(i))
 
         if (i+1) % 200 == 0:
-            print('%d iterations' % (i+1))
-            print('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
+            logging.info('%d iterations' % (i+1))
+            logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
             #print('total_loss: %3f' % np.mean(total_loss[-100:]))
             #print('perplexity: %.3f' % np.mean(train_res_perplexity[-100:]))
-            print()
+            logging.info()
 
     torch.save(model.state_dict(), save_path)
     return train_res_recon_error, train_res_perplexity, nanfiles
