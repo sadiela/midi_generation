@@ -1,21 +1,9 @@
 '''
-This file contains the initial VQ-VAE model clas
+This file contains the VQ-VAE model class
 '''
 ###########
 # Imports #
 ###########
-#from __future__ import print_function
-
-#import matplotlib.pyplot as plt
-# from scipy.signal import savgol_filter
-#from six.moves import xrange
-#import umap
-#import pandas as pd
-#from skimage import io, transform
-#import torchvision.datasets as datasets
-#import torchvision.transforms as transforms
-#from torchvision.utils import make_grid
-#from torchvision import transforms, utils
 
 import numpy as np
 from numpy.core.numeric import full
@@ -29,6 +17,7 @@ import random
 import os
 from tqdm import tqdm
 import pickle
+import logging
 #from midi_utility import * 
 
 # is reconstruction error going down? 
@@ -67,24 +56,31 @@ class MidiDataset(Dataset):
         self.norm = norm 
         self.maxlength = 16*32
         self.sparse = sparse
-        self.paths = [ npy_file_dir / file for file in file_list]
+        self.paths = [ npy_file_dir / file for file in file_list] # get entire list of midi tensor file names 
         
         #self.batch_file_paths = set()
 
     def __getitem__(self, index):
         # choose random file path from directory (not already chosen), chunk it 
+
+        # load in tensor
         if self.sparse:
           pickled_tensor = pickle.load(self.paths[index])
           cur_tensor = pickled_tensor.toarray()
         else:
           cur_tensor = np.load(self.paths[index]) #, allow_pickle=True)
+
+        # convert to torch tensor (vs numpy tensor)
         p, l_i = cur_tensor.shape
         cur_data = torch.tensor(cur_tensor)
+
+        # normalize if specified
         if self.norm:
           cur_data = cur_data / self.maxlength 
-        # make sure divisible by l 
+        
+        # make sure divisible by l
+        # CHUNK! 
         if cur_data.shape[1] < self.l: 
-          #print(self.paths[index], "too short")
           padded = torch.zeros((p, self.l))
           padded[:,0:l_i] = cur_data
           l_i=l
@@ -92,7 +88,7 @@ class MidiDataset(Dataset):
           padded = cur_data[:,:(cur_data.shape[1]-(cur_data.shape[1]%self.l))]
         padded = padded.float()
         cur_chunked = torch.reshape(padded, (l_i//self.l, 1, p, self.l)) 
-        return cur_chunked
+        return cur_chunked # 3d tensor: l_i\\l x p x l
 
     def __getname__(self, index):
         return self.paths[index]
@@ -111,7 +107,7 @@ class MIDIVectorQuantizer(nn.Module):
     self._commitment_cost = commitment_cost
 
     self._embedding = nn.Embedding(self._num_embeddings, self._embedding_dim)
-    self._embedding.weight.data.uniform_(-1/self._num_embeddings, 1/self._num_embeddings)
+    self._embedding.weight.data.uniform_(-1/self._num_embeddings, 1/self._num_embeddings) # randomize embeddings to start
 
   def forward(self, inputs):
     # PASS ONE SONG AT A TIME
@@ -119,8 +115,8 @@ class MIDIVectorQuantizer(nn.Module):
     # batch dependent on song length, train one song at a time 
     # input = b x p x l
 
-    inputs = inputs.squeeze(1)
-    #print(inputs.shape)
+    logging.debug("Original input shape: %s", str(inputs.shape))
+    inputs = inputs.squeeze(1) # need to be 2d
     
     # we will embed along dim p 
     inputs = inputs.permute(0,2,1).contiguous() # now bxlxp

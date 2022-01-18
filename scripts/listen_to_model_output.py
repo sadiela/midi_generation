@@ -1,3 +1,10 @@
+''' file for analyzing trained model results
+- Reconstruct midis using model: reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False)
+- Save midi reconstructions: save_graphs(midi_path, save_path)
+- Plot loss/perplexity for a model: show_result_graphs(yaml_name)
+- Listen to midi reconstructions: play_music(midi_filename)
+'''
+
 ###########
 # Imports #
 ###########
@@ -244,7 +251,6 @@ def main():
     #show_result_graphs(yaml_name2)
     #show_result_graphs(yaml_name3)
     #show_result_graphs(yaml_name4)
-
 
 
 if __name__ == "__main__":

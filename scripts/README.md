@@ -35,4 +35,17 @@ Eventually, we also need to find some kind of differentiable approximation to ou
 - New evaluation function? Use DP loss as evaluation if confident
 - Code for simpler DP problem for understanding
 
-### Entry 1/14/2022
+### Entry 1/18/2022
+
+To Do: 
+* Set up logging (instead of print statements) to go with verbosity command line flag
+* High level explanation of VQ-VAE algorithm
+* Deep dive into algorithm architecture
+* Outline parts of the architecture that can be experimented with and what needs to stay the same
+* Successful run of VAE (no quantization)
+* Get two recursive implementations of knapsack DP to match answers
+* Documentation/organization of all scripts
+* Add Yichen to textconv project
+* Decide how/where we want Yichen to work on the SCC... clone another copy of the repo? 
+* Create a baby dataset for testing (3 songs?)
+* Create clean data preprocessing pipeline
