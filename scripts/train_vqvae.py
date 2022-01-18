@@ -7,6 +7,7 @@ import argparse
 import time
 from pathlib import Path
 import logging
+from datetime import datetime
 
 
 '''
@@ -31,6 +32,7 @@ datpath = PROJECT_DIRECTORY  / 'data' / 'all_midi_tensors'  # '..\\midi_data\\fu
 desktopdatpath = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'midi_tensors_2'
 modpath = PROJECT_DIRECTORY / 'models'
 respath = PROJECT_DIRECTORY / 'results'
+logpath = PROJECT_DIRECTORY / 'scripts' / 'log_files'
 #/usr3/graduate/sadiela/midi_generation/models/' #model_10_25_2.pt'
 
 ##############################
@@ -88,7 +90,12 @@ if __name__ == "__main__":
 
     loglevel = args['verbosity']
     numeric_level = getattr(logging, loglevel.upper(), None) # put it into uppercase
-    logging.basicConfig(filename='vq_vae_training.log', encoding='utf-8', level=numeric_level)
+
+    now = datetime.now()
+    date = now.strftime("%m-%d-%Y")
+    logfile = get_free_filename('vq_vae_training' + date, logpath, suffix='.log')
+
+    logging.basicConfig(filename=logfile, encoding='utf-8', level=numeric_level)
 
     logging.info("ARGS: %s", str(args))
     #input("Continue...")
