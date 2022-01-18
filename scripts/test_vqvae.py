@@ -26,7 +26,7 @@ def test(datapath, resultspath, modelpath, fstub, mse_loss, batchsize=10, normal
     # i think num embeddings was 64 before? 
     model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
     model_file = get_free_filename('model_' + fstub, modelpath, suffix='.pt')
-    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, mse_loss=mse_loss, bs=batchsize, normalize=normalize)
+    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, mse_loss=mse_loss, bs=batchsize, normalize=normalize, quantize=quantize)
     # save losses to file
     print("NUM NAN FILES:", len(nan_recon_files))
     results={"reconstruction_error": recon_error, "perplexity": perplex, "nan_reconstruction_files": nan_recon_files}
