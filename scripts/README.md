@@ -39,12 +39,12 @@ Eventually, we also need to find some kind of differentiable approximation to ou
 
 To Do: 
 * Set up logging (instead of print statements) to go with verbosity command line flag (DONE)
+* Get two recursive implementations of knapsack DP to match answers --> DONE(?)
 * High level explanation of VQ-VAE algorithm
 * Deep dive into algorithm architecture
     * Model diagram
 * Outline parts of the architecture that can be experimented with and what needs to stay the same
 * Successful run of VAE (no quantization)
-* Get two recursive implementations of knapsack DP to match answers --> DONE(?)
 * Documentation/organization of all scripts (MOSTLY DONE)
     * vq_vae deep dive still left
 * Add Yichen to textconv project
