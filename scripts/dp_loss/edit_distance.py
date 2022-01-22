@@ -115,7 +115,7 @@ print(editDistDP(str1, str2, 8, 6), -exact_recursive_formula(theta.shape[0]-1, t
 #print(editDistDP(str1, str2, len(str1), len(str2)))
 list1 = ['mom', 'saturday', 'today', 'hello']
 list2 = ['maim', 'sunday', 'tomorrow', 'help']
-g = 0.5
+g = 0.05
 
 for w1, w2 in zip(list1, list2):
     print(w1, w2)
