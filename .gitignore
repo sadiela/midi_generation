@@ -1,5 +1,5 @@
 /midi_data/
 /models/
 /data/
-/__pycache_/
-scripts/__pycache_/
+/__pycache__/
+scripts/__pycache__/

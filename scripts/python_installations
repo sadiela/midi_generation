@@ -1,0 +1,6 @@
+#!/bin/bash -l
+module load python3/3.8.6
+module load pytorch/1.8.1
+pip3 install --no-cache-dir --prefix=/projectnb/textconv/pythonlibs pretty_midi pygame numpy
+export PYTHONPATH=/projectnb/textconv/pythonlibs/lib/python3.8/site-packages/:$PYTHONPATH
+export PATH=/projectnb/textconv/pythonlibs/bin:$PATH
