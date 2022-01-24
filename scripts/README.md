@@ -47,10 +47,13 @@ To Do:
 * Successful run of VAE (no quantization)
 * Documentation/organization of all scripts (MOSTLY DONE)
     * vq_vae deep dive still left
-* Add Yichen to textconv project
+* Add Yichen to textconv project (DONE)
 * First tasks for Yichen (DONE)
-* Decide how/where we want Yichen to work on the SCC... clone another copy of the repo? 
+* Decide how/where we want Yichen to work on the SCC... clone another copy of the repo? (DONE)
 * Create a baby dataset for testing (3 songs?)
 * Create a medium-sized dataset for Yichen (50 songs?)
 * Create clean data preprocessing pipeline (DONE)
     * Add more command line arguments
+
+### Entry 1/22/2022
+Finished differentiable recursion for the edit distance problem, including code for generating the theta matrix from two words. Next step is to adapt this implementation for the midi problem. The structure will be the same, but we have to account for the pitch shift operation as well. We also need to change the value of the edges to account for how much of a change is required to add/subtract/change a note (same number of notes before and after? How much do they have to be moved?).
