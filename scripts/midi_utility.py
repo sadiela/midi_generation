@@ -9,9 +9,8 @@ explore and manipulate midi data as well as preprocessing functions
 import random
 import sys
 import os
-import pygame # for playing midi
+#import pygame # for playing midi
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-#import json
 import numpy as np
 import pretty_midi # midi manipulation library
 from tqdm import tqdm
@@ -35,7 +34,7 @@ bitsize = -16   # unsigned 16 bit
 channels = 2  # 1 is mono, 2 is stereo
 buffer = 1024   # number of samples
 
-def play_music(midi_filename):
+'''def play_music(midi_filename):
     pygame.mixer.init(freq, bitsize, channels, buffer)
     pygame.mixer.music.set_volume(0.8) # optional volume 0 to 1.0
     # plays an entire midi file
@@ -68,6 +67,7 @@ def play_x_seconds(midi_filename, x=10, savefile=False):
         print("delete file when done")
         os.remove(temp_filename)
     # delete temp file
+'''
 
 def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
     # GENERATE A RANDOM MIDI AND SAVE TO A FILE

@@ -2,11 +2,10 @@
 
 # Set project
 #$ -P textconv
-#$ -o vqvae_mae.txt
+#$ -o sparsify_midis.txt
 #$ -m ea
 #$ -j y
 #$ -V
-#$ -l h_rt=24:00:00
 # Request 4 cpus
 
 #$ -pe omp 4
@@ -17,8 +16,7 @@
 # Spec min gpu compute compatibility
 #$ -l gpu_c=6
 
-
 module load miniconda
 conda activate py3
 
-python3 ../test_vqvae.py -l -r 'mae' 
+python3 convert_to_sparse.py
