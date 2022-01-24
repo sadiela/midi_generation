@@ -59,7 +59,7 @@ def diffable_recursion(theta, gamma=1):
             E[i,j] = q[i,j]*e_bar[i]
             e_bar[j] += E[i,j]
 
-    return v[N-1], E
+    return v[N-1], E # loss and gradient matrix
 
 def diffable_recursion_1(j,theta, gamma=1): 
     if j==0: # j is the first node 

@@ -18,9 +18,9 @@ def construct_theta(str1, str2):
             if str1[i] == str2[j]:
                 theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j+1, m,n)] = 0
             else:
-                theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j+1, m,n)] = -1
-            theta[k_from_ij(i,j, m,n)][k_from_ij(i,j+1, m,n)]=-1
-            theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j, m,n)]=-1
+                theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j+1, m,n)] = 1
+            theta[k_from_ij(i,j, m,n)][k_from_ij(i,j+1, m,n)]= 1
+            theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j, m,n)]= 1
     return theta
             
             
@@ -74,7 +74,7 @@ def editDistDP(str1, str2, m, n):
  
  
 # Driver code
-str1 = "ma"
+str1 = "maim"
 str2 = "mom"
  
 theta = construct_theta(str1, str2)
