@@ -251,6 +251,16 @@ class Model(nn.Module):
           x_recon = self._decoder(z)
           return 0, x_recon, 0
 
+class DynamicLoss(Function):
+  @staticmethod
+  def forward(recon, data):
+    # build theta
+    # determine answer
+    return 0
+  
+  def backward():
+    return 0
+
 def collate_fn(data, collate_shuffle=True):
   # data is a list of tensors
   # concatenate and shuffle all list items
