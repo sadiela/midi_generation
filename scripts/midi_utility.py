@@ -17,6 +17,7 @@ from tqdm import tqdm
 from gen_utility import * 
 from pathlib import Path
 from scipy import sparse
+import pickle
 
 PROJECT_DIRECTORY = Path('..')
 #data_folder = Path("source_data/text_files/")
@@ -159,16 +160,16 @@ def midis_to_tensors(midi_dirpath, tensor_dirpath, subdiv=32, maxnotelength=16, 
     maxlength=maxnotelength*subdiv
     file_list = os.listdir(midi_dirpath)
     for file in tqdm(file_list):
-        cur_tensor = midi_to_tensor(midi_dirpath + file, subdiv=subdiv, maxnotelength=maxnotelength)
+        cur_tensor = midi_to_tensor(midi_dirpath / file, subdiv=subdiv, maxnotelength=maxnotelength)
         if cur_tensor is not None: 
             if not normalize: 
-                np.save(tensor_dirpath + file.split('.')[0] + '.npy', cur_tensor)
+                np.save(tensor_dirpath / str(file.split('.')[0] + '.npy'), cur_tensor)
             else: 
                 cur_tensor_normed = cur_tensor/maxlength
                 if np.count_nonzero == 0: 
                     print(cur_tensor.size, np.count_nonzero(cur_tensor)) #, np.count_nonzero(cur_tensor_normed))
                 else:
-                    np.save(tensor_dirpath + file.split('.')[0] + '.npy', cur_tensor_normed)
+                    np.save(tensor_dirpath / str(file.split('.')[0] + '.npy'), cur_tensor_normed)
         else:
             "error in conversion to tensor"
 
@@ -180,7 +181,7 @@ def midi_to_tensor(filepath, subdiv=32, maxnotelength=16): # default maxlength i
     #   - smallest note subdivision = 32nd note (0.250 seconds)
     #   - no tempo change
     # returns a 128 x maxlength x 1 tensor representing the midi that was input
-    midi_data = pretty_midi.PrettyMIDI(filepath)
+    midi_data = pretty_midi.PrettyMIDI(str(filepath))
     tempo_changes = midi_data.get_tempo_changes() #, midi_data.estimate_tempi())
     if len(tempo_changes[1]) > 1:
         print("TEMPO CHANGES!") # might want to skip file in this situation
@@ -244,7 +245,7 @@ def separate_tracks(midi_directory, target_directory):
     file_list = os.listdir(midi_directory)
     for file in file_list: #tqdm(file_list):
         try:
-            open_midi = pretty_midi.PrettyMIDI(midi_directory + '\\' + file)
+            open_midi = pretty_midi.PrettyMIDI(str(midi_directory / file))
             for i, instrument in enumerate(open_midi.instruments): 
                 #print(i, instrument.name, instrument.program, instrument.is_drum)
                 cur_midi = pretty_midi.PrettyMIDI() # define new midi object
@@ -255,8 +256,8 @@ def separate_tracks(midi_directory, target_directory):
                         cur.notes.append(note)
                     # save cur as a new midi file
                     cur_midi.instruments.append(cur)
-                    if not os.path.exists(target_directory + file.split('.')[0] + '_'+ str(i) + '.mid'):
-                        cur_midi.write(target_directory + file.split('.')[0] + '_'+ str(i) + '.mid')
+                    if not os.path.exists(target_directory / str(file.split('.')[0] + '_'+ str(i) + '.mid')):
+                        cur_midi.write(str(target_directory / str(file.split('.')[0] + '_'+ str(i) + '.mid')))
                     else:
                         print(file.split('.')[0] + '_'+ str(i) + '.mid EXISTS!')
         except Exception as e:
@@ -267,11 +268,11 @@ def separate_tracks(midi_directory, target_directory):
 def crop_midis(dirname, new_dirname, cut_beginning=True, maxlength=None, remove_special=True): 
     file_list = os.listdir(dirname)
     for file in tqdm(file_list):
-        old_name = dirname + file
+        old_name = dirname / file
         if remove_special: 
-            new_name = new_dirname + re.sub(r'[^A-Za-z0-9_. ]', r'', file) #remove_special_chars(file) # + file.split('.')[0] + '_cropped.mid'
+            new_name = new_dirname / re.sub(r'[^A-Za-z0-9_. ]', r'', file) #remove_special_chars(file) # + file.split('.')[0] + '_cropped.mid'
         else:
-            new_name = new_dirname + file
+            new_name = new_dirname / file
         #if not os.path.exists(new_name):
         crop_midi(old_name, new_name, cut_beginning=cut_beginning, maxlength=maxlength)
 
@@ -279,7 +280,7 @@ def crop_midi(filename, newfilename, cut_beginning=True, maxlength=None):
     # cut out empty space at beginning of midi file
     # maxlength given in seconds
     try:
-        open_midi = pretty_midi.PrettyMIDI(filename)
+        open_midi = pretty_midi.PrettyMIDI(str(filename))
         new_midi = pretty_midi.PrettyMIDI() # define new midi object
         new_instr = pretty_midi.Instrument(program=1) # create new midi instrument
         if cut_beginning:
@@ -293,17 +294,16 @@ def crop_midi(filename, newfilename, cut_beginning=True, maxlength=None):
                 shifted_note = pretty_midi.Note(velocity=note.velocity, pitch=note.pitch, start=note.start-start_time, end=note.end-start_time)
                 new_instr.notes.append(shifted_note)
         new_midi.instruments.append(new_instr)
-        new_midi.write(newfilename)
+        new_midi.write(str(newfilename))
     except Exception as e: 
         print("Error", e)
         pass
-
 
 def convert_to_sparse(tensor_dir, sparse_dir, del_tensor_dir=False):
     file_list = os.listdir(tensor_dir)
     for f in tqdm(file_list): 
         cur_arr = np.load(tensor_dir / f)
-        sparse_arr = scipy.sparse.csr_matrix(cur_arr)
+        sparse_arr = sparse.csr_matrix(cur_arr)
         with open(sparse_dir / f, 'wb') as outfile:
                 pickle.dump(sparse_arr, outfile)
     # Delete tensor_dir to save space
