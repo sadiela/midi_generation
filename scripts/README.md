@@ -57,3 +57,6 @@ To Do:
 
 ### Entry 1/22/2022
 Finished differentiable recursion for the edit distance problem, including code for generating the theta matrix from two words. Next step is to adapt this implementation for the midi problem. The structure will be the same, but we have to account for the pitch shift operation as well. We also need to change the value of the edges to account for how much of a change is required to add/subtract/change a note (same number of notes before and after? How much do they have to be moved?).
+
+### Entry 1/27/2022
+Start defining weekly sprints with different goals using Github projects. Sprints will start Monday and end the following Sunday to line up with meetings. 
