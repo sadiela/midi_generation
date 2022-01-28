@@ -320,8 +320,8 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
         if lossfunc=='mse':
           recon_error = F.mse_loss(data_recon, data) #/ data_variance
         elif lossfunc=='dyn':
-
-        else:
+          recon_error = dynamic_loss(data_recon, data)
+        else: # loss function = mae
           recon_error = F.l1_loss(data_recon, data)
         loss = recon_error + vq_loss # will be 0 if no quantization
         loss.backward()
