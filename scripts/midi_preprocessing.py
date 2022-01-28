@@ -19,21 +19,8 @@ from pathlib import Path
 
 from midi_utility import *
 
-if __name__ == "__main__":
-    print("START!")
-    datapath = PROJECT_DIRECTORY  / 'data' / 'raw_data'  # '..\\midi_data\\full_dataset_midis_normalized\\'
-    processed_datapath = PROJECT_DIRECTORY / 'data' / 'preprocessed_data'
 
-    parser = argparse.ArgumentParser(description='Arguments for preprocessing midis')
-    #parser.add_argument('-l','--lossfunc', help='Choose loss function.', default=True)
-    parser.add_argument('-r', '--rawdata', help='Path to raw MIDI data.', default=datapath)
-    parser.add_argument('-p', '--pdata', help='Path where processed data will be saved', default=processed_datapath)
-
-    args = vars(parser.parse_args())
-
-    rawdir = args['rawdata']
-    procdir = args['pdata']
-
+def preprocess(rawdir, procdir):
     # might not need these two lines
     rawdir = Path(rawdir)
     print(rawdir)
@@ -67,3 +54,19 @@ if __name__ == "__main__":
     for f in os.listdir(crop):
             os.remove(os.path.join(crop, f))
 
+if __name__ == "__main__":
+    print("START!")
+    datapath = PROJECT_DIRECTORY  / 'data' / 'raw_data'  # '..\\midi_data\\full_dataset_midis_normalized\\'
+    processed_datapath = PROJECT_DIRECTORY / 'data' / 'preprocessed_data'
+
+    parser = argparse.ArgumentParser(description='Arguments for preprocessing midis')
+    #parser.add_argument('-l','--lossfunc', help='Choose loss function.', default=True)
+    parser.add_argument('-r', '--rawdata', help='Path to raw MIDI data.', default=datapath)
+    parser.add_argument('-p', '--pdata', help='Path where processed data will be saved', default=processed_datapath)
+
+    args = vars(parser.parse_args())
+
+    rawdir = args['rawdata']
+    procdir = args['pdata']
+
+    preprocess(rawdir, procdir)

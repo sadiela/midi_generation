@@ -4,3 +4,6 @@ numpy
 pretty_midi
 tqdm
 yaml
+pandas
+scipy
+pypianoroll
