@@ -28,6 +28,9 @@ def construct_theta(midi1, midi2):
     print(theta.shape)
     theta[:,:] = np.Inf
 
+    for idx in range(m):
+        theta[0, m] = 
+
     for i in range(m-1):
         for j in range(n-1):
             #print(str1[i], str2[j])

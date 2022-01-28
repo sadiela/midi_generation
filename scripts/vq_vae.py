@@ -18,6 +18,7 @@ import os
 from tqdm import tqdm
 import pickle
 import logging
+from dp_loss import *
 #from midi_utility import * 
 
 # is reconstruction error going down? 
@@ -251,15 +252,20 @@ class Model(nn.Module):
           x_recon = self._decoder(z)
           return 0, x_recon, 0
 
-class DynamicLoss(Function):
+class DynamicLoss(torch.autograd.Function):
   @staticmethod
-  def forward(recon, data):
-    # build theta
+  def forward(ctx, recon, data):
+    # build theta from original data and reconstruction
+    theta = construct_theta(recon, data)
+    loss, grad = diffable_recursion(theta)
+    ctx.save_for_backward(grad)
     # determine answer
-    return 0
+    return loss
   
-  def backward():
-    return 0
+  @staticmethod
+  def backward(ctx):
+    grad, = ctx.saved_tensors
+    return grad
 
 def collate_fn(data, collate_shuffle=True):
   # data is a list of tensors
@@ -271,7 +277,7 @@ def collate_fn(data, collate_shuffle=True):
   else:
     return full_list
 
-def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_loss=True, bs=10, normalize=False, quantize=True, sparse=False):
+def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfunc='mse', bs=10, normalize=False, quantize=True, sparse=False):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     midi_tensor_dataset = MidiDataset(datapath, norm=normalize, sparse=sparse)
@@ -298,6 +304,8 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
     logging.info("Device: %s" , device)
     max_tensor_size= 0 
 
+    dynamic_loss = DynamicLoss.apply
+
     for i, data in enumerate(training_data):
         #name = midi_tensor_dataset.__getname__(i)
         # s x p x 1 x l
@@ -309,8 +317,10 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
 
         #print('TRAIN:')
         vq_loss, data_recon, perplexity = model(data)
-        if mse_loss:
+        if lossfunc=='mse':
           recon_error = F.mse_loss(data_recon, data) #/ data_variance
+        elif lossfunc=='dyn':
+
         else:
           recon_error = F.l1_loss(data_recon, data)
         loss = recon_error + vq_loss # will be 0 if no quantization
