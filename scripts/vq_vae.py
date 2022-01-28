@@ -19,6 +19,7 @@ from tqdm import tqdm
 import pickle
 import logging
 from dp_loss import *
+from pathlib import Path
 #from midi_utility import * 
 
 # is reconstruction error going down? 
@@ -57,16 +58,17 @@ class MidiDataset(Dataset):
         self.norm = norm 
         self.maxlength = 16*32
         self.sparse = sparse
-        self.paths = [ npy_file_dir / file for file in file_list] # get entire list of midi tensor file names 
+        self.paths = [ Path(npy_file_dir) / file for file in file_list] # get entire list of midi tensor file names 
         
         #self.batch_file_paths = set()
 
     def __getitem__(self, index):
         # choose random file path from directory (not already chosen), chunk it 
-
+        print(str(self.paths[index]))
         # load in tensor
         if self.sparse:
-          pickled_tensor = pickle.load(self.paths[index])
+          with open(self.paths[index], 'rb') as f:
+            pickled_tensor = pickle.load(f)
           cur_tensor = pickled_tensor.toarray()
         else:
           cur_tensor = np.load(self.paths[index]) #, allow_pickle=True)
@@ -142,7 +144,7 @@ class MIDIVectorQuantizer(nn.Module):
     
     # Quantize and unflatten
     quantized = torch.matmul(encodings, self._embedding.weight).view(input_shape)
-    logging.quantized(str(quantized) + str(quantized.shape))
+    logging.info(str(quantized) + str(quantized.shape))
 
      # Loss
     e_latent_loss = F.mse_loss(quantized.detach(), inputs)
@@ -237,7 +239,7 @@ class Model(nn.Module):
         self.quantize = quantize
 
     def forward(self, x):
-      if self.noquantize:
+      if not self.quantize:
         z = self._encoder(x)
         x_recon = self._decoder(z)
         return 0, x_recon, 0
@@ -319,6 +321,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
         vq_loss, data_recon, perplexity = model(data)
         if lossfunc=='mse':
           recon_error = F.mse_loss(data_recon, data) #/ data_variance
+          print('GRADIENT:', recon_error.grad)
         elif lossfunc=='dyn':
           recon_error = dynamic_loss(data_recon, data)
         else: # loss function = mae
