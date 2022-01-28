@@ -28,9 +28,6 @@ def construct_theta(midi1, midi2):
     print(theta.shape)
     theta[:,:] = np.Inf
 
-    for idx in range(m):
-        theta[0, m] = 
-
     for i in range(m-1):
         for j in range(n-1):
             #print(str1[i], str2[j])
@@ -102,25 +99,25 @@ def dp_loss(y, n, y_hat, m):
                dp_loss(y, n-1, y_hat, m-1) + cost
             )
 
+if __name__ == "__main__":
+    # try with two example midis:
+    mid1 = np.array([
+        [0,0,0,0,0,2],
+        [2,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,5,0,1,0,2],
+        [0,0,0,0,0,0]
+        ])  
 
-# try with two example midis:
-mid1 = np.array([
-    [0,0,0,0,0,2],
-    [2,0,0,0,0,0],
-    [0,0,0,0,0,0],
-    [0,5,0,1,0,2],
-    [0,0,0,0,0,0]
-    ])  
+    mid2 = np.array([
+        [1,0,0,0,0,0],
+        [0,0,2,0,0,0],
+        [0,2,0,0,0,0],
+        [0,0,0,1,0,2],
+        [0,0,0,0,0,0]
+        ])  
 
-mid2 = np.array([
-    [1,0,0,0,0,0],
-    [0,0,2,0,0,0],
-    [0,2,0,0,0,0],
-    [0,0,0,1,0,2],
-    [0,0,0,0,0,0]
-    ])  
-
-theta= construct_theta(mid1, mid2)
-ans1 = exact_recursive_formula(theta.shape[0]-1,theta)
-ans2, E = diffable_recursion(theta, gamma=0.1)
-print(-ans1, -ans2)
+    theta= construct_theta(mid1, mid2)
+    ans1 = exact_recursive_formula(theta.shape[0]-1,theta)
+    ans2, E = diffable_recursion(theta, gamma=0.1)
+    print(-ans1, -ans2)
