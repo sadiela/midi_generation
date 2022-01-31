@@ -343,12 +343,13 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
         if pd.isna(recon_error.item()):
           nanfiles.append(midi_tensor_dataset.__getname__(i))
 
-        if (i+1) % 200 == 0:
+        if (i+1) % 5000 == 0:
             logging.info('%d iterations' % (i+1))
             logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
             #print('total_loss: %3f' % np.mean(total_loss[-100:]))
             #print('perplexity: %.3f' % np.mean(train_res_perplexity[-100:]))
             logging.info()
 
+    logging.info("saving model to %s"%save_path)
     torch.save(model.state_dict(), save_path)
     return train_res_recon_error, train_res_perplexity, nanfiles

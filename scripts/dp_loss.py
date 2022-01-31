@@ -22,6 +22,9 @@ def single_note_val(a):
     return np.count_nonzero(a)
 
 def construct_theta(midi1, midi2):
+    # can I construct gradient of theta alongside this? 
+    # for each theta (k,l), will have gradient w.r.t. midi2
+    #   gradient will be 0 for all except midi2[:,j]
     m = midi1.shape[1] + 1
     n = midi2.shape[1] + 1
     theta = np.zeros((m*n, m*n))
@@ -36,7 +39,7 @@ def construct_theta(midi1, midi2):
             else:
                 theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j+1, m,n)] = num_note_diff(midi1[:, i] ,midi2[:, j] ) # replacing; cost depends on ...?
             theta[k_from_ij(i,j, m,n)][k_from_ij(i,j+1, m,n)]= single_note_val(midi2[:, j])# deletion
-            theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j, m,n)]= single_note_val(midi1[:, i]) # insertion
+            theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j, m,n)]= single_note_val(midi1[:, i]) # insertion I think i want these both dependent on midi2... is that possible? 
             # shifting?
     return -theta
 
