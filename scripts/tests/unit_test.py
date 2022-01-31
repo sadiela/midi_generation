@@ -7,6 +7,7 @@ sys.path.append('..')
 sys.path.append('.')
 #import pytest
 import numpy as np
+import torch
 import torch.nn.functional as F
 
 from midi_preprocessing import preprocess
@@ -27,7 +28,7 @@ testingLog = homeDirectory / 'tests' / 'test_logs' / 'unit_tests.log'
 batchsize = 10
 sparse = True
 
-logging.basicConfig(filename=testingLog, encoding='utf-8', level='DEBUG')
+logging.basicConfig(filename=testingLog, level='DEBUG')
 
 
 trainingParameterList = [ 
@@ -71,25 +72,25 @@ if __name__ == "__main__":
         [0,0,0,0,0,0]
         ])  
 
-    mid1 = mid1.astype('float64')
-    mid2 = mid2.astype('float64')
+    mid1 = mid1.astype('double')
+    mid2 = mid2.astype('double')
 
+    mid1 = torch.from_numpy(mid1)
+    mid2 = torch.from_numpy(mid2)
 
     dynamic_loss = DynamicLoss.apply
 
-    print("L2")
+    '''print("L2")
     print(mid1.shape, mid2.shape)
     l2_loss = F.mse_loss(torch.Tensor(mid1), torch.Tensor(mid2))
     print(l2_loss.grad)
     l2_loss.backward()
     print(l2_loss.grad)
-    print(l2_loss)
+    print(l2_loss)'''
 
     print("\nDynamic")
     dyn_loss = dynamic_loss(mid1, mid2)
-    print(dyn_loss.grad)
-    dyn_loss.backward()
-    print(dyn_loss.grad)
     print(dyn_loss)
+    dyn_loss.backward()
 
 
