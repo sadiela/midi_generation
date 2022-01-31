@@ -258,8 +258,12 @@ class DynamicLoss(torch.autograd.Function):
   @staticmethod
   def forward(ctx, recon, data):
     # build theta from original data and reconstruction
-    theta = construct_theta(recon, data)
+    print(recon, data)
+    theta, grad_theta = construct_theta(recon, data)
     loss, grad = diffable_recursion(theta)
+    # grad = grad * grad_theta # chain rule (n^2 * n^2) x (n^2 * n^2 * p * n)
+    print(grad.shape, grad_theta.shape)
+    grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
     ctx.save_for_backward(grad)
     # determine answer
     return loss
