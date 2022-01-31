@@ -10,7 +10,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from midi_preprocessing import preprocess
+#from midi_preprocessing import preprocess
 from vq_vae import DynamicLoss
 from dp_loss import *
 import train_vqvae 
@@ -42,9 +42,10 @@ trainingParameterList = [
     ['l1norm', 'mae', True, False],
 ]
 
-def testProcessing():
+#def testProcessing():
+#    print("PATH AND DIRECTORY", sys.path, homeDirectory)
     # clear processed data folder beforehand
-    preprocess(rawData, procData)
+#    preprocess(rawData, procData)
 
 def testTraining():  
   print("Train test")
