@@ -16,7 +16,7 @@ import train_vqvae
 import logging
 
 homeDirectory = Path('..')
-print(sys.path, homeDirectory)
+print("PATH AND DIRECTORY", sys.path, homeDirectory)
 
 rawData = homeDirectory / 'tests' / 'raw_data'
 procData = homeDirectory / 'tests' / 'test_processed_data'
