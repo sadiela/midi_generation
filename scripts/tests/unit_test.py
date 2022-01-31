@@ -11,30 +11,45 @@ import torch.nn.functional as F
 from midi_preprocessing import preprocess
 from vq_vae import DynamicLoss
 from dp_loss import *
+import train_vqvae 
+import logging
 
 homeDirectory = Path('..')
 
 rawData = homeDirectory / 'tests' / 'raw_data'
 procData = homeDirectory / 'tests' / 'test_processed_data'
+dataDir = homeDirectory / 'tests' / 'processed_data' / 'sparse'
+outDir = homeDirectory / 'tests' / 'results' 
+modelDir = homeDirectory / 'tests' / 'models'
+testingLog = homeDirectory / 'tests' / 'test_logs' / 'unit_tests.log'
+batchsize = 10
+sparse = True
+
+logging.basicConfig(filename=testingLog, encoding='utf-8', level='DEBUG')
+
+
+trainingParameterList = [ 
+    ['l2quant', 'mse', False, True],
+    ['l1quant', 'mae', False, True],
+    ['l2', 'mse', False, False],
+    ['l1', 'mae', False, False],
+    ['l2quantnorm', 'mse', True, True],
+    ['l1quantnorm', 'mae', True, True],
+    ['l2norm', 'mse', True, False],
+    ['l1norm', 'mae', True, False],
+]
 
 def testProcessing():
     # clear processed data folder beforehand
     preprocess(rawData, procData)
 
-class DynamicLoss(torch.autograd.Function):
-  @staticmethod
-  def forward(ctx, recon, data):
-    # build theta from original data and reconstruction
-    theta = construct_theta(recon, data)
-    loss, grad = diffable_recursion(theta)
-    ctx.save_for_backward(grad)
-    # determine answer
-    return loss
-  
-  @staticmethod
-  def backward(ctx):
-    grad, = ctx.saved_tensors
-    return grad
+def testTraining():  
+  print("Train test")
+  for l in trainingParameterList:
+      train_vqvae.train(dataDir, outDir, modelDir, fstub=l[0], loss=l[1], batchsize=batchsize, normalize=l[2], quantize=l[3], sparse=sparse)
+
+def testAnalysis():
+    print('analysis test')
 
 if __name__ == "__main__":
     # try with two example midis:

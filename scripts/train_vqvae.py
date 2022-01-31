@@ -40,7 +40,7 @@ logpath = PROJECT_DIRECTORY / 'scripts' / 'log_files'
 ##############################
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def test(datapath, resultspath, modelpath, fstub, loss, batchsize=10, normalize=False, quantize=True, sparse=False):
+def train(datapath, resultspath, modelpath, fstub, loss, batchsize=10, normalize=False, quantize=True, sparse=False):
     # i think num embeddings was 64 before? 
     # Declare model
     model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
@@ -92,7 +92,7 @@ if __name__ == "__main__":
 
     now = datetime.now()
     date = now.strftime("%m-%d-%Y")
-    logfile = get_free_filename('vq_vae_training' + date, logpath, suffix='.log')
+    logfile = get_free_filename('vq_vae_training-' + date, logpath, suffix='.log')
 
     logging.basicConfig(filename=logfile, encoding='utf-8', level=numeric_level)
 
@@ -109,5 +109,5 @@ if __name__ == "__main__":
     quantize = args['quant']
 
     
-    test(datadir, outdir, modeldir, fstub, loss, batchsize, normalize, quantize, sparse)
+    train(datadir, outdir, modeldir, fstub, loss, batchsize, normalize, quantize, sparse)
     logging.info("All done! TOTAL TIME: %s", str(time.time()-prog_start))
