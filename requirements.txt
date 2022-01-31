@@ -3,7 +3,7 @@ torch
 numpy
 pretty_midi
 tqdm
-yaml
+pyyaml
 pandas
 scipy
 pypianoroll
