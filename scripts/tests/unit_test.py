@@ -5,15 +5,16 @@ from pathlib import Path
 import sys
 sys.path.append('..')
 sys.path.append('.')
+sys.path.append('./scripts/')
 #import pytest
 import numpy as np
 import torch
 import torch.nn.functional as F
 
-#from midi_preprocessing import preprocess
-#from vq_vae import DynamicLoss
-#from dp_loss import *
-#import train_vqvae 
+from midi_preprocessing import preprocess
+from vq_vae import DynamicLoss
+from dp_loss import *
+import train_vqvae 
 import logging
 
 homeDirectory = Path('..')
