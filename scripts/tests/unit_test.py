@@ -11,9 +11,9 @@ import torch
 import torch.nn.functional as F
 
 #from midi_preprocessing import preprocess
-from vq_vae import DynamicLoss
-from dp_loss import *
-import train_vqvae 
+#from vq_vae import DynamicLoss
+#from dp_loss import *
+#import train_vqvae 
 import logging
 
 homeDirectory = Path('..')
@@ -42,11 +42,12 @@ trainingParameterList = [
     ['l1norm', 'mae', True, False],
 ]
 
-#def testProcessing():
-#    print("PATH AND DIRECTORY", sys.path, homeDirectory)
-    # clear processed data folder beforehand
-#    preprocess(rawData, procData)
+def testProcessing():
+    print("PATH AND DIRECTORY", sys.path, homeDirectory)
+    #clear processed data folder beforehand
+    #preprocess(rawData, procData)
 
+'''
 def testTraining():  
   print("Train test")
   for l in trainingParameterList:
@@ -81,17 +82,17 @@ if __name__ == "__main__":
 
     dynamic_loss = DynamicLoss.apply
 
-    '''print("L2")
+    print("L2")
     print(mid1.shape, mid2.shape)
     l2_loss = F.mse_loss(torch.Tensor(mid1), torch.Tensor(mid2))
     print(l2_loss.grad)
     l2_loss.backward()
     print(l2_loss.grad)
-    print(l2_loss)'''
+    print(l2_loss)
 
     print("\nDynamic")
     dyn_loss = dynamic_loss(mid1, mid2)
     print(dyn_loss)
-    dyn_loss.backward()
+    dyn_loss.backward()'''
 
 
