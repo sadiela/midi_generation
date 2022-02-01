@@ -3,7 +3,6 @@ Unit tests for VQVAE training workflow
 '''
 from pathlib import Path
 import sys
-sys.path.append('..')
 sys.path.append('.')
 sys.path.append('./scripts/')
 #import pytest
@@ -46,9 +45,9 @@ trainingParameterList = [
 def testProcessing():
     print("PATH AND DIRECTORY", sys.path, homeDirectory)
     #clear processed data folder beforehand
-    #preprocess(rawData, procData)
+    preprocess(rawData, procData)
 
-'''
+
 def testTraining():  
   print("Train test")
   for l in trainingParameterList:
@@ -94,6 +93,6 @@ if __name__ == "__main__":
     print("\nDynamic")
     dyn_loss = dynamic_loss(mid1, mid2)
     print(dyn_loss)
-    dyn_loss.backward()'''
+    dyn_loss.backward()
 
 
