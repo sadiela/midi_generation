@@ -45,7 +45,7 @@ trainingParameterList = [
 #def testProcessing():
 #    print("PATH AND DIRECTORY", sys.path, homeDirectory)
     # clear processed data folder beforehand
-#    preprocess(rawData, procData)
+#g    preprocess(rawData, procData)
 
 def testTraining():  
   print("Train test")
