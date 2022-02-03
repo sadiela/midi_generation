@@ -3,6 +3,7 @@ Unit tests for VQVAE training workflow
 '''
 from pathlib import Path
 import sys
+sys.path.append('..')
 sys.path.append('.')
 sys.path.append('./scripts/')
 #import pytest
@@ -59,35 +60,30 @@ def testAnalysis():
 if __name__ == "__main__":
     # try with two example midis:
     mid1 = np.array([
-        [0,0,0,0,0,2],
-        [2,0,0,0,0,0],
-        [0,0,0,0,0,0],
-        [0,5,0,1,0,2],
-        [0,0,0,0,0,0]
+        [1,1,2,0],
+        [0,0,0,1],
+        [0,0,0,0]
         ])  
 
     mid2 = np.array([
-        [1,0,0,0,0,0],
-        [0,0,2,0,0,0],
-        [0,2,0,0,0,0],
-        [0,0,0,1,0,2],
-        [0,0,0,0,0,0]
+        [0,0,0,0],
+        [0,1,0,1],
+        [0,0,0,0]
         ])  
 
-    mid1 = mid1.astype('double')
-    mid2 = mid2.astype('double')
+    mid1 = mid1.astype('float64')
+    mid2 = mid2.astype('float64')
 
     mid1 = torch.from_numpy(mid1)
     mid2 = torch.from_numpy(mid2)
+
+    mid2.requires_grad_()
 
     dynamic_loss = DynamicLoss.apply
 
     print("L2")
     print(mid1.shape, mid2.shape)
-    l2_loss = F.mse_loss(torch.Tensor(mid1), torch.Tensor(mid2))
-    print(l2_loss.grad)
-    l2_loss.backward()
-    print(l2_loss.grad)
+    l2_loss = F.mse_loss(mid1, mid2)
     print(l2_loss)
 
     print("\nDynamic")

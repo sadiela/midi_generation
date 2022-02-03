@@ -13,13 +13,14 @@ def k_from_ij(i,j,m,n):
     return n*i + j 
 
 def num_note_diff(a,b):
-    a[a>0] = 1
-    b[b>0] = 1
+    #a[a>0] = 1
+    #b[b>0] = 1
     not_equal = np.where(np.not_equal(a,b))
-    return np.abs(np.count_nonzero(a[not_equal])+np.count_nonzero(b[not_equal]))
+    return torch.sum(torch.abs(a[not_equal] - b[not_equal])) # scalar
 
 def single_note_val(a):
-    return np.count_nonzero(a)
+    print("SINGLE NOT VAL", torch.sum(a))
+    return torch.sum(a) # scalar 
 
 def construct_theta(midi1, midi2):
     # can I construct gradient of theta alongside this? 
@@ -47,6 +48,7 @@ def construct_theta(midi1, midi2):
             theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j, m,n)]= single_note_val(midi1[:, i]) # insertion I think i want these both dependent on midi2... is that possible? 
             # NOTHING (gradient w.r.t. midi2)
             # shifting?
+            # gradient is telling you how much to change each x value... we will have
     return -theta, -grad_theta
 
 def exact_recursive_formula(j, theta): 
@@ -111,25 +113,21 @@ def dp_loss(y, n, y_hat, m):
 if __name__ == "__main__":
     # try with two example midis:
     mid1 = np.array([
-        [0,0,0,0,0,2],
-        [2,0,0,0,0,0],
-        [0,0,0,0,0,0],
-        [0,5,0,1,0,2],
-        [0,0,0,0,0,0]
+        [1,1,2,0],
+        [0,0,0,1],
+        [0,20,0,0]
         ])  
 
     mid2 = np.array([
-        [1,0,0,0,0,0],
-        [0,0,2,0,0,0],
-        [0,2,0,0,0,0],
-        [0,0,0,1,0,2],
-        [0,0,0,0,0,0]
+        [0,20,0,10],
+        [0,10,0,10],
+        [0,0,0,10]
         ])  
 
-    mid1 = torch.from_numpy(mid1)
-    mid2 = torch.from_numpy(mid2)
+    mid1 = torch.from_numpy(mid1, requires_grad=True)
+    mid2 = torch.from_numpy(mid2, requires_grad=True)
 
-    theta= construct_theta(mid1, mid2)
+    theta, grad_theta = construct_theta(mid1, mid2)
     ans1 = exact_recursive_formula(theta.shape[0]-1,theta)
     ans2, E = diffable_recursion(theta, gamma=0.1)
     print(-ans1, -ans2)
