@@ -5,12 +5,14 @@ from pathlib import Path
 import sys
 sys.path.append('..')
 sys.path.append('.')
+sys.path.append('./scripts/')
 #import pytest
 import numpy as np
 import torch
 import torch.nn.functional as F
+import os
 
-#from midi_preprocessing import preprocess
+from midi_preprocessing import preprocess
 from vq_vae import DynamicLoss
 from dp_loss import *
 import train_vqvae 
@@ -20,7 +22,7 @@ homeDirectory = Path('..')
 print("PATH AND DIRECTORY", sys.path, homeDirectory)
 
 rawData = homeDirectory / 'tests' / 'raw_data'
-procData = homeDirectory / 'tests' / 'test_processed_data'
+procData = homeDirectory / 'tests' / 'processed_data'
 dataDir = homeDirectory / 'tests' / 'processed_data' / 'sparse'
 outDir = homeDirectory / 'tests' / 'results' 
 modelDir = homeDirectory / 'tests' / 'models'
@@ -42,10 +44,10 @@ trainingParameterList = [
     ['l1norm', 'mae', True, False],
 ]
 
-#def testProcessing():
-#    print("PATH AND DIRECTORY", sys.path, homeDirectory)
-    # clear processed data folder beforehand
-#g    preprocess(rawData, procData)
+def testProcessing():
+    print("PATH AND DIRECTORY", os.cwd(), homeDirectory, sys.path)
+    #clear processed data folder beforehand
+    preprocess(rawData, procData)
 
 def testTraining():  
   print("Train test")
@@ -58,36 +60,31 @@ def testAnalysis():
 if __name__ == "__main__":
     # try with two example midis:
     mid1 = np.array([
-        [0,0,0,0,0,2],
-        [2,0,0,0,0,0],
-        [0,0,0,0,0,0],
-        [0,5,0,1,0,2],
-        [0,0,0,0,0,0]
+        [1,1,2,0],
+        [0,0,0,1],
+        [0,0,0,0]
         ])  
 
     mid2 = np.array([
-        [1,0,0,0,0,0],
-        [0,0,2,0,0,0],
-        [0,2,0,0,0,0],
-        [0,0,0,1,0,2],
-        [0,0,0,0,0,0]
+        [0,0,0,0],
+        [0,1,0,1],
+        [0,0,0,0]
         ])  
 
-    mid1 = mid1.astype('double')
-    mid2 = mid2.astype('double')
+    mid1 = mid1.astype('float64')
+    mid2 = mid2.astype('float64')
 
     mid1 = torch.from_numpy(mid1)
     mid2 = torch.from_numpy(mid2)
 
+    mid2.requires_grad_()
+
     dynamic_loss = DynamicLoss.apply
 
-    '''print("L2")
+    print("L2")
     print(mid1.shape, mid2.shape)
-    l2_loss = F.mse_loss(torch.Tensor(mid1), torch.Tensor(mid2))
-    print(l2_loss.grad)
-    l2_loss.backward()
-    print(l2_loss.grad)
-    print(l2_loss)'''
+    l2_loss = F.mse_loss(mid1, mid2)
+    print(l2_loss)
 
     print("\nDynamic")
     dyn_loss = dynamic_loss(mid1, mid2)

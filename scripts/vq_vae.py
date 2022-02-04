@@ -262,16 +262,18 @@ class DynamicLoss(torch.autograd.Function):
     theta, grad_theta = construct_theta(recon, data)
     loss, grad = diffable_recursion(theta)
     # grad = grad * grad_theta # chain rule (n^2 * n^2) x (n^2 * n^2 * p * n)
-    print(grad.shape, grad_theta.shape)
+    #print(grad.shape, grad_theta.shape)
+    #print(grad, grad_theta)
     grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
+    print("GRADIENT:", grad)
     ctx.save_for_backward(grad)
     # determine answer
     return loss
   
   @staticmethod
-  def backward(ctx):
+  def backward(ctx, grad_output):
     grad, = ctx.saved_tensors
-    return grad
+    return grad, None
 
 def collate_fn(data, collate_shuffle=True):
   # data is a list of tensors
