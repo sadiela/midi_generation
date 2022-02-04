@@ -18,7 +18,7 @@ from dp_loss import *
 import train_vqvae 
 import logging
 
-homeDirectory = Path('..')
+homeDirectory = Path('./scripts/')
 print("PATH AND DIRECTORY", sys.path, homeDirectory)
 
 rawData = homeDirectory / 'tests' / 'raw_data'
