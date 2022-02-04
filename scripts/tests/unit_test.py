@@ -23,7 +23,7 @@ print("PATH AND DIRECTORY", sys.path, homeDirectory)
 
 rawData = homeDirectory / 'tests' / 'raw_data'
 procData = homeDirectory / 'tests' / 'processed_data'
-dataDir = homeDirectory / 'tests' / 'processed_data' / 'sparse'
+dataDir = homeDirectory / 'tests' / 'processed_data' / 'sparse_midi'
 outDir = homeDirectory / 'tests' / 'results' 
 modelDir = homeDirectory / 'tests' / 'models'
 testingLog = homeDirectory / 'tests' / 'test_logs' / 'unit_tests.log'
