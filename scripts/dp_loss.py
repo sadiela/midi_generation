@@ -19,7 +19,6 @@ def num_note_diff(a,b):
     return torch.sum(torch.abs(a[not_equal] - b[not_equal])) # scalar
 
 def single_note_val(a):
-    print("SINGLE NOT VAL", torch.sum(a))
     return torch.sum(a) # scalar 
 
 def construct_theta(midi1, midi2):
@@ -35,7 +34,7 @@ def construct_theta(midi1, midi2):
 
     for i in range(m-1):
         for j in range(n-1):
-            print(midi1[:,i].shape, grad_theta[0][0][:,0].shape)
+            #print(midi1[:,i].shape, grad_theta[0][0][:,0].shape)
             #print(str1[i], str2[j])
             if (midi1[:, i] == midi2[:, j]).all():
                 theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j+1, m,n)] = 0
@@ -49,6 +48,7 @@ def construct_theta(midi1, midi2):
             # NOTHING (gradient w.r.t. midi2)
             # shifting?
             # gradient is telling you how much to change each x value... we will have
+    print("GRAD THETA NONZEROS:", torch.count_nonzero(grad_theta)) # there are 12...
     return -theta, -grad_theta
 
 def exact_recursive_formula(j, theta): 
@@ -66,7 +66,7 @@ def exact_recursive_formula(j, theta):
         answer = max([theta[idx,j] + exact_recursive_formula(idx,theta) for idx in parent_indices]) 
         return answer
             
-def diffable_recursion(theta, gamma=1):
+def diffable_recursion(theta, gamma=0.5):
     N = theta.shape[0] 
     e_bar = torch.zeros(N)
     e_bar[N-1]=1
@@ -75,10 +75,11 @@ def diffable_recursion(theta, gamma=1):
     E = torch.zeros((N,N))
     for i in range(2, N):
         parent_indices = torch.where(theta[:,i]>np.NINF)[0]
-        #print("Parents:", parent_indices)
+        print("Parents:", parent_indices)
         u = torch.tensor(np.asarray([theta[idx,i] + v[idx] for idx in parent_indices]))
         #print(i, u)
         v[i] = gamma * torch.log(torch.sum(torch.exp(u/gamma)))
+        print(i, v[i])
         q_vals = torch.exp(u/gamma)/torch.sum(torch.exp(u/gamma))
         #print(u, q_vals)
         for k, idx in enumerate(parent_indices):
@@ -89,7 +90,7 @@ def diffable_recursion(theta, gamma=1):
             E[i,j] = q[i,j]*e_bar[i]
             e_bar[j] += E[i,j]
 
-    return v[N-1], E
+    return -v[N-1], -E
             
 def dp_loss(y, n, y_hat, m): 
     # assume y, y_hat the same dimension (pxn)

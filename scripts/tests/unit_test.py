@@ -30,11 +30,11 @@ testingLog = homeDirectory / 'tests' / 'test_logs' / 'unit_tests.log'
 batchsize = 10
 sparse = True
 
-logging.basicConfig(filename=testingLog, level='DEBUG')
+#logging.basicConfig(filename=testingLog, level='DEBUG')
 
 
 trainingParameterList = [ 
-    ['l2quant', 'mse', False, True],
+    ['l2quant', 'mse', False, True], # filestub, loss type, normalize, quantize
     ['l1quant', 'mae', False, True],
     ['l2', 'mse', False, False],
     ['l1', 'mae', False, False],
@@ -42,6 +42,8 @@ trainingParameterList = [
     ['l1quantnorm', 'mae', True, True],
     ['l2norm', 'mse', True, False],
     ['l1norm', 'mae', True, False],
+    ['dploss', 'dyn', False, False],
+    ['dplossquant', 'dyn', False, True]
 ]
 
 def testProcessing():
@@ -57,8 +59,8 @@ def testTraining():
 def testAnalysis():
     print('analysis test')
 
-if __name__ == "__main__":
-    # try with two example midis:
+
+def testDPLoss():
     mid1 = np.array([
         [1,1,2,0],
         [0,0,0,1],
@@ -69,6 +71,24 @@ if __name__ == "__main__":
         [0,0,0,0],
         [0,1,0,1],
         [0,0,0,0]
+        ])  
+
+    dyn_loss = dynamic_loss(mid1, mid2)
+    print(dyn_loss)
+
+
+if __name__ == "__main__":
+    # try with two example midis:
+    mid1 = np.array([
+        [1,0,1,0],
+        [0,0,0,1],
+        [0,0,0,0]
+        ])  
+
+    mid2 = np.array([
+        [1,1,.6,1],
+        [0.5,1,0,1],
+        [1,1,1,1]
         ])  
 
     mid1 = mid1.astype('float64')
@@ -89,6 +109,6 @@ if __name__ == "__main__":
     print("\nDynamic")
     dyn_loss = dynamic_loss(mid1, mid2)
     print(dyn_loss)
-    dyn_loss.backward()
+    #dyn_loss.backward()
 
 

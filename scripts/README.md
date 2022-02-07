@@ -60,3 +60,6 @@ Finished differentiable recursion for the edit distance problem, including code 
 
 ### Entry 1/27/2022
 Start defining weekly sprints with different goals using Github projects. Sprints will start Monday and end the following Sunday to line up with meetings. 
+
+### Entry 2/7/2022
+Large values in x, x_recon result in infinit loss/nan gradients. This is easily remedied with max note length cutoff and normalization. 
