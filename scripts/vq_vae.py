@@ -258,22 +258,36 @@ class DynamicLoss(torch.autograd.Function):
   @staticmethod
   def forward(ctx, recon, data):
     # build theta from original data and reconstruction
-    print(recon, data)
-    theta, grad_theta = construct_theta(recon, data)
-    loss, grad = diffable_recursion(theta)
+    #print(recon, data)
+    theta, grad_theta_x = construct_theta(recon, data)
+    loss, grad_L_theta = diffable_recursion(theta)
+    loss_exact = exact_recursive_formula(theta.shape[0]-1, theta)
+    print("LOSSES:", loss, -loss_exact)
+    #print(grad_L_theta)
     # grad = grad * grad_theta # chain rule (n^2 * n^2) x (n^2 * n^2 * p * n)
-    #print(grad.shape, grad_theta.shape)
-    #print(grad, grad_theta)
-    grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
-    print("GRADIENT:", grad)
-    ctx.save_for_backward(grad)
+    n_2 = grad_L_theta.shape[0]
+    #print(n_2)
+    grad_L_x = torch.zeros((recon.shape[0], recon.shape[1]))
+    for i in range(n_2):
+      for j in range(n_2):
+        if torch.abs(grad_L_theta[i][j]) != 0:
+          print('DTHETA IJ NON ZERO', i,j, grad_L_theta[i][j])
+          print(grad_theta_x[i][j])
+        if torch.count_nonzero(grad_theta_x[i][j]) != 0:
+          print('DX IJ NON ZERO', i,j, grad_theta_x[i][j])
+        cur_grad = grad_L_theta[i][j] * grad_theta_x[i][j]
+        grad_L_x = torch.add(grad_L_x, cur_grad)
+
+    #grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
+    print("GRADIENT:", grad_L_x)
+    ctx.save_for_backward(grad_L_x)
     # determine answer
     return loss
   
   @staticmethod
   def backward(ctx, grad_output):
-    grad, = ctx.saved_tensors
-    return grad, None
+    grad_L_x, = ctx.saved_tensors
+    return grad_L_x, None
 
 def collate_fn(data, collate_shuffle=True):
   # data is a list of tensors
@@ -327,7 +341,6 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
         vq_loss, data_recon, perplexity = model(data)
         if lossfunc=='mse':
           recon_error = F.mse_loss(data_recon, data) #/ data_variance
-          print('GRADIENT:', recon_error.grad)
         elif lossfunc=='dyn':
           recon_error = dynamic_loss(data_recon, data)
         else: # loss function = mae
@@ -354,7 +367,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
             logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
             #print('total_loss: %3f' % np.mean(total_loss[-100:]))
             #print('perplexity: %.3f' % np.mean(train_res_perplexity[-100:]))
-            logging.info()
+            logging.info('\n')
 
     logging.info("saving model to %s"%save_path)
     torch.save(model.state_dict(), save_path)
