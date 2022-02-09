@@ -11,18 +11,19 @@ def construct_theta(str1, str2):
     n = len(str2) + 1
     theta = np.zeros((m*n, m*n))
     theta[:,:] = np.Inf
+    print(theta.shape)
 
-    for i in range(m-1):
-        for j in range(n-1):
-            #print(str1[i], str2[j])
-            if str1[i] == str2[j]:
-                theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j+1, m,n)] = 0
+    for i in range(1,m):
+        for j in range(1,n): 
+            print(i,j)
+            if(str1[i-1]==str2[j-1]):
+                # edge from i-1, j-1 to here is 0
+                theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = 0
             else:
-                theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j+1, m,n)] = 1 # replacing; cost depends on ...?
-            theta[k_from_ij(i,j, m,n)][k_from_ij(i,j+1, m,n)]= 1 # insertion
-            theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j, m,n)]= 1 # deletion
-            # shifting?
-    return -theta
+                theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = 1
+            theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i-1,j, m,n)]= 1 # insertion
+            theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)]= 1 # deletion
+    return theta
             
 def diffable_recursion(theta, gamma=1):
     N = theta.shape[0] 
@@ -107,12 +108,12 @@ def editDistDP(str1, str2, m, n):
 #   Can do this by inverting edge weights 
 
 # Driver code
-str1 = "Saturday"
-str2 = "Sunday"
+str1 = "sad"
+str2 = "sag"
  
 theta = construct_theta(str1, str2)
 print(theta)
-print(editDistDP(str1, str2, 8, 6), -exact_recursive_formula(theta.shape[0]-1, theta))
+'''print(editDistDP(str1, str2, 8, 6), -exact_recursive_formula(theta.shape[0]-1, theta))
 #print(editDistDP(str1, str2, len(str1), len(str2)))
 list1 = ['mom', 'saturday', 'today', 'hello']
 list2 = ['maim', 'sunday', 'tomorrow', 'help']
@@ -127,4 +128,4 @@ for w1, w2 in zip(list1, list2):
     ans3 = -diffable_recursion(theta, g)[0]
     print(ans1, ans2, ans3)
 
-# what alignment does the "answer" refer to?
+# what alignment does the "answer" refer to?'''

@@ -62,15 +62,15 @@ def testAnalysis():
 
 def testDPLoss():
     mid1 = np.array([
-        [1,1,2,0],
-        [0,0,0,1],
-        [0,0,0,0]
+        [1,1,2],
+        [0,0,0],
+        [0,0,0]
         ])  
 
     mid2 = np.array([
-        [0,0,0,0],
-        [0,1,0,1],
-        [0,0,0,0]
+        [1,1,1],
+        [0,1,0],
+        [1,0,1]
         ])  
 
     dyn_loss = dynamic_loss(mid1, mid2)
@@ -80,15 +80,15 @@ def testDPLoss():
 if __name__ == "__main__":
     # try with two example midis:
     mid1 = np.array([
-        [1,0,1,0],
-        [0,0,0,1],
-        [0,0,0,0]
+        [1,1,2],
+        [0,0,0],
+        [0,0,0]
         ])  
 
     mid2 = np.array([
-        [1,1,.6,1],
-        [0.5,1,0,1],
-        [1,1,1,1]
+        [1,1,1],
+        [0,1,0],
+        [1,0,1]
         ])  
 
     mid1 = mid1.astype('float64')
