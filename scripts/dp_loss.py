@@ -32,19 +32,16 @@ def construct_theta(midi1, midi2):
     print(midi1.shape, midi2.shape, grad_theta.shape)
     theta[:,:] = np.Inf
 
-    for i in range(m-1):
-        for j in range(n-1):
-            #print(midi1[:,i].shape, grad_theta[0][0][:,0].shape)
-            #print(str1[i], str2[j])
-            if (midi1[:, i] == midi2[:, j]).all():
-                theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j+1, m,n)] = 0
-                #grad_theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j+1, m,n)][:][:] = np.zeros((midi2.shape[0], midi2.shape[1]))
+    for i in range(1,m):
+        for j in range(1,n):
+            if (midi1[:, i-1] == midi2[:, j-1]).all():
+                theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = 0
             else:
-                theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j+1, m,n)] = num_note_diff(midi1[:, i] ,midi2[:, j]) # replacing; cost depends on ...?
-                grad_theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j+1, m,n)][:,j] = np.abs(midi1[:,i]-midi2[:,j])
-            theta[k_from_ij(i,j, m,n)][k_from_ij(i,j+1, m,n)]= single_note_val(midi2[:, j])# deletion
-            grad_theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j+1, m,n)][:,j] = midi2[:,j]
-            theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j, m,n)]= single_note_val(midi1[:, i]) # insertion I think i want these both dependent on midi2... is that possible? 
+                theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = num_note_diff(midi1[:, i-1] ,midi2[:, j-1]) # replacing; cost depends on ...?
+                grad_theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j+1, m,n)][:,j] = np.abs(midi1[:,i-1]-midi2[:,j-1])
+            theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)]= single_note_val(midi2[:, j-1])# deletion
+            grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)][:,j] = midi2[:,j-1]
+            theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i-1,j, m,n)] = single_note_val(midi1[:, i-1]) # insertion I think i want these both dependent on midi2... is that possible? 
             # NOTHING (gradient w.r.t. midi2)
             # shifting?
             # gradient is telling you how much to change each x value... we will have

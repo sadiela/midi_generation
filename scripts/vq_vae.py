@@ -267,6 +267,8 @@ class DynamicLoss(torch.autograd.Function):
     # grad = grad * grad_theta # chain rule (n^2 * n^2) x (n^2 * n^2 * p * n)
     n_2 = grad_L_theta.shape[0]
     #print(n_2)
+    print("DL_DTheta:", torch.count_nonzero(grad_L_theta), grad_L_theta)
+    print("DTheta_Dx:", torch.count_nonzero(grad_theta_x)) #, grad_L_theta)
     grad_L_x = torch.zeros((recon.shape[0], recon.shape[1]))
     for i in range(n_2):
       for j in range(n_2):
