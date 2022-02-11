@@ -256,10 +256,11 @@ class Model(nn.Module):
 
 class DynamicLoss(torch.autograd.Function):
   @staticmethod
-  def forward(ctx, recon, data):
+  def forward(ctx, X_hat, X):
     # build theta from original data and reconstruction
     #print(recon, data)
-    theta, grad_theta_x = construct_theta(recon, data)
+    theta, grad_theta_xhat = construct_theta(X, X_hat)
+    print("THETA:", theta)
     loss, grad_L_theta = diffable_recursion(theta)
     loss_exact = exact_recursive_formula(theta.shape[0]-1, theta)
     print("LOSSES:", loss, -loss_exact)
@@ -268,17 +269,18 @@ class DynamicLoss(torch.autograd.Function):
     n_2 = grad_L_theta.shape[0]
     #print(n_2)
     print("DL_DTheta:", torch.count_nonzero(grad_L_theta), grad_L_theta)
-    print("DTheta_Dx:", torch.count_nonzero(grad_theta_x)) #, grad_L_theta)
-    grad_L_x = torch.zeros((recon.shape[0], recon.shape[1]))
+    print("DTheta_Dx:", torch.count_nonzero(grad_theta_xhat)) #, grad_L_theta)
+    grad_L_x = torch.zeros((X_hat.shape[0], X_hat.shape[1]))
     for i in range(n_2):
       for j in range(n_2):
-        if torch.abs(grad_L_theta[i][j]) != 0:
-          print('DTHETA IJ NON ZERO', i,j, grad_L_theta[i][j])
-          print(grad_theta_x[i][j])
-        if torch.count_nonzero(grad_theta_x[i][j]) != 0:
-          print('DX IJ NON ZERO', i,j, grad_theta_x[i][j])
-        cur_grad = grad_L_theta[i][j] * grad_theta_x[i][j]
-        grad_L_x = torch.add(grad_L_x, cur_grad)
+        if torch.abs(grad_L_theta[j][i]) != 0 and torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
+          print('NON ZERO PAIR', i,j, grad_L_theta[j][i], grad_theta_xhat[i][j])
+          print(grad_L_theta[j][i] * grad_theta_xhat[i][j])
+          #  print(grad_theta_xhat[i][j])
+          #if torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
+          #  print('DX IJ NON ZERO', i,j, grad_theta_xhat[i][j])
+          cur_grad = grad_L_theta[j][i] * grad_theta_xhat[i][j]
+          grad_L_x = torch.add(grad_L_x, cur_grad)
 
     #grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
     print("GRADIENT:", grad_L_x)
@@ -344,7 +346,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
         if lossfunc=='mse':
           recon_error = F.mse_loss(data_recon, data) #/ data_variance
         elif lossfunc=='dyn':
-          recon_error = dynamic_loss(data_recon, data)
+          recon_error = dynamic_loss(data_recon, data) #X_hat, then X!!!
         else: # loss function = mae
           recon_error = F.l1_loss(data_recon, data)
         loss = recon_error + vq_loss # will be 0 if no quantization
