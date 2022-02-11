@@ -12,7 +12,7 @@ def ij_from_k(k, N):
 def k_from_ij(i,j,m,n):
     return n*i + j 
 
-def num_note_diff(a,b):
+def note_diff(a,b):
     #a[a>0] = 1
     #b[b>0] = 1
     not_equal = np.where(np.not_equal(a,b))
@@ -21,28 +21,28 @@ def num_note_diff(a,b):
 def single_note_val(a):
     return torch.sum(a) # scalar 
 
-def construct_theta(midi1, midi2):
+def construct_theta(x, x_hat):
     # can I construct gradient of theta alongside this? 
-    # for each theta (k,l), will have gradient w.r.t. midi2
-    #   gradient will be 0 for all except midi2[:,j]
-    m = midi1.shape[1] + 1
-    n = midi2.shape[1] + 1
+    # for each theta (k,l), will have gradient w.r.t. x_hat
+    #   gradient will be 0 for all except x_hat[:,j]
+    m = x.shape[1] + 1
+    n = x_hat.shape[1] + 1
     theta = torch.zeros((m*n, m*n))
-    grad_theta = torch.zeros((m*n, m*n, midi2.shape[0], midi2.shape[1]))
-    print(midi1.shape, midi2.shape, grad_theta.shape)
+    grad_theta = torch.zeros((m*n, m*n, x_hat.shape[0], x_hat.shape[1]))
+    print(x.shape, x_hat.shape, grad_theta.shape)
     theta[:,:] = np.Inf
 
     for i in range(1,m):
         for j in range(1,n):
-            if (midi1[:, i-1] == midi2[:, j-1]).all():
+            if (x[:, i-1] == x_hat[:, j-1]).all():
                 theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = 0
             else:
-                theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = num_note_diff(midi1[:, i-1] ,midi2[:, j-1]) # replacing; cost depends on ...?
-                grad_theta[k_from_ij(i,j, m,n)][k_from_ij(i+1,j+1, m,n)][:,j] = np.abs(midi1[:,i-1]-midi2[:,j-1])
-            theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)]= single_note_val(midi2[:, j-1])# deletion
-            grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)][:,j] = midi2[:,j-1]
-            theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i-1,j, m,n)] = single_note_val(midi1[:, i-1]) # insertion I think i want these both dependent on midi2... is that possible? 
-            # NOTHING (gradient w.r.t. midi2)
+                theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = note_diff(x[:, i-1] ,x_hat[:, j-1]) # replacing; cost depends on ...?
+                grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)][:,j-1] = np.abs(x[:,i-1]-x_hat[:,j-1])
+            theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)]= single_note_val(x_hat[:, j-1])# deletion
+            grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)][:,j-1] = x_hat[:,j-1]
+            theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i-1,j, m,n)] = single_note_val(x[:, i-1]) # insertion I think i want these both dependent on x_hat... is that possible? 
+            # NOTHING (gradient w.r.t. x_hat)
             # shifting?
             # gradient is telling you how much to change each x value... we will have
     print("GRAD THETA NONZEROS:", torch.count_nonzero(grad_theta)) # there are 12...
@@ -62,8 +62,35 @@ def exact_recursive_formula(j, theta):
         # just get the max length path
         answer = max([theta[idx,j] + exact_recursive_formula(idx,theta) for idx in parent_indices]) 
         return answer
-            
+
+'''      
 def diffable_recursion(theta, gamma=0.5):
+    N = theta.shape[0] 
+    e_bar = torch.zeros(N)
+    e_bar[N-1]=1
+    v = torch.zeros(N)
+    q = torch.zeros((N,N))
+    E = torch.zeros((N,N))
+    for j in range(2, N): # go through children
+        parent_indices = torch.where(theta[:,j]>np.NINF)[0]
+        print("Parents:", parent_indices)
+        u = torch.tensor(np.asarray([theta[idx,j] + v[idx] for idx in parent_indices]))
+        #print(i, u)
+        v[j] = gamma * torch.log(torch.sum(torch.exp(u/gamma)))
+        print(j, v[j])
+        q_vals = torch.exp(u/gamma)/torch.sum(torch.exp(u/gamma)) # q gradients
+        #print(u, q_vals)
+        for k, idx in enumerate(parent_indices):
+            q[idx,j] = q_vals[k]
+    for i in range(N-1,0, -1): # i is the parent index
+        children_indices = torch.where(theta[i,:]>np.NINF)[0]
+        for j in children_indices:
+            E[i,j] = e_bar[i]*q[i,j]
+            e_bar[j] += E[i,j]
+
+    return -v[N-1], -E'''
+
+def diffable_recursion(theta, gamma=1):
     N = theta.shape[0] 
     e_bar = torch.zeros(N)
     e_bar[N-1]=1
@@ -72,11 +99,10 @@ def diffable_recursion(theta, gamma=0.5):
     E = torch.zeros((N,N))
     for i in range(2, N):
         parent_indices = torch.where(theta[:,i]>np.NINF)[0]
-        print("Parents:", parent_indices)
+        #print("Parents:", parent_indices)
         u = torch.tensor(np.asarray([theta[idx,i] + v[idx] for idx in parent_indices]))
         #print(i, u)
         v[i] = gamma * torch.log(torch.sum(torch.exp(u/gamma)))
-        print(i, v[i])
         q_vals = torch.exp(u/gamma)/torch.sum(torch.exp(u/gamma))
         #print(u, q_vals)
         for k, idx in enumerate(parent_indices):
