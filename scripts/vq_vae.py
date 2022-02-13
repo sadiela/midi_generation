@@ -22,6 +22,7 @@ from dp_loss import *
 from pathlib import Path
 #from midi_utility import * 
 
+
 # is reconstruction error going down? 
 # Run w/ more data
 # Increase # of embedding vectors? 
@@ -253,53 +254,6 @@ class Model(nn.Module):
         else:
           x_recon = self._decoder(z)
           return 0, x_recon, 0
-
-class DynamicLoss(torch.autograd.Function):
-  @staticmethod
-  def forward(ctx, X_hat, X):
-    # build theta from original data and reconstruction
-    #print(recon, data)
-    theta, grad_theta_xhat = construct_theta(X, X_hat)
-    print("THETA:", theta)
-    loss, grad_L_theta = diffable_recursion(theta)
-    loss_exact = exact_recursive_formula(theta.shape[0]-1, theta)
-    print("LOSSES:", loss, -loss_exact)
-    #print(grad_L_theta)
-    # grad = grad * grad_theta # chain rule (n^2 * n^2) x (n^2 * n^2 * p * n)
-    n_2 = grad_L_theta.shape[0]
-    #print(n_2)
-    print("DL_DTheta:", torch.count_nonzero(grad_L_theta), grad_L_theta)
-    print("DTheta_Dx:", torch.count_nonzero(grad_theta_xhat)) #, grad_L_theta)
-    grad_L_x = torch.zeros((X_hat.shape[0], X_hat.shape[1]))
-    for i in range(n_2):
-      for j in range(n_2):
-        '''if torch.abs(grad_L_theta[j][i]) != 0 and torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
-          print('NON ZERO PAIR', i,j, grad_L_theta[j][i], grad_theta_xhat[i][j])
-          print(grad_L_theta[j][i] * grad_theta_xhat[i][j])
-          #  print(grad_theta_xhat[i][j])
-          #if torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
-          #  print('DX IJ NON ZERO', i,j, grad_theta_xhat[i][j])
-          cur_grad = grad_L_theta[j][i] * grad_theta_xhat[i][j]
-          grad_L_x = torch.add(grad_L_x, cur_grad)'''
-        if torch.abs(grad_L_theta[i][j]) != 0 and torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
-          print('NON ZERO PAIR', i,j, grad_L_theta[i][j], grad_theta_xhat[i][j])
-          print(grad_L_theta[i][j] * grad_theta_xhat[i][j])
-          #  print(grad_theta_xhat[i][j])
-          #if torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
-          #  print('DX IJ NON ZERO', i,j, grad_theta_xhat[i][j])
-          cur_grad = grad_L_theta[i][j] * grad_theta_xhat[i][j]
-          grad_L_x = torch.add(grad_L_x, cur_grad)
-
-    #grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
-    print("GRADIENT:", grad_L_x)
-    ctx.save_for_backward(grad_L_x)
-    # determine answer
-    return loss
-  
-  @staticmethod
-  def backward(ctx, grad_output):
-    grad_L_x, = ctx.saved_tensors
-    return grad_L_x, None
 
 def collate_fn(data, collate_shuffle=True):
   # data is a list of tensors

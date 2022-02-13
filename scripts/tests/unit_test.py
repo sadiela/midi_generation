@@ -30,6 +30,8 @@ testingLog = homeDirectory / 'tests' / 'test_logs' / 'unit_tests.log'
 batchsize = 10
 sparse = True
 
+dynamic_loss = DynamicLoss.apply
+
 #logging.basicConfig(filename=testingLog, level='DEBUG')
 
 
@@ -76,37 +78,59 @@ def testDPLoss():
     dyn_loss = dynamic_loss(mid1, mid2)
     print(dyn_loss)
 
+def compare_losses(mid1, mid2): 
+    l2_loss = F.mse_loss(mid1, mid2)
+    dyn_loss = dynamic_loss(mid1, mid2)
+    print("L2:", l2_loss.data)
+    print("Dynamic:", dyn_loss.data)
+
 
 if __name__ == "__main__":
     # try with two example midis:
-    mid1 = np.array([
+    mid1 = torch.tensor([
         [1,1],
         [0,0],
-        ])  
+        ], dtype=torch.float32)  
 
-    mid2 = np.array([
+    mid2 = torch.tensor([
         [1,1],
         [0,1]
-        ])  
+        ], dtype=torch.float32)  
 
-    mid1 = mid1.astype('float64')
-    mid2 = mid2.astype('float64')
+    mid3 = torch.tensor([
+        [1,1],
+        [1,1],
+        ], dtype=torch.float32)  
 
-    mid1 = torch.from_numpy(mid1)
-    mid2 = torch.from_numpy(mid2)
+    mid4 = torch.tensor([
+        [1,0],
+        [0,0]
+        ], dtype=torch.float32)  
+
+    mid5 = torch.tensor([
+        [1,2],
+        [0,0],
+        ], dtype=torch.float32)  
+
+    mid6 = torch.tensor([
+        [1,4],
+        [0,1]
+        ], dtype=torch.float32)  
+
+    mid6 = torch.tensor([
+        [0,0],
+        [0,0]
+        ], dtype=torch.float32)  
 
     mid2.requires_grad_()
+    mid4.requires_grad_()
 
-    dynamic_loss = DynamicLoss.apply
-
-    print("L2")
-    print(mid1.shape, mid2.shape)
-    l2_loss = F.mse_loss(mid1, mid2)
-    print(l2_loss)
-
-    print("\nDynamic")
-    dyn_loss = dynamic_loss(mid1, mid2)
-    print(dyn_loss)
-    #dyn_loss.backward()
+    compare_losses(mid1, mid2)
+    compare_losses(mid1, mid3)
+    compare_losses(mid1, mid4)  
+    compare_losses(mid1, mid5)
+    compare_losses(mid1, mid6)  
+    #compare_losses(mid1, mid7)
+    #compare_losses(mid1, mid8)  
 
 
