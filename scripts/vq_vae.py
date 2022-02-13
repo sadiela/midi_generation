@@ -273,13 +273,21 @@ class DynamicLoss(torch.autograd.Function):
     grad_L_x = torch.zeros((X_hat.shape[0], X_hat.shape[1]))
     for i in range(n_2):
       for j in range(n_2):
-        if torch.abs(grad_L_theta[j][i]) != 0 and torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
+        '''if torch.abs(grad_L_theta[j][i]) != 0 and torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
           print('NON ZERO PAIR', i,j, grad_L_theta[j][i], grad_theta_xhat[i][j])
           print(grad_L_theta[j][i] * grad_theta_xhat[i][j])
           #  print(grad_theta_xhat[i][j])
           #if torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
           #  print('DX IJ NON ZERO', i,j, grad_theta_xhat[i][j])
           cur_grad = grad_L_theta[j][i] * grad_theta_xhat[i][j]
+          grad_L_x = torch.add(grad_L_x, cur_grad)'''
+        if torch.abs(grad_L_theta[i][j]) != 0 and torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
+          print('NON ZERO PAIR', i,j, grad_L_theta[i][j], grad_theta_xhat[i][j])
+          print(grad_L_theta[i][j] * grad_theta_xhat[i][j])
+          #  print(grad_theta_xhat[i][j])
+          #if torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
+          #  print('DX IJ NON ZERO', i,j, grad_theta_xhat[i][j])
+          cur_grad = grad_L_theta[i][j] * grad_theta_xhat[i][j]
           grad_L_x = torch.add(grad_L_x, cur_grad)
 
     #grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
