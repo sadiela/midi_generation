@@ -29,7 +29,7 @@ def construct_theta(x, x_hat):
     n = x_hat.shape[1] + 1
     theta = torch.zeros((m*n, m*n))
     grad_theta = torch.zeros((m*n, m*n, x_hat.shape[0], x_hat.shape[1]))
-    print(x.shape, x_hat.shape, grad_theta.shape)
+    #print(x.shape, x_hat.shape, grad_theta.shape)
     theta[:,:] = np.Inf
 
     for i in range(1,m):
@@ -45,7 +45,7 @@ def construct_theta(x, x_hat):
             # NOTHING (gradient w.r.t. x_hat)
             # shifting?
             # gradient is telling you how much to change each x value... we will have
-    print("GRAD THETA NONZEROS:", torch.count_nonzero(grad_theta)) # there are 12...
+    #print("GRAD THETA NONZEROS:", torch.count_nonzero(grad_theta)) # there are 12...
     return -theta, -grad_theta
 
 def exact_recursive_formula(j, theta): 
@@ -114,25 +114,43 @@ def diffable_recursion(theta, gamma=1):
             e_bar[i] += E[i,j]
 
     return -v[N-1], -E
-            
-def dp_loss(y, n, y_hat, m): 
-    # assume y, y_hat the same dimension (pxn)
-    
-    #_,n = y.shape
-    #_,m = y_hat.shape
-    
-    # base case
-    if m == 0:
-        return n 
-    if n == 0:
-        return m
-    
-    cost = sum(y[:, m-1] - y_hat[:, n-1])
 
-    return min(dp_loss(y, n-1, y_hat, m) + 1,
-               dp_loss(y, n, y_hat, m-1) + 1, 
-               dp_loss(y, n-1, y_hat, m-1) + cost
-            )
+class DynamicLoss(torch.autograd.Function):
+  @staticmethod
+  def forward(ctx, X_hat, X):
+    # build theta from original data and reconstruction
+    theta, grad_theta_xhat = construct_theta(X, X_hat)
+    #print("THETA:", theta)
+    loss, grad_L_theta = diffable_recursion(theta)
+    loss_exact = exact_recursive_formula(theta.shape[0]-1, theta)
+    #print("LOSSES:", loss, -loss_exact)
+    #print(grad_L_theta)
+    n_2 = grad_L_theta.shape[0]
+    #print(n_2)
+    #print("DL_DTheta:", torch.count_nonzero(grad_L_theta), grad_L_theta)
+    #print("DTheta_Dx:", torch.count_nonzero(grad_theta_xhat)) #, grad_L_theta)
+    grad_L_x = torch.zeros((X_hat.shape[0], X_hat.shape[1]))
+    for i in range(n_2):
+      for j in range(n_2):
+        if torch.abs(grad_L_theta[i][j]) != 0 and torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
+          #print('NON ZERO PAIR', i,j, grad_L_theta[i][j], grad_theta_xhat[i][j])
+          #print(grad_L_theta[i][j] * grad_theta_xhat[i][j])
+          #  print(grad_theta_xhat[i][j])
+          #if torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
+          #  print('DX IJ NON ZERO', i,j, grad_theta_xhat[i][j])
+          cur_grad = grad_L_theta[i][j] * grad_theta_xhat[i][j]
+          grad_L_x = torch.add(grad_L_x, cur_grad)
+
+    #grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
+    print(grad_L_x)
+    ctx.save_for_backward(grad_L_x)
+    # determine answer
+    return loss
+  
+  @staticmethod
+  def backward(ctx, grad_output):
+    grad_L_x, = ctx.saved_tensors
+    return grad_L_x, None
 
 if __name__ == "__main__":
     # try with two example midis:
