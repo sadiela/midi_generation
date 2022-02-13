@@ -97,21 +97,21 @@ def diffable_recursion(theta, gamma=1):
     v = torch.zeros(N)
     q = torch.zeros((N,N))
     E = torch.zeros((N,N))
-    for i in range(2, N):
-        parent_indices = torch.where(theta[:,i]>np.NINF)[0]
+    for j in range(2, N): # looping through and looking at PARENTS of j
+        parent_indices = torch.where(theta[:,j]>np.NINF)[0]
         #print("Parents:", parent_indices)
-        u = torch.tensor(np.asarray([theta[idx,i] + v[idx] for idx in parent_indices]))
+        u = torch.tensor(np.asarray([theta[i,j] + v[i] for i in parent_indices]))
         #print(i, u)
-        v[i] = gamma * torch.log(torch.sum(torch.exp(u/gamma)))
+        v[j] = gamma * torch.log(torch.sum(torch.exp(u/gamma)))
         q_vals = torch.exp(u/gamma)/torch.sum(torch.exp(u/gamma))
         #print(u, q_vals)
-        for k, idx in enumerate(parent_indices):
-            q[i,idx] = q_vals[k]
-    for j in range(N-1,0, -1):
-        children_indices = torch.where(theta[j,:]>np.NINF)[0]
-        for i in children_indices:
-            E[i,j] = q[i,j]*e_bar[i]
-            e_bar[j] += E[i,j]
+        for k, i in enumerate(parent_indices):
+            q[i,j] = q_vals[k]
+    for i in range(N-1,0, -1): # looping through and looking at CHILDREN of i
+        children_indices = torch.where(theta[i,:]>np.NINF)[0]
+        for j in children_indices:
+            E[i,j] = q[i,j]*e_bar[j]
+            e_bar[i] += E[i,j]
 
     return -v[N-1], -E
             
