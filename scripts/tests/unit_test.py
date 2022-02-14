@@ -123,7 +123,11 @@ if __name__ == "__main__":
         ], dtype=torch.float32)  
 
     mid2.requires_grad_()
+    mid3.requires_grad_()
     mid4.requires_grad_()
+    mid5.requires_grad_()
+    mid6.requires_grad_()
+
 
     compare_losses(mid1, mid2)
     compare_losses(mid1, mid3)
