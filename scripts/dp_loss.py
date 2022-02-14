@@ -21,6 +21,11 @@ def note_diff(a,b):
 def single_note_val(a):
     return torch.sum(a) # scalar 
 
+def distance_derivative(x):
+    x[x>0] = 1
+    x[x<0] = -1
+    return x
+
 def construct_theta(x, x_hat):
     # can I construct gradient of theta alongside this? 
     # for each theta (k,l), will have gradient w.r.t. x_hat
@@ -38,9 +43,9 @@ def construct_theta(x, x_hat):
                 theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = 0
             else:
                 theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = note_diff(x[:, i-1] ,x_hat[:, j-1]) # replacing; cost depends on ...?
-                grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)][:,j-1] = np.abs(x[:,i-1]-x_hat[:,j-1])
+                grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)][:,j-1] = distance_derivative(x[:,i-1]-x_hat[:,j-1]) # FIX ZEROS
             theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)]= single_note_val(x_hat[:, j-1])# deletion
-            grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)][:,j-1] = x_hat[:,j-1]
+            grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)][:,j-1] = distance_derivative(-x_hat[:,j-1]) #, np.abs(-x_hat[:,j-1])) # FIX
             theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i-1,j, m,n)] = single_note_val(x[:, i-1]) # insertion I think i want these both dependent on x_hat... is that possible? 
             # NOTHING (gradient w.r.t. x_hat)
             # shifting?
@@ -90,7 +95,7 @@ def diffable_recursion(theta, gamma=0.5):
 
     return -v[N-1], -E'''
 
-def diffable_recursion(theta, gamma=1):
+def diffable_recursion(theta, gamma=0.3):
     N = theta.shape[0] 
     e_bar = torch.zeros(N)
     e_bar[N-1]=1
