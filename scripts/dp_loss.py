@@ -26,6 +26,9 @@ def distance_derivative(x):
     x[x<0] = -1
     return x
 
+def pitch_shift_distance(a,b):
+    return 0
+
 def construct_theta(x, x_hat):
     # can I construct gradient of theta alongside this? 
     # for each theta (k,l), will have gradient w.r.t. x_hat
