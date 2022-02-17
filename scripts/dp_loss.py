@@ -36,14 +36,19 @@ def construct_theta(x, x_hat):
     grad_theta = torch.zeros((m*n, m*n, x_hat.shape[0], x_hat.shape[1]))
     #print(x.shape, x_hat.shape, grad_theta.shape)
     theta[:,:] = np.Inf
+    theta[0,0] = -1
 
     for i in range(1,m):
         for j in range(1,n):
+            #print(i,j, x[:, i-1], x_hat[:, j-1] )
             if (x[:, i-1] == x_hat[:, j-1]).all():
                 theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = 0
             else:
+                #print("NOTE DIFFERENCE & DERIVATIVE:", note_diff(x[:, i-1] ,x_hat[:, j-1]), distance_derivative(x[:,i-1]-x_hat[:,j-1]))
+                #print("K VALS:", k_from_ij(i-1,j-1, m,n), k_from_ij(i,j, m,n))
                 theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = note_diff(x[:, i-1] ,x_hat[:, j-1]) # replacing; cost depends on ...?
                 grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)][:,j-1] = distance_derivative(x[:,i-1]-x_hat[:,j-1]) # FIX ZEROS
+                #print("NEW GRAD THETA VALS:", grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)])
             theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)]= single_note_val(x_hat[:, j-1])# deletion
             grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)][:,j-1] = distance_derivative(-x_hat[:,j-1]) #, np.abs(-x_hat[:,j-1])) # FIX
             theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i-1,j, m,n)] = single_note_val(x[:, i-1]) # insertion I think i want these both dependent on x_hat... is that possible? 
@@ -125,10 +130,12 @@ class DynamicLoss(torch.autograd.Function):
   def forward(ctx, X_hat, X):
     # build theta from original data and reconstruction
     theta, grad_theta_xhat = construct_theta(X, X_hat)
-    #print("THETA:", theta)
+    #print(grad_theta_xhat[0][1])
     loss, grad_L_theta = diffable_recursion(theta)
     loss_exact = exact_recursive_formula(theta.shape[0]-1, theta)
-    #print("LOSSES:", loss, -loss_exact)
+    print('theta', theta)
+    print('Grad wrt theta', grad_L_theta)
+    print("LOSSES:", loss, -loss_exact)
     #print(grad_L_theta)
     n_2 = grad_L_theta.shape[0]
     #print(n_2)
@@ -138,7 +145,7 @@ class DynamicLoss(torch.autograd.Function):
     for i in range(n_2):
       for j in range(n_2):
         if torch.abs(grad_L_theta[i][j]) != 0 and torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
-          #print('NON ZERO PAIR', i,j, grad_L_theta[i][j], grad_theta_xhat[i][j])
+          print('NON ZERO PAIR', i,j, grad_L_theta[i][j], grad_theta_xhat[i][j])
           #print(grad_L_theta[i][j] * grad_theta_xhat[i][j])
           #  print(grad_theta_xhat[i][j])
           #if torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
@@ -147,7 +154,7 @@ class DynamicLoss(torch.autograd.Function):
           grad_L_x = torch.add(grad_L_x, cur_grad)
 
     #grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
-    print(grad_L_x)
+    print('FINAL GRADIENT:', torch.round(grad_L_x))
     ctx.save_for_backward(grad_L_x)
     # determine answer
     return loss
