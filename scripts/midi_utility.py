@@ -303,8 +303,9 @@ def convert_to_sparse(tensor_dir, sparse_dir, del_tensor_dir=False):
     file_list = os.listdir(tensor_dir)
     for f in tqdm(file_list): 
         cur_arr = np.load(tensor_dir / f)
+        new_f = f.split('.')[0] + '.p'
         sparse_arr = sparse.csr_matrix(cur_arr)
-        with open(sparse_dir / f, 'wb') as outfile:
+        with open(sparse_dir / new_f, 'wb') as outfile:
                 pickle.dump(sparse_arr, outfile)
     # Delete tensor_dir to save space
     if del_tensor_dir: 

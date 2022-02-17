@@ -18,7 +18,10 @@ import os
 from tqdm import tqdm
 import pickle
 import logging
+from dp_loss import *
+from pathlib import Path
 #from midi_utility import * 
+
 
 # is reconstruction error going down? 
 # Run w/ more data
@@ -56,16 +59,17 @@ class MidiDataset(Dataset):
         self.norm = norm 
         self.maxlength = 16*32
         self.sparse = sparse
-        self.paths = [ npy_file_dir / file for file in file_list] # get entire list of midi tensor file names 
+        self.paths = [ Path(npy_file_dir) / file for file in file_list] # get entire list of midi tensor file names 
         
         #self.batch_file_paths = set()
 
     def __getitem__(self, index):
         # choose random file path from directory (not already chosen), chunk it 
-
+        print(str(self.paths[index]))
         # load in tensor
         if self.sparse:
-          pickled_tensor = pickle.load(self.paths[index])
+          with open(self.paths[index], 'rb') as f:
+            pickled_tensor = pickle.load(f)
           cur_tensor = pickled_tensor.toarray()
         else:
           cur_tensor = np.load(self.paths[index]) #, allow_pickle=True)
@@ -141,7 +145,7 @@ class MIDIVectorQuantizer(nn.Module):
     
     # Quantize and unflatten
     quantized = torch.matmul(encodings, self._embedding.weight).view(input_shape)
-    logging.quantized(str(quantized) + str(quantized.shape))
+    logging.info(str(quantized) + str(quantized.shape))
 
      # Loss
     e_latent_loss = F.mse_loss(quantized.detach(), inputs)
@@ -236,7 +240,7 @@ class Model(nn.Module):
         self.quantize = quantize
 
     def forward(self, x):
-      if self.noquantize:
+      if not self.quantize:
         z = self._encoder(x)
         x_recon = self._decoder(z)
         return 0, x_recon, 0
@@ -251,16 +255,6 @@ class Model(nn.Module):
           x_recon = self._decoder(z)
           return 0, x_recon, 0
 
-class DynamicLoss(Function):
-  @staticmethod
-  def forward(recon, data):
-    # build theta
-    # determine answer
-    return 0
-  
-  def backward():
-    return 0
-
 def collate_fn(data, collate_shuffle=True):
   # data is a list of tensors
   # concatenate and shuffle all list items
@@ -271,7 +265,7 @@ def collate_fn(data, collate_shuffle=True):
   else:
     return full_list
 
-def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_loss=True, bs=10, normalize=False, quantize=True, sparse=False):
+def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfunc='mse', bs=10, normalize=False, quantize=True, sparse=False):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     midi_tensor_dataset = MidiDataset(datapath, norm=normalize, sparse=sparse)
@@ -298,6 +292,8 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
     logging.info("Device: %s" , device)
     max_tensor_size= 0 
 
+    dynamic_loss = DynamicLoss.apply
+
     for i, data in enumerate(training_data):
         #name = midi_tensor_dataset.__getname__(i)
         # s x p x 1 x l
@@ -309,9 +305,11 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
 
         #print('TRAIN:')
         vq_loss, data_recon, perplexity = model(data)
-        if mse_loss:
+        if lossfunc=='mse':
           recon_error = F.mse_loss(data_recon, data) #/ data_variance
-        else:
+        elif lossfunc=='dyn':
+          recon_error = dynamic_loss(data_recon, data) #X_hat, then X!!!
+        else: # loss function = mae
           recon_error = F.l1_loss(data_recon, data)
         loss = recon_error + vq_loss # will be 0 if no quantization
         loss.backward()
@@ -330,12 +328,13 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, mse_los
         if pd.isna(recon_error.item()):
           nanfiles.append(midi_tensor_dataset.__getname__(i))
 
-        if (i+1) % 200 == 0:
+        if (i+1) % 5000 == 0:
             logging.info('%d iterations' % (i+1))
             logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
             #print('total_loss: %3f' % np.mean(total_loss[-100:]))
             #print('perplexity: %.3f' % np.mean(train_res_perplexity[-100:]))
-            logging.info()
+            logging.info('\n')
 
+    logging.info("saving model to %s"%save_path)
     torch.save(model.state_dict(), save_path)
     return train_res_recon_error, train_res_perplexity, nanfiles

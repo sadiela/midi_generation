@@ -1,6 +1,8 @@
 numpy
-torch
-numpy
+pytorch
 pretty_midi
 tqdm
-yaml
+pyyaml
+pandas
+scipy
+pypianoroll
