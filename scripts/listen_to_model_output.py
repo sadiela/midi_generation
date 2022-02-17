@@ -64,7 +64,7 @@ def save_graphs(midi_path, save_path):
         recon.plot()
         plt.title(file)
         # FIX!
-        plt.savefig(str(save_path) + '\\' + str(file.split('.')[0] + '.png'))
+        plt.savefig(str(save_path / str(file.split('.')[0] + '.png')))
 
 def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False):
     res_string = "RECON ERRORS!\n"

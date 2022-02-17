@@ -40,7 +40,7 @@ logpath = PROJECT_DIRECTORY / 'scripts' / 'log_files'
 ##############################
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def test(datapath, resultspath, modelpath, fstub, mse_loss, batchsize=10, normalize=False, quantize=True, sparse=False):
+def train(datapath, resultspath, modelpath, fstub, loss, batchsize=10, normalize=False, quantize=True, sparse=False):
     # i think num embeddings was 64 before? 
     # Declare model
     model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
@@ -48,7 +48,7 @@ def test(datapath, resultspath, modelpath, fstub, mse_loss, batchsize=10, normal
     logging.info("Model will be saved to: %s", model_file)
 
     # train model
-    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, mse_loss=mse_loss, bs=batchsize, normalize=normalize, quantize=quantize, sparse=sparse)
+    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, lossfunc=loss, bs=batchsize, normalize=normalize, quantize=quantize, sparse=sparse)
     
     # save losses to file
     logging.info("NUM NAN FILES: %d", len(nan_recon_files))
@@ -71,8 +71,7 @@ if __name__ == "__main__":
                         default=False, help='whether or not to normalize the tensors')
     parser.add_argument('-b', '--batchsize', help='Number of songs in a batch', default=10)
     # run a single label experiment by default, if --multi flag is added, run a multilabel experiment!
-    parser.add_argument('-l','--lossfunc', dest='lossfunction', action='store_const', const=False,
-                        default=True, help="True=mse, false=l1")
+    parser.add_argument('-l','--lossfunc', help='loss function to use', default='mse')
     parser.add_argument('-q', '--quantize', dest='quant', action='store_const', const=False,
                         default=True, help="True=VQVAE, false=VAE")
     #parser.add_argument('-n', '--nfolds', help='number of folds to use in cross validation', default=1) # make default 1?
@@ -88,18 +87,18 @@ if __name__ == "__main__":
 
     args = vars(parser.parse_args())
 
-    loglevel = args['verbosity']
+    loglevel = args['loglevel']
     numeric_level = getattr(logging, loglevel.upper(), None) # put it into uppercase
 
     now = datetime.now()
     date = now.strftime("%m-%d-%Y")
-    logfile = get_free_filename('vq_vae_training' + date, logpath, suffix='.log')
+    logfile = get_free_filename('vq_vae_training-' + date, logpath, suffix='.log')
 
     logging.basicConfig(filename=logfile, encoding='utf-8', level=numeric_level)
 
     logging.info("ARGS: %s", str(args))
     #input("Continue...")
-    mse_loss = args['lossfunction'] # True or false
+    loss = args['lossfunc'] # True or false
     datadir = args['datadir']
     modeldir = args['modeldir']
     fstub = args['resname']
@@ -110,5 +109,5 @@ if __name__ == "__main__":
     quantize = args['quant']
 
     
-    test(datadir, outdir, modeldir, fstub, mse_loss, batchsize, normalize, quantize, sparse)
+    train(datadir, outdir, modeldir, fstub, loss, batchsize, normalize, quantize, sparse)
     logging.info("All done! TOTAL TIME: %s", str(time.time()-prog_start))
