@@ -35,8 +35,8 @@ num_training_updates = 15000
 num_hiddens = 128
 num_residual_hiddens = 16
 num_residual_layers = 2
-l = 1024 # batch length
-p=128
+l = 16 #1024 # batch length
+p= 128
 decay = 0.99
 learning_rate = 1e-3
 #num_embeddings = 64
@@ -75,23 +75,25 @@ class MidiDataset(Dataset):
           cur_tensor = np.load(self.paths[index]) #, allow_pickle=True)
 
         # convert to torch tensor (vs numpy tensor)
-        p, l_i = cur_tensor.shape
         cur_data = torch.tensor(cur_tensor)
-
+        p, l_i = cur_tensor.shape
+        
         # normalize if specified
         if self.norm:
           cur_data = cur_data / self.maxlength 
         
         # make sure divisible by l
         # CHUNK! 
-        if cur_data.shape[1] < self.l: 
+        print("DATA SHAPE:", cur_data.shape)
+        if l_i // self.l == 0: 
           padded = torch.zeros((p, self.l))
           padded[:,0:l_i] = cur_data
-          l_i=l
+          l_i=self.l
         else: 
           padded = cur_data[:,:(cur_data.shape[1]-(cur_data.shape[1]%self.l))]
         padded = padded.float()
         cur_chunked = torch.reshape(padded, (l_i//self.l, 1, p, self.l)) 
+        
         return cur_chunked # 3d tensor: l_i\\l x p x l
 
     def __getname__(self, index):
@@ -297,6 +299,8 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
     for i, data in enumerate(training_data):
         #name = midi_tensor_dataset.__getname__(i)
         # s x p x 1 x l
+        print("DATASHAPE:", data.shape, data[0][0].shape)
+        input("continue...")
         data = data.to(device)
         cursize = torch.numel(data)
         if cursize > max_tensor_size:
