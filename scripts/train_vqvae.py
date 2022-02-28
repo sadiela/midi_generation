@@ -70,6 +70,10 @@ if __name__ == "__main__":
     parser.add_argument('-n', '--normalize', dest='norm', action='store_const', const=True, 
                         default=False, help='whether or not to normalize the tensors')
     parser.add_argument('-b', '--batchsize', help='Number of songs in a batch', default=10)
+    parser.add_argument('-a', '--batchlength', help='Length of midi object', default=128)
+    parser.add_argument('-u', '--numembed', help='Number of embeddings', default=1024)
+    parser.add_argument('-e', '--embeddim', help='Number of embeddings', default=36)
+
     # run a single label experiment by default, if --multi flag is added, run a multilabel experiment!
     parser.add_argument('-l','--lossfunc', help='loss function to use', default='mse')
     parser.add_argument('-q', '--quantize', dest='quant', action='store_const', const=False,
@@ -105,9 +109,11 @@ if __name__ == "__main__":
     outdir = args['outdir']
     sparse = args['sparse']
     batchsize = int(args['batchsize'])
+    batchlength = int(args['batchlength'])
     normalize = args['norm']
     quantize = args['quant']
-
+    embeddim = int(args['embeddim'])
+    numembed = int(args['numembed'])
     
-    train(datadir, outdir, modeldir, fstub, loss, batchsize, normalize, quantize, sparse)
+    train(datadir, outdir, modeldir, fstub, loss, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim)
     logging.info("All done! TOTAL TIME: %s", str(time.time()-prog_start))
