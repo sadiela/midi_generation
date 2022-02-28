@@ -82,8 +82,9 @@ def testDPLoss():
 
 def compare_losses(mid1, mid2): 
     l2_loss = F.mse_loss(mid1, mid2)
-    dyn_loss = dynamic_loss(mid1, mid2)
-    print("L2:", l2_loss.data)
+    dyn_loss = dynamic_loss(mid1, mid2) #recon, orig
+    l2_loss.backward()
+    print("L2:", l2_loss.data, l2_loss.grad)
     print("Dynamic:", dyn_loss.data)
 
 
@@ -96,8 +97,8 @@ if __name__ == "__main__":
         ], dtype=torch.float32)  
 
     mid2 = torch.tensor([
-        [1,1],
-        [0,1]
+        [0,0,0,0],
+        [0,0,0,0],
         ], dtype=torch.float32)  
 
     mid3 = torch.tensor([
@@ -133,7 +134,7 @@ if __name__ == "__main__":
 
 
     #compare_losses(mid1, mid2)
-    compare_losses(mid3, mid1)
+    compare_losses(mid1, mid2)
     #compare_losses(mid1, mid4)  
     #compare_losses(mid1, mid5)
     #compare_losses(mid1, mid6)  
@@ -141,3 +142,6 @@ if __name__ == "__main__":
     #compare_losses(mid1, mid8)  
 
 
+    #loss = criterion(outputs, labels.long() )
+    #print(loss.data)
+    #print(loss.grad)

@@ -130,7 +130,32 @@ def diffable_recursion(theta, gamma=0.3):
 class DynamicLoss(torch.autograd.Function):
   @staticmethod
   def forward(ctx, X_hat, X):
-    # X_hat, X are bigger than we thought...
+    # build theta from original data and reconstruction
+    theta, grad_theta_xhat = construct_theta(X, X_hat)
+    #print(grad_theta_xhat[0][1])
+    loss, grad_L_theta = diffable_recursion(theta)
+    loss_exact = exact_recursive_formula(theta.shape[0]-1, theta)
+    #print(grad_L_theta)
+    n_2 = grad_L_theta.shape[0]
+    #print(n_2)
+    #print("DL_DTheta:", torch.count_nonzero(grad_L_theta), grad_L_theta)
+    #print("DTheta_Dx:", torch.count_nonzero(grad_theta_xhat)) #, grad_L_theta)
+    grad_L_x = torch.zeros((X_hat.shape[0], X_hat.shape[1]))
+    for i in range(n_2):
+      for j in range(n_2):
+        if torch.abs(grad_L_theta[i][j]) != 0 and torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
+          #print(grad_L_theta[i][j] * grad_theta_xhat[i][j])
+          #  print(grad_theta_xhat[i][j])
+          #if torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
+          #  print('DX IJ NON ZERO', i,j, grad_theta_xhat[i][j])
+          cur_grad = grad_L_theta[i][j] * grad_theta_xhat[i][j]
+          grad_L_x = torch.add(grad_L_x, cur_grad)
+    #grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
+    print('FINAL GRADIENT:', grad_L_x)
+    ctx.save_for_backward(grad_L_x)
+    # determine answer
+    return loss
+    '''# X_hat, X are bigger than we thought...
     # build theta from original data and reconstruction
     grad_L_x = torch.zeros((X.shape[0], X.shape[1], X.shape[2], X.shape[3]))
     for i in range(X_hat.shape[0]):
@@ -159,7 +184,7 @@ class DynamicLoss(torch.autograd.Function):
     print('FINAL GRADIENT:', torch.round(grad_L_x))
     ctx.save_for_backward(grad_L_x)
     # determine answer
-    return loss
+    return loss'''
   
   @staticmethod
   def backward(ctx, grad_output):
