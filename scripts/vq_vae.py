@@ -35,8 +35,8 @@ num_training_updates = 15000
 num_hiddens = 128
 num_residual_hiddens = 16
 num_residual_layers = 2
-l = 16 #1024 # batch length
-p= 128
+l = 512 #1024 # batch length
+p= 36 #128
 decay = 0.99
 learning_rate = 1e-3
 #num_embeddings = 64
@@ -49,7 +49,7 @@ learning_rate = 1e-3
 class MidiDataset(Dataset):
     """Midi dataset."""
 
-    def __init__(self, npy_file_dir, l=1024, sparse=False, norm=False):
+    def __init__(self, npy_file_dir, l=512, sparse=False, norm=False):
         """
         Args:
             npy_file_dir (string): Path to the npy file directory
@@ -76,7 +76,8 @@ class MidiDataset(Dataset):
 
         # convert to torch tensor (vs numpy tensor)
         cur_data = torch.tensor(cur_tensor)
-        p, l_i = cur_tensor.shape
+        cur_data = cur_data[46:-46,:]
+        p, l_i = cur_data.shape
         
         # normalize if specified
         if self.norm:
@@ -84,7 +85,7 @@ class MidiDataset(Dataset):
         
         # make sure divisible by l
         # CHUNK! 
-        print("DATA SHAPE:", cur_data.shape)
+        #print("DATA SHAPE:", cur_data.shape)
         if l_i // self.l == 0: 
           padded = torch.zeros((p, self.l))
           padded[:,0:l_i] = cur_data
@@ -267,10 +268,10 @@ def collate_fn(data, collate_shuffle=True):
   else:
     return full_list
 
-def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfunc='mse', bs=10, normalize=False, quantize=True, sparse=False):
+def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfunc='mse', bs=10, batchlength=256, normalize=False, quantize=True, sparse=False):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    midi_tensor_dataset = MidiDataset(datapath, norm=normalize, sparse=sparse)
+    midi_tensor_dataset = MidiDataset(datapath, l=batchlength, norm=normalize, sparse=sparse)
 
     # declare model and optimizer
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, amsgrad=False)
@@ -299,7 +300,6 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
     for i, data in enumerate(training_data):
         #name = midi_tensor_dataset.__getname__(i)
         # s x p x 1 x l
-        print("DATASHAPE:", data.shape, data[0][0].shape)
         data = data.to(device)
         cursize = torch.numel(data)
         if cursize > max_tensor_size:
