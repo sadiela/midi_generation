@@ -40,29 +40,6 @@ def construct_theta(x, x_hat):
     grad_theta = torch.zeros((m*n, m*n, x_hat.shape[0], x_hat.shape[1]))
     #print(x.shape, x_hat.shape, grad_theta.shape)
     theta[:,:] = np.Inf
-<<<<<<< HEAD
-    theta[0,0] = -1
-
-    for i in range(1,m):
-        for j in range(1,n):
-            #print(i,j, x[:, i-1], x_hat[:, j-1] )
-            if (x[:, i-1] == x_hat[:, j-1]).all():
-                theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = 0
-            else:
-                #print("NOTE DIFFERENCE & DERIVATIVE:", note_diff(x[:, i-1] ,x_hat[:, j-1]), distance_derivative(x[:,i-1]-x_hat[:,j-1]))
-                #print("K VALS:", k_from_ij(i-1,j-1, m,n), k_from_ij(i,j, m,n))
-                theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = note_diff(x[:, i-1] ,x_hat[:, j-1]) # replacing; cost depends on ...?
-                grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)][:,j-1] = distance_derivative(x[:,i-1]-x_hat[:,j-1]) # FIX ZEROS
-                #print("NEW GRAD THETA VALS:", grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)])
-            theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)]= single_note_val(x_hat[:, j-1])# deletion
-            grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)][:,j-1] = distance_derivative(-x_hat[:,j-1]) #, np.abs(-x_hat[:,j-1])) # FIX
-            theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i-1,j, m,n)] = single_note_val(x[:, i-1]) # insertion I think i want these both dependent on x_hat... is that possible? 
-            # NOTHING (gradient w.r.t. x_hat)
-            # shifting?
-            # gradient is telling you how much to change each x value... we will have
-    #print("GRAD THETA NONZEROS:", torch.count_nonzero(grad_theta)) # there are 12...
-    return -theta, -grad_theta
-=======
     try:
         for i in range(1,m):
             for j in range(1,n):
@@ -82,7 +59,6 @@ def construct_theta(x, x_hat):
     except RuntimeError as err:
         print(err, x.shape, x_hat.shape)
         return torch.zeros((m*n, m*n)), torch.zeros((m*n, m*n, x_hat.shape[0], x_hat.shape[1]))
->>>>>>> f6bc079f905072494d484463b548279b5fda606e
 
 def exact_recursive_formula(j, theta): 
     # we assume we have the edge representation of the graph theta (i,j) (parent,child)
@@ -156,31 +132,6 @@ class DynamicLoss(torch.autograd.Function):
   def forward(ctx, X_hat, X):
     # X_hat, X are bigger than we thought...
     # build theta from original data and reconstruction
-<<<<<<< HEAD
-    theta, grad_theta_xhat = construct_theta(X, X_hat)
-    #print(grad_theta_xhat[0][1])
-    loss, grad_L_theta = diffable_recursion(theta)
-    loss_exact = exact_recursive_formula(theta.shape[0]-1, theta)
-    print('theta', theta)
-    print('Grad wrt theta', grad_L_theta)
-    print("LOSSES:", loss, -loss_exact)
-    #print(grad_L_theta)
-    n_2 = grad_L_theta.shape[0]
-    #print(n_2)
-    #print("DL_DTheta:", torch.count_nonzero(grad_L_theta), grad_L_theta)
-    #print("DTheta_Dx:", torch.count_nonzero(grad_theta_xhat)) #, grad_L_theta)
-    grad_L_x = torch.zeros((X_hat.shape[0], X_hat.shape[1]))
-    for i in range(n_2):
-      for j in range(n_2):
-        if torch.abs(grad_L_theta[i][j]) != 0 and torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
-          print('NON ZERO PAIR', i,j, grad_L_theta[i][j], grad_theta_xhat[i][j])
-          #print(grad_L_theta[i][j] * grad_theta_xhat[i][j])
-          #  print(grad_theta_xhat[i][j])
-          #if torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
-          #  print('DX IJ NON ZERO', i,j, grad_theta_xhat[i][j])
-          cur_grad = grad_L_theta[i][j] * grad_theta_xhat[i][j]
-          grad_L_x = torch.add(grad_L_x, cur_grad)
-=======
     grad_L_x = torch.zeros((X.shape[0], X.shape[1], X.shape[2], X.shape[3]))
     for i in range(X_hat.shape[0]):
         theta, grad_theta_xhat = construct_theta(X[i][0], X_hat[i][0])
@@ -203,7 +154,6 @@ class DynamicLoss(torch.autograd.Function):
                     #  print('DX IJ NON ZERO', i,j, grad_theta_xhat[i][j])
                     cur_grad = grad_L_theta[i][j] * grad_theta_xhat[i][j]
                     grad_L_x[i][0] = torch.add(grad_L_x, cur_grad)
->>>>>>> f6bc079f905072494d484463b548279b5fda606e
 
     #grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
     print('FINAL GRADIENT:', torch.round(grad_L_x))
