@@ -76,7 +76,8 @@ class MidiDataset(Dataset):
 
         # convert to torch tensor (vs numpy tensor)
         cur_data = torch.tensor(cur_tensor)
-        p, l_i = cur_tensor.shape
+        cur_data = cur_data[46:-46,:]
+        p, l_i = cur_data.shape
         
         # normalize if specified
         if self.norm:
@@ -84,7 +85,7 @@ class MidiDataset(Dataset):
         
         # make sure divisible by l
         # CHUNK! 
-        print("DATA SHAPE:", cur_data.shape)
+        #print("DATA SHAPE:", cur_data.shape)
         if l_i // self.l == 0: 
           padded = torch.zeros((p, self.l))
           padded[:,0:l_i] = cur_data
@@ -299,8 +300,6 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
     for i, data in enumerate(training_data):
         #name = midi_tensor_dataset.__getname__(i)
         # s x p x 1 x l
-        print("DATASHAPE:", data.shape, data[0][0].shape)
-        input("continue...")
         data = data.to(device)
         cursize = torch.numel(data)
         if cursize > max_tensor_size:
