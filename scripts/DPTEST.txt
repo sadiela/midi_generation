@@ -67,3 +67,37 @@ Traceback (most recent call last):
   File "/projectnb2/textconv/sadiela/midi_generation/scripts/dp_loss.py", line 39, in construct_theta
     theta = torch.zeros((m*n, m*n))
 RuntimeError: [enforce fail at CPUAllocator.cpp:68] . DefaultCPUAllocator: can't allocate memory: you tried to allocate 4415251562500 bytes. Error code 12 (Cannot allocate memory)
+file exists
+file exists
+file exists
+file exists
+file exists
+file exists
+file exists
+file exists
+file exists
+file exists
+no file
+tests/processed_data/sparse_mini/Believe_6.p
+tests/processed_data/sparse_mini/Barbara Ann_4.p
+tests/processed_data/sparse_mini/All the Things You Are_6.p
+tests/processed_data/sparse_mini/Believe_9.p
+tests/processed_data/sparse_mini/All the Things You Are_7.p
+tests/processed_data/sparse_mini/Believe_7.p
+tests/processed_data/sparse_mini/All the Things You Are_8.p
+tests/processed_data/sparse_mini/Barbara Ann_5.p
+tests/processed_data/sparse_mini/All the Things You Are_12.p
+tests/processed_data/sparse_mini/Believe_2.p
+CONSTRUCTING THETA: torch.Size([36, 128]) torch.Size([36, 128])
+Traceback (most recent call last):
+  File "dp_test.py", line 29, in <module>
+    train_vqvae.train(dataDir, outDir, modelDir, fstub=fstub, loss='dyn', batchsize=batchsize, batchlength=batchlength, normalize=True, quantize=True, sparse=sparse, num_embeddings=1024, embedding_dim=36)
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/train_vqvae.py", line 51, in train
+    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, lossfunc=loss, bs=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse)
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/vq_vae.py", line 314, in train_model
+    recon_error = dynamic_loss(data_recon, data) #X_hat, then X!!!
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/dp_loss.py", line 137, in forward
+    theta, grad_theta_xhat = construct_theta(X[i][0], X_hat[i][0])
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/dp_loss.py", line 40, in construct_theta
+    grad_theta = torch.zeros((m*n, m*n, x_hat.shape[0], x_hat.shape[1]))
+RuntimeError: [enforce fail at CPUAllocator.cpp:68] . DefaultCPUAllocator: can't allocate memory: you tried to allocate 5104242542592 bytes. Error code 12 (Cannot allocate memory)

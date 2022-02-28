@@ -43,6 +43,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 def train(datapath, resultspath, modelpath, fstub, loss, batchsize=10, batchlength=256, normalize=False, quantize=True, sparse=False, num_embeddings=1024, embedding_dim=36):
     # i think num embeddings was 64 before? 
     # Declare model
+    print("DEVICE:", device)
     model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
     model_file = get_free_filename('model_' + fstub, modelpath, suffix='.pt')
     logging.info("Model will be saved to: %s", model_file)
