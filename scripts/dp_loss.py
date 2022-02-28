@@ -26,6 +26,9 @@ def distance_derivative(x):
     x[x<0] = -1
     return x
 
+def pitch_shift_distance(a,b):
+    return 0
+
 def construct_theta(x, x_hat):
     print("CONSTRUCTING THETA:", x.shape, x_hat.shape)
     # can I construct gradient of theta alongside this? 
@@ -153,7 +156,7 @@ class DynamicLoss(torch.autograd.Function):
                     grad_L_x[i][0] = torch.add(grad_L_x, cur_grad)
 
     #grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
-    print(grad_L_x)
+    print('FINAL GRADIENT:', torch.round(grad_L_x))
     ctx.save_for_backward(grad_L_x)
     # determine answer
     return loss

@@ -62,4 +62,11 @@ Finished differentiable recursion for the edit distance problem, including code 
 Start defining weekly sprints with different goals using Github projects. Sprints will start Monday and end the following Sunday to line up with meetings. 
 
 ### Entry 2/7/2022
-Large values in x, x_recon result in infinit loss/nan gradients. This is easily remedied with max note length cutoff and normalization. 
+Large values in x, x_recon result in infinite loss/nan gradients. This is easily remedied with max note length cutoff and normalization. 
+
+### Entry 2/17/2022
+Loss function appears relatively operationl. Three known issues: 
+* large x, x_recon values result in infinite loss and NAN gradients
+* gradients do not appear to be accurate for the first column of 
+* Have yet to see |gradient|>1, even with large note value differences. 
+* Think it is worth testing on some data to see how it does/how long it takes to run.
