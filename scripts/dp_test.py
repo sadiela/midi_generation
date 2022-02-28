@@ -22,7 +22,8 @@ outDir = homeDirectory / 'tests' / 'results'
 modelDir = homeDirectory / 'tests' / 'models'
 testingLog = homeDirectory / 'tests' / 'test_logs' / 'unit_tests.log'
 batchsize = 10
+batchlength = 128
 sparse = True
 fstub = "dpTEST"
 
-train_vqvae.train(dataDir, outDir, modelDir, fstub=fstub, loss='dyn', batchsize=batchsize, normalize=True, quantize=True, sparse=sparse)
+train_vqvae.train(dataDir, outDir, modelDir, fstub=fstub, loss='dyn', batchsize=batchsize, batchlength=batchlength, normalize=True, quantize=True, sparse=sparse, num_embeddings=1024, embedding_dim=36)
