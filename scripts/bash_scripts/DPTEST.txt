@@ -1,0 +1,13 @@
+no file
+Traceback (most recent call last):
+  File "../dp_test.py", line 28, in <module>
+    train_vqvae.train(dataDir, outDir, modelDir, fstub=fstub, loss='dyn', batchsize=batchsize, normalize=True, quantize=True, sparse=sparse)
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/train_vqvae.py", line 47, in train
+    model_file = get_free_filename('model_' + fstub, modelpath, suffix='.pt')
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/gen_utility.py", line 22, in get_free_filename
+    Path(file_candidate).touch()
+  File "/projectnb/textconv/sadiela/.conda/envs/py3/lib/python3.8/pathlib.py", line 1278, in touch
+    fd = self._raw_open(flags, mode)
+  File "/projectnb/textconv/sadiela/.conda/envs/py3/lib/python3.8/pathlib.py", line 1087, in _raw_open
+    return self._accessor.open(self, flags, mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'tests/models/model_dpTEST-2022-02-270.pt'
