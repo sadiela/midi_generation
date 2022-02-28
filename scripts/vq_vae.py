@@ -76,7 +76,8 @@ class MidiDataset(Dataset):
 
         # convert to torch tensor (vs numpy tensor)
         cur_data = torch.tensor(cur_tensor)
-        p, l_i = cur_tensor.shape
+        cur_data = cur_data[46:-46,:]
+        p, l_i = cur_data.shape
         
         # normalize if specified
         if self.norm:
