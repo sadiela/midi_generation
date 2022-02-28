@@ -40,15 +40,15 @@ logpath = PROJECT_DIRECTORY / 'scripts' / 'log_files'
 ##############################
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def train(datapath, resultspath, modelpath, fstub, loss, batchsize=10, normalize=False, quantize=True, sparse=False):
+def train(datapath, resultspath, modelpath, fstub, loss, batchsize=10, batchlength=256, normalize=False, quantize=True, sparse=False, num_embeddings=1024, embedding_dim=36):
     # i think num embeddings was 64 before? 
     # Declare model
-    model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
+    model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
     model_file = get_free_filename('model_' + fstub, modelpath, suffix='.pt')
     logging.info("Model will be saved to: %s", model_file)
 
     # train model
-    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, lossfunc=loss, bs=batchsize, normalize=normalize, quantize=quantize, sparse=sparse)
+    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, lossfunc=loss, bs=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse)
     
     # save losses to file
     logging.info("NUM NAN FILES: %d", len(nan_recon_files))
