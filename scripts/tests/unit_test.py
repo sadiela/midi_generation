@@ -45,7 +45,9 @@ trainingParameterList = [
     ['l2norm', 'mse', True, False],
     ['l1norm', 'mae', True, False],
     ['dploss', 'dyn', False, False],
-    ['dplossquant', 'dyn', False, True]
+    ['dplossquant', 'dyn', False, True],
+    ['dplossnorm', 'dyn', True, False],
+    ['dplossquantnorm', 'dyn', True, True]
 ]
 
 def testProcessing():
