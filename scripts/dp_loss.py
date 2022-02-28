@@ -129,7 +129,7 @@ class DynamicLoss(torch.autograd.Function):
   def forward(ctx, X_hat, X):
     # X_hat, X are bigger than we thought...
     # build theta from original data and reconstruction
-    grad_L_x = torch.zeros((X.shape[0], X.shape[1], X.shape[2], X.shape[3]))
+    grad_L_x = torch.zeros((X.shape[0], X.shape[1], X.shape[2], X.shape[3])) # THIS SIZE FINE
     for i in range(X_hat.shape[0]):
         theta, grad_theta_xhat = construct_theta(X[i][0], X_hat[i][0])
         #print("THETA:", theta)
