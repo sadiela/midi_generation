@@ -300,7 +300,6 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
         #name = midi_tensor_dataset.__getname__(i)
         # s x p x 1 x l
         print("DATASHAPE:", data.shape, data[0][0].shape)
-        input("continue...")
         data = data.to(device)
         cursize = torch.numel(data)
         if cursize > max_tensor_size:
