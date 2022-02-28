@@ -96,14 +96,14 @@ if __name__ == "__main__":
         ], dtype=torch.float32)  
 
     mid2 = torch.tensor([
-        [1,1],
-        [0,1]
-        ], dtype=torch.float32)  
+        [0,0,0,0],
+        [0,0,0,0],
+        ], dtype=torch.float32) 
 
     mid3 = torch.tensor([
-        [1,0,0,3],
-        [5,0,0,0],
-        ], dtype=torch.float32)  
+        [0,0,1,0],
+        [0,1,1,0],
+        ], dtype=torch.float32) 
 
     mid4 = torch.tensor([
         [1,0],
@@ -132,9 +132,9 @@ if __name__ == "__main__":
     mid6.requires_grad_()
 
 
-    #compare_losses(mid1, mid2)
-    compare_losses(mid3, mid1)
-    #compare_losses(mid1, mid4)  
+    compare_losses(mid2, mid1)
+    compare_losses(mid1, mid2)
+    compare_losses(mid3, mid1)  
     #compare_losses(mid1, mid5)
     #compare_losses(mid1, mid6)  
     #compare_losses(mid1, mid7)
