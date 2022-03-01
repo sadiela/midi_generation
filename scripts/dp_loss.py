@@ -22,9 +22,10 @@ def single_note_val(a):
     return torch.sum(a) # scalar 
 
 def distance_derivative(x):
-    x[x>0] = 1
-    x[x<0] = -1
-    return x
+    grad = np.copy(x)
+    grad[grad>0] = 1
+    grad[grad<0] = -1
+    return grad
 
 def pitch_shift_distance(a,b):
     return 0
