@@ -79,6 +79,6 @@ To do:
 1. Change theta calculation to be sparse DONE!
 2. Change grad_theta calculation to be sparse DONE!
 3. Change loss calculation to be sparse DONE!
-4. Change grad_loss calculation to be sparse
+4. Change grad_loss calculation to be sparse --> not working for certain indices
 5. Chain rule of grad_theta and grad_loss --> sparsely 
 6. Unit tests for equivalence of two loss modules 
