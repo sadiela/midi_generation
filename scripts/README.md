@@ -65,8 +65,20 @@ Start defining weekly sprints with different goals using Github projects. Sprint
 Large values in x, x_recon result in infinite loss/nan gradients. This is easily remedied with max note length cutoff and normalization. 
 
 ### Entry 2/17/2022
-Loss function appears relatively operationl. Three known issues: 
+Loss function appears relatively operational. Three known issues: 
 * large x, x_recon values result in infinite loss and NAN gradients
 * gradients do not appear to be accurate for the first column of 
 * Have yet to see |gradient|>1, even with large note value differences. 
 * Think it is worth testing on some data to see how it does/how long it takes to run.
+
+
+### Entry 3/2/2022
+Must create a new version of the DP loss algorithm that uses sparse matrices because the theta and grad theta tensors are much too large.
+
+To do:
+1. Change theta calculation to be sparse DONE!
+2. Change grad_theta calculation to be sparse DONE!
+3. Change loss calculation to be sparse DONE!
+4. Change grad_loss calculation to be sparse
+5. Chain rule of grad_theta and grad_loss --> sparsely 
+6. Unit tests for equivalence of two loss modules 
