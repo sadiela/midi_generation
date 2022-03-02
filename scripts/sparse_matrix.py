@@ -131,6 +131,19 @@ def q_additions(parent_indices, q_vals, j, N):
         v.append(q_vals[k])
     return torch.sparse_coo_tensor(indices, v, (N,N))
 
+def add_E_val(idx1, idx2, val, N):
+    indices = [[idx1],[idx2]]
+    values = [val]
+    return torch.sparse_coo_tensor(indices, values, (N,N))
+
+def get_ijth_val(sparsemat, i,j):
+    sparsemat = sparsemat.coalesce()
+    indices = sparsemat.indices()
+    values = sparsemat.values()
+    for idx in range(indices.size()[1]):
+        if indices[0,idx] == i and indices[1,idx] == j:
+            return values[idx]
+
 def sparse_diffable_recursion(theta, gamma=0.3): # passed in sparse
     N = theta.size()[0] # 
     e_bar = torch.zeros(N)
@@ -148,13 +161,14 @@ def sparse_diffable_recursion(theta, gamma=0.3): # passed in sparse
         v[j] = gamma * torch.log(torch.sum(torch.exp(u/gamma))) # this is fine
         q_vals = torch.exp(u/gamma)/torch.sum(torch.exp(u/gamma)) # this is fine
         q = q + q_additions(parent_indices, q_vals, j, N)
-    '''for i in range(N-1,0, -1): # looping through and looking at CHILDREN of i
-        children_indices = torch.where(theta[i,:]>np.NINF)[0]
+    for i in range(N-1,0, -1): # looping through and looking at CHILDREN of i
+        children_indices = get_child_indices(theta, i) #torch.where(theta[i,:]>np.NINF)[0]
         for j in children_indices:
-            E[i,j] = q[i,j]*e_bar[j]
-            e_bar[i] += E[i,j]'''
-    print('LOSSES SPARSE:', v.shape, v)
-    return -v[N-1] #, -E
+            q_ij = j[1] # value at ij
+            E += add_E_val(i, j[0], q_ij*e_bar[j[0]], N)
+            # E[i,j] = q[i,j]*e_bar[j]
+            e_bar[i] += get_ijth_val(E, i, j[0])
+    return -v[N-1], -E
 
 def diffable_recursion(theta, gamma=0.3):
     N = theta.shape[0] 
@@ -178,7 +192,6 @@ def diffable_recursion(theta, gamma=0.3):
         for j in children_indices:
             E[i,j] = q[i,j]*e_bar[j]
             e_bar[i] += E[i,j]
-    print('LOSSES ORIG:', v.shape, v)
     return -v[N-1], -E
 
 class DynamicLoss(torch.autograd.Function):
@@ -193,16 +206,17 @@ class DynamicLoss(torch.autograd.Function):
         grad_theta_xhat = grad_theta_xhat.coalesce()
         #print("THETA:", theta)
         loss, grad_L_theta = diffable_recursion(theta)
+        grad_L_theta.coalesce()
         #loss_exact = exact_recursive_formula(theta.shape[0]-1, theta)
         #print("LOSSES:", loss, -loss_exact)
         #print(grad_L_theta)
-        n_2 = grad_L_theta.shape[0]
+        n_2 = grad_L_theta.size()[0]
         #print(n_2)
         #print("DL_DTheta:", torch.count_nonzero(grad_L_theta), grad_L_theta)
         #print("DTheta_Dx:", torch.count_nonzero(grad_theta_xhat)) #, grad_L_theta)
         for i in range(n_2):
             for j in range(n_2):
-                if torch.abs(grad_L_theta[i][j]) != 0 and torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
+                if torch.abs(get_ijth_val(grad_L_theta, i,j)) != 0 and torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
                     #print('NON ZERO PAIR', i,j, grad_L_theta[i][j], grad_theta_xhat[i][j])
                     #print(grad_L_theta[i][j] * grad_theta_xhat[i][j])
                     #  print(grad_theta_xhat[i][j])
@@ -224,13 +238,13 @@ class DynamicLoss(torch.autograd.Function):
 
 
 mid1 = torch.tensor([
-        [1,1,0,3],
-        [0,0,1,0],
+        [1,1],#,0,3],
+        [0,0]#,1,0],
         ], dtype=torch.float32)  
 
 mid2 = torch.tensor([
-        [1,0,0,3],
-        [0,1,0,0],
+        [1,1],#,1,8],
+        [0,1],#0,0],
         ], dtype=torch.float32) 
 
 orig_theta, grad_theta = construct_theta(mid1, mid2)
@@ -239,9 +253,13 @@ sparsetheta = sparsetheta.coalesce()
 
 loss_orig, lossgrad = diffable_recursion(orig_theta, gamma=0.3)
 
-loss_sparse = sparse_diffable_recursion(sparsetheta, gamma=0.3)
+loss_sparse, sparselossgrad = sparse_diffable_recursion(sparsetheta, gamma=0.3)
 
 print("LOSSES:", loss_orig, loss_sparse)
+print(torch.equal(loss_orig, loss_sparse))
+print(torch.equal(lossgrad, sparselossgrad.to_dense()))
+print(torch.eq(lossgrad, sparselossgrad.to_dense()).sum())
+print(torch.norm(lossgrad - sparselossgrad.to_dense()))
 #sparse_theta, sparse_grad_theta = construct_theta_sparse(mid1, mid2)
 
 #print(sparse_grad_theta.size()[0])
