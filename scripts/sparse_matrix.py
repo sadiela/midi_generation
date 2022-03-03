@@ -215,7 +215,7 @@ class DynamicLoss(torch.autograd.Function):
         #print("DL_DTheta:", torch.count_nonzero(grad_L_theta), grad_L_theta)
         #print("DTheta_Dx:", torch.count_nonzero(grad_theta_xhat)) #, grad_L_theta)
         for i in range(n_2):
-            for j in range(n_2):
+            for j in range(n_2): ##### NOT DONE W THIS PART!!!! ####
                 if torch.abs(get_ijth_val(grad_L_theta, i,j)) != 0 and torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
                     #print('NON ZERO PAIR', i,j, grad_L_theta[i][j], grad_theta_xhat[i][j])
                     #print(grad_L_theta[i][j] * grad_theta_xhat[i][j])
