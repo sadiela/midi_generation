@@ -22,7 +22,7 @@ def single_note_val(a):
     return torch.sum(a) # scalar 
 
 def distance_derivative(x):
-    grad = np.copy(x)
+    grad = torch.clone(x)
     grad[grad>0] = 1
     grad[grad<0] = -1
     return grad
@@ -103,7 +103,7 @@ def diffable_recursion(theta, gamma=0.5):
 
     return -v[N-1], -E'''
 
-def diffable_recursion(theta, gamma=1):
+def diffable_recursion(theta, gamma=0.1):
     N = theta.shape[0] 
     e_bar = torch.zeros(N)
     e_bar[N-1]=1
