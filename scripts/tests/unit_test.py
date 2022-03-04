@@ -30,7 +30,7 @@ testingLog = homeDirectory / 'tests' / 'test_logs' / 'unit_tests.log'
 batchsize = 10
 sparse = True
 
-dynamic_loss = DynamicLoss.apply
+dynamic_loss = DynamicLossSingle.apply
 
 #logging.basicConfig(filename=testingLog, level='DEBUG')
 
@@ -96,8 +96,8 @@ if __name__ == "__main__":
         ], dtype=torch.float32)  
 
     mid2 = torch.tensor([
-        [1,1],
-        [0,1]
+        [0,0,0,0],
+        [0,0,0,0],
         ], dtype=torch.float32)  
 
     mid3 = torch.tensor([
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     mid6.requires_grad_()
 
 
-    #compare_losses(mid1, mid2)
+    compare_losses(mid1, mid2)
     compare_losses(mid3, mid1)
     #compare_losses(mid1, mid4)  
     #compare_losses(mid1, mid5)
