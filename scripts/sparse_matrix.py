@@ -255,20 +255,28 @@ print("LOSSES:", loss_orig, loss_sparse)
 print("LOSSES EQUAL:", torch.equal(loss_orig, loss_sparse))
 print("THETAS:", torch.equal(origtheta, sparsetheta))
 print("GRAD THETAS:", torch.equal(gradtheta, sparsegradtheta.to_dense()))
-print("GRAD LOSSES", torch.equal(lossgrad, sparselossgrad.to_dense()))
+print("GRAD LOSSES:", torch.equal(lossgrad, sparselossgrad.to_dense()))
 
 print("MATCHING INDICES:", torch.eq(lossgrad, sparselossgrad.to_dense()).sum(), "out of", lossgrad.numel())
 
-'''midis1 = [mid1, mid2]
-midis2 = [mid1, mid2]
+midis1 = [mid1, mid2]
+midis2 = [mid2, mid1]
 
 def test_sparse_loss():
     for m1, m2 in zip(midis1, midis2):
         origtheta, gradtheta = construct_theta(m1, m2)
         sparsetheta, sparsegradtheta = construct_theta_sparse(m1, m2)
-        assert (torch.equal(origtheta, sparsetheta.to_dense()))
-        assert (torch.equal(gradtheta, sparsegradtheta.to_dense()))'''
+        sparsetheta = sparsetheta.coalesce()
+        loss_orig, lossgrad = diffable_recursion(origtheta, gamma=0.3)
+        loss_sparse, sparselossgrad = sparse_diffable_recursion(sparsetheta, gamma=0.3)
+        sparsetheta = sparsetheta.to_dense()
+        sparsetheta[sparsetheta==0] = np.NINF
+        assert (torch.equal(origtheta, sparsetheta))
+        assert (torch.equal(gradtheta, sparsegradtheta.to_dense()))
+        assert (torch.equal(loss_orig, loss_sparse))
+        assert (torch.equal(lossgrad, sparselossgrad.to_dense()))
 
+test_sparse_loss()
 
 '''
 dynamic_loss = DynamicLossSingle.apply
