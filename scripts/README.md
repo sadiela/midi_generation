@@ -82,3 +82,4 @@ To do:
 4. Change grad_loss calculation to be sparse --> not working for certain indices
 5. Chain rule of grad_theta and grad_loss --> sparsely 
 6. Unit tests for equivalence of two loss modules 
+7. Compare new loss with old loss
