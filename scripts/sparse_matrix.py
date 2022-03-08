@@ -132,10 +132,11 @@ def sparse_diffable_recursion(theta, gamma=0.3): # passed in sparse
         v[j] = gamma * torch.log(torch.sum(torch.exp(u/gamma))) # this is fine
         q_vals = torch.exp(u/gamma)/torch.sum(torch.exp(u/gamma)) # this is fine
         q = q + q_additions(parent_indices, q_vals, j, N)
+    print("q:", q)
     for i in range(N-1,0, -1): # looping through and looking at CHILDREN of i
         children_indices = get_child_indices(theta, i) #torch.where(theta[i,:]>np.NINF)[0]
         for j in children_indices:
-            q_ij = j[1] # value at ij
+            q_ij = get_ijth_val(q, i,j[0]) # value at ij
             E += E_val(i, j[0], q_ij*e_bar[j[0]], N)
             e_bar[i] += get_ijth_val(E, i, j[0])
     return -v[N-1], -E
