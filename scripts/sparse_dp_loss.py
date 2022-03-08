@@ -1,8 +1,7 @@
 
-import scipy as sp
 import torch
 import numpy as np 
-from dp_loss import *
+#from dp_loss import *
 import torch.nn.functional as F
 
 def ij_from_k(k, N):
@@ -231,100 +230,101 @@ class SparseDynamicLossSingle(torch.autograd.Function):
     return grad_L_x, None
 
 
-mid1 = torch.tensor([
-        [1,1],#,0,3],
-        [1,0]#,1,0],
-        ], dtype=torch.float32)  
+if __name__ == "__main__":
+    mid1 = torch.tensor([
+            [1,1],#,0,3],
+            [1,0]#,1,0],
+            ], dtype=torch.float32)  
 
-mid2 = torch.tensor([
-        [1,0],#,1,8],
-        [0,1],#0,0],
-        ], dtype=torch.float32) 
+    mid2 = torch.tensor([
+            [1,0],#,1,8],
+            [0,1],#0,0],
+            ], dtype=torch.float32) 
 
-origtheta, gradtheta = construct_theta(mid1, mid2)
-sparsetheta, sparsegradtheta = construct_theta_sparse(mid1, mid2)
-sparsetheta = sparsetheta.coalesce()
+    #origtheta, gradtheta = construct_theta(mid1, mid2)
+    sparsetheta, sparsegradtheta = construct_theta_sparse(mid1, mid2)
+    sparsetheta = sparsetheta.coalesce()
 
-loss_orig, lossgrad = diffable_recursion(origtheta, gamma=0.3)
+    #loss_orig, lossgrad = diffable_recursion(origtheta, gamma=0.3)
 
-loss_sparse, sparselossgrad = sparse_diffable_recursion(sparsetheta, gamma=0.3)
+    loss_sparse, sparselossgrad = sparse_diffable_recursion(sparsetheta, gamma=0.3)
 
-sparsetheta = sparsetheta.to_dense()
-sparsetheta[sparsetheta==0] = np.NINF
+    sparsetheta = sparsetheta.to_dense()
+    sparsetheta[sparsetheta==0] = np.NINF
 
-print("LOSSES:", loss_orig, loss_sparse)
-print("LOSSES EQUAL:", torch.equal(loss_orig, loss_sparse))
-print("THETAS:", torch.equal(origtheta, sparsetheta))
-print("GRAD THETAS:", torch.equal(gradtheta, sparsegradtheta.to_dense()))
-print("GRAD LOSSES:", torch.equal(lossgrad, sparselossgrad.to_dense()))
+    '''print("LOSSES:", loss_orig, loss_sparse)
+    print("LOSSES EQUAL:", torch.equal(loss_orig, loss_sparse))
+    print("THETAS:", torch.equal(origtheta, sparsetheta))
+    print("GRAD THETAS:", torch.equal(gradtheta, sparsegradtheta.to_dense()))
+    print("GRAD LOSSES:", torch.equal(lossgrad, sparselossgrad.to_dense()))
 
-print("MATCHING INDICES:", torch.eq(lossgrad, sparselossgrad.to_dense()).sum(), "out of", lossgrad.numel())
+    print("MATCHING INDICES:", torch.eq(lossgrad, sparselossgrad.to_dense()).sum(), "out of", lossgrad.numel())
 
-midis1 = [mid1, mid2]
-midis2 = [mid2, mid1]
+    midis1 = [mid1, mid2]
+    midis2 = [mid2, mid1]
 
-def test_sparse_loss():
-    for m1, m2 in zip(midis1, midis2):
-        origtheta, gradtheta = construct_theta(m1, m2)
-        sparsetheta, sparsegradtheta = construct_theta_sparse(m1, m2)
-        sparsetheta = sparsetheta.coalesce()
-        loss_orig, lossgrad = diffable_recursion(origtheta, gamma=0.3)
-        loss_sparse, sparselossgrad = sparse_diffable_recursion(sparsetheta, gamma=0.3)
-        sparsetheta = sparsetheta.to_dense()
-        sparsetheta[sparsetheta==0] = np.NINF
-        assert (torch.equal(origtheta, sparsetheta))
-        assert (torch.equal(gradtheta, sparsegradtheta.to_dense()))
-        assert (torch.equal(loss_orig, loss_sparse))
-        assert (torch.equal(lossgrad, sparselossgrad.to_dense()))
+    def test_sparse_loss():
+        for m1, m2 in zip(midis1, midis2):
+            origtheta, gradtheta = construct_theta(m1, m2)
+            sparsetheta, sparsegradtheta = construct_theta_sparse(m1, m2)
+            sparsetheta = sparsetheta.coalesce()
+            loss_orig, lossgrad = diffable_recursion(origtheta, gamma=0.3)
+            loss_sparse, sparselossgrad = sparse_diffable_recursion(sparsetheta, gamma=0.3)
+            sparsetheta = sparsetheta.to_dense()
+            sparsetheta[sparsetheta==0] = np.NINF
+            assert (torch.equal(origtheta, sparsetheta))
+            assert (torch.equal(gradtheta, sparsegradtheta.to_dense()))
+            assert (torch.equal(loss_orig, loss_sparse))
+            assert (torch.equal(lossgrad, sparselossgrad.to_dense()))
 
-test_sparse_loss()
+    test_sparse_loss()
+    '''
+    '''
+    dynamic_loss = DynamicLossSingle.apply
+    sparse_dynamic_loss = SparseDynamicLossSingle.apply
 
-'''
-dynamic_loss = DynamicLossSingle.apply
-sparse_dynamic_loss = SparseDynamicLossSingle.apply
+    #print("LOSSES:", loss_orig, loss_sparse)
+    #print(torch.equal(loss_orig, loss_sparse))
+    #print(torch.equal(lossgrad, sparselossgrad.to_dense()))
+    #print(torch.eq(lossgrad, sparselossgrad.to_dense()).sum())
+    #print(torch.norm(lossgrad - sparselossgrad.to_dense()))
+    #sparse_theta, sparse_grad_theta = construct_theta_sparse(mid1, mid2)
 
-#print("LOSSES:", loss_orig, loss_sparse)
-#print(torch.equal(loss_orig, loss_sparse))
-#print(torch.equal(lossgrad, sparselossgrad.to_dense()))
-#print(torch.eq(lossgrad, sparselossgrad.to_dense()).sum())
-#print(torch.norm(lossgrad - sparselossgrad.to_dense()))
-#sparse_theta, sparse_grad_theta = construct_theta_sparse(mid1, mid2)
+    l2_loss = F.mse_loss(mid1, mid2)
+    dyn_loss = dynamic_loss(mid1, mid2)
+    sparse_dyn_loss = sparse_dynamic_loss(mid1,mid2)
+    print("L2:", l2_loss.data)
+    print("Dynamic:", dyn_loss.data)
+    print("Sparse dynamic:", sparse_dyn_loss.data)
 
-l2_loss = F.mse_loss(mid1, mid2)
-dyn_loss = dynamic_loss(mid1, mid2)
-sparse_dyn_loss = sparse_dynamic_loss(mid1,mid2)
-print("L2:", l2_loss.data)
-print("Dynamic:", dyn_loss.data)
-print("Sparse dynamic:", sparse_dyn_loss.data)
+    #print(sparse_grad_theta.size()[0])
 
-#print(sparse_grad_theta.size()[0])
-
-#print("EQUAL GRADS:", torch.equal(grad_theta, sparse_grad_theta.to_dense()))
-
-
-sparse_theta = sparse_theta.to_dense()
-print(sparse_theta)
-sparse_theta[sparse_theta ==0] = np.NINF
-#sparse_theta[sparse_theta==-0.1] = 0
+    #print("EQUAL GRADS:", torch.equal(grad_theta, sparse_grad_theta.to_dense()))
 
 
-print("ORIGINAL THETA:", orig_theta, orig_theta.dtype)
+    sparse_theta = sparse_theta.to_dense()
+    print(sparse_theta)
+    sparse_theta[sparse_theta ==0] = np.NINF
+    #sparse_theta[sparse_theta==-0.1] = 0
 
-print("NEW THETA:", sparse_theta, sparse_theta.dtype)
-print(torch.equal(orig_theta, sparse_theta))
-'''
-'''
-i = [[0, 1, 1],
-     [2, 0, 2]]
-v =  [3, 4, 5]
-a = torch.sparse_coo_tensor((2,3))
-b = torch.sparse_coo_tensor(i, v, (2,3))
-c = a + b
-#print(a.to_dense(), a.indices(), a.values())
-print(b.to_dense())
-c =c.coalesce()
-print(c.to_dense(), c.indices()[:,0], c.values())
 
-c.indices()[:,0] # the first set of indices corresponding to the first value in the mat
-c.values()[0] # CORRESPONDING VALUE!
-'''
+    print("ORIGINAL THETA:", orig_theta, orig_theta.dtype)
+
+    print("NEW THETA:", sparse_theta, sparse_theta.dtype)
+    print(torch.equal(orig_theta, sparse_theta))
+    '''
+    '''
+    i = [[0, 1, 1],
+        [2, 0, 2]]
+    v =  [3, 4, 5]
+    a = torch.sparse_coo_tensor((2,3))
+    b = torch.sparse_coo_tensor(i, v, (2,3))
+    c = a + b
+    #print(a.to_dense(), a.indices(), a.values())
+    print(b.to_dense())
+    c =c.coalesce()
+    print(c.to_dense(), c.indices()[:,0], c.values())
+
+    c.indices()[:,0] # the first set of indices corresponding to the first value in the mat
+    c.values()[0] # CORRESPONDING VALUE!
+    '''
