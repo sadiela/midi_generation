@@ -18,7 +18,8 @@ import os
 from tqdm import tqdm
 import pickle
 import logging
-from dp_loss import *
+#from dp_loss import *
+from sparse_dp_loss import *
 from pathlib import Path
 #from midi_utility import * 
 
@@ -295,7 +296,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
     logging.info("Device: %s" , device)
     max_tensor_size= 0 
 
-    dynamic_loss = DynamicLoss.apply
+    dynamic_loss = SparseDynamicLoss.apply
 
     for i, data in enumerate(training_data):
         #name = midi_tensor_dataset.__getname__(i)
