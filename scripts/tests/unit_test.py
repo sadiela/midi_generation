@@ -133,13 +133,8 @@ if __name__ == "__main__":
     mid6.requires_grad_()
 
 
-<<<<<<< HEAD
     #compare_losses(mid1, mid2)
     compare_losses(mid1, mid2)
-=======
-    compare_losses(mid1, mid2)
-    compare_losses(mid3, mid1)
->>>>>>> 0dc80dd75a99cb83231ea2f28db55b8aabe9aa4d
     #compare_losses(mid1, mid4)  
     #compare_losses(mid1, mid5)
     #compare_losses(mid1, mid6)  
