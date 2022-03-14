@@ -12,7 +12,7 @@ import os
 
 from midi_preprocessing import preprocess
 from vq_vae import DynamicLoss
-from dp_loss import *
+from dp_loss.sparse_dp_loss import *
 import train_vqvae 
 import logging
 

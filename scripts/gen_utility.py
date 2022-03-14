@@ -10,7 +10,7 @@ from pathlib import Path
 def get_free_filename(stub, directory, suffix=''):
     counter = 0
     while True:
-        file_candidate = '{}/{}-{}{}{}'.format(str(directory), stub, datetime.today().strftime('%Y-%m-%d'), counter, suffix)
+        file_candidate = '{}/{}-{}-{}{}'.format(str(directory), stub, datetime.today().strftime('%Y-%m-%d'), counter, suffix)
         if Path(file_candidate).exists():
             print("file exists")
             counter += 1
