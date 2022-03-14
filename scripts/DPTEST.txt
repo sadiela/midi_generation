@@ -1,72 +1,5 @@
-python3: can't open file '../dp_test.py': [Errno 2] No such file or directory
+DEVICE: cuda
 file exists
-no file
-tests/processed_data/sparse_mini/Believe_0.p
-DATA SHAPE: torch.Size([128, 10604])
-tests/processed_data/sparse_mini/All the Things You Are_6.p
-DATA SHAPE: torch.Size([128, 5936])
-tests/processed_data/sparse_mini/Barbara Ann_8.p
-DATA SHAPE: torch.Size([128, 7678])
-tests/processed_data/sparse_mini/Barbara Ann_4.p
-DATA SHAPE: torch.Size([128, 1147])
-tests/processed_data/sparse_mini/All the Things You Are_13.p
-DATA SHAPE: torch.Size([128, 11695])
-tests/processed_data/sparse_mini/Barbara Ann_5.p
-DATA SHAPE: torch.Size([128, 7675])
-tests/processed_data/sparse_mini/All the Things You Are_8.p
-DATA SHAPE: torch.Size([128, 334])
-tests/processed_data/sparse_mini/Believe_1.p
-DATA SHAPE: torch.Size([128, 14781])
-tests/processed_data/sparse_mini/Barbara Ann_2.p
-DATA SHAPE: torch.Size([128, 7846])
-tests/processed_data/sparse_mini/Barbara Ann_1.p
-DATA SHAPE: torch.Size([128, 8044])
-DATASHAPE: torch.Size([70, 1, 128, 1024]) torch.Size([128, 1024])
-continue...Traceback (most recent call last):
-  File "dp_test.py", line 28, in <module>
-    train_vqvae.train(dataDir, outDir, modelDir, fstub=fstub, loss='dyn', batchsize=batchsize, normalize=True, quantize=True, sparse=sparse)
-  File "/projectnb2/textconv/sadiela/midi_generation/scripts/train_vqvae.py", line 51, in train
-    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, lossfunc=loss, bs=batchsize, normalize=normalize, quantize=quantize, sparse=sparse)
-  File "/projectnb2/textconv/sadiela/midi_generation/scripts/vq_vae.py", line 303, in train_model
-    input("continue...")
-EOFError: EOF when reading a line
-file exists
-file exists
-no file
-tests/processed_data/sparse_mini/Believe_9.p
-DATA SHAPE: torch.Size([128, 13630])
-tests/processed_data/sparse_mini/All the Things You Are_13.p
-DATA SHAPE: torch.Size([128, 11695])
-tests/processed_data/sparse_mini/Believe_4.p
-DATA SHAPE: torch.Size([128, 11942])
-tests/processed_data/sparse_mini/Believe_6.p
-DATA SHAPE: torch.Size([128, 14746])
-tests/processed_data/sparse_mini/Barbara Ann_8.p
-DATA SHAPE: torch.Size([128, 7678])
-tests/processed_data/sparse_mini/All the Things You Are_3.p
-DATA SHAPE: torch.Size([128, 10404])
-tests/processed_data/sparse_mini/All the Things You Are_10.p
-DATA SHAPE: torch.Size([128, 9822])
-tests/processed_data/sparse_mini/All the Things You Are_7.p
-DATA SHAPE: torch.Size([128, 9004])
-tests/processed_data/sparse_mini/Barbara Ann_1.p
-DATA SHAPE: torch.Size([128, 8044])
-tests/processed_data/sparse_mini/Barbara Ann_7.p
-DATA SHAPE: torch.Size([128, 7679])
-DATASHAPE: torch.Size([97, 1, 128, 1024]) torch.Size([128, 1024])
-CONSTRUCTING THETA: torch.Size([128, 1024]) torch.Size([128, 1024])
-Traceback (most recent call last):
-  File "dp_test.py", line 28, in <module>
-    train_vqvae.train(dataDir, outDir, modelDir, fstub=fstub, loss='dyn', batchsize=batchsize, normalize=True, quantize=True, sparse=sparse)
-  File "/projectnb2/textconv/sadiela/midi_generation/scripts/train_vqvae.py", line 51, in train
-    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, lossfunc=loss, bs=batchsize, normalize=normalize, quantize=quantize, sparse=sparse)
-  File "/projectnb2/textconv/sadiela/midi_generation/scripts/vq_vae.py", line 314, in train_model
-    recon_error = dynamic_loss(data_recon, data) #X_hat, then X!!!
-  File "/projectnb2/textconv/sadiela/midi_generation/scripts/dp_loss.py", line 137, in forward
-    theta, grad_theta_xhat = construct_theta(X[i][0], X_hat[i][0])
-  File "/projectnb2/textconv/sadiela/midi_generation/scripts/dp_loss.py", line 39, in construct_theta
-    theta = torch.zeros((m*n, m*n))
-RuntimeError: [enforce fail at CPUAllocator.cpp:68] . DefaultCPUAllocator: can't allocate memory: you tried to allocate 4415251562500 bytes. Error code 12 (Cannot allocate memory)
 file exists
 file exists
 file exists
@@ -78,21 +11,21 @@ file exists
 file exists
 file exists
 no file
-tests/processed_data/sparse_mini/Believe_6.p
-tests/processed_data/sparse_mini/Barbara Ann_4.p
-tests/processed_data/sparse_mini/All the Things You Are_6.p
-tests/processed_data/sparse_mini/Believe_9.p
-tests/processed_data/sparse_mini/All the Things You Are_7.p
 tests/processed_data/sparse_mini/Believe_7.p
-tests/processed_data/sparse_mini/All the Things You Are_8.p
-tests/processed_data/sparse_mini/Barbara Ann_5.p
-tests/processed_data/sparse_mini/All the Things You Are_12.p
-tests/processed_data/sparse_mini/Believe_2.p
+tests/processed_data/sparse_mini/All the Things You Are_2.p
+tests/processed_data/sparse_mini/Believe_9.p
+tests/processed_data/sparse_mini/Believe_1.p
+tests/processed_data/sparse_mini/All the Things You Are_4.p
+tests/processed_data/sparse_mini/Believe_6.p
+tests/processed_data/sparse_mini/Barbara Ann_4.p
+tests/processed_data/sparse_mini/All the Things You Are_7.p
+tests/processed_data/sparse_mini/All the Things You Are_1.p
+tests/processed_data/sparse_mini/Believe_3.p
 CONSTRUCTING THETA: torch.Size([36, 128]) torch.Size([36, 128])
 Traceback (most recent call last):
   File "dp_test.py", line 29, in <module>
     train_vqvae.train(dataDir, outDir, modelDir, fstub=fstub, loss='dyn', batchsize=batchsize, batchlength=batchlength, normalize=True, quantize=True, sparse=sparse, num_embeddings=1024, embedding_dim=36)
-  File "/projectnb2/textconv/sadiela/midi_generation/scripts/train_vqvae.py", line 51, in train
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/train_vqvae.py", line 52, in train
     recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, lossfunc=loss, bs=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse)
   File "/projectnb2/textconv/sadiela/midi_generation/scripts/vq_vae.py", line 314, in train_model
     recon_error = dynamic_loss(data_recon, data) #X_hat, then X!!!
@@ -101,3 +34,12 @@ Traceback (most recent call last):
   File "/projectnb2/textconv/sadiela/midi_generation/scripts/dp_loss.py", line 40, in construct_theta
     grad_theta = torch.zeros((m*n, m*n, x_hat.shape[0], x_hat.shape[1]))
 RuntimeError: [enforce fail at CPUAllocator.cpp:68] . DefaultCPUAllocator: can't allocate memory: you tried to allocate 5104242542592 bytes. Error code 12 (Cannot allocate memory)
+python3: can't open file 'test_vqvae.py': [Errno 2] No such file or directory
+START
+no file
+Traceback (most recent call last):
+  File "train_vqvae.py", line 102, in <module>
+    logging.basicConfig(filename=logfile, encoding='utf-8', level=numeric_level)
+  File "/projectnb/textconv/sadiela/.conda/envs/py3/lib/python3.8/logging/__init__.py", line 2009, in basicConfig
+    raise ValueError('Unrecognised argument(s): %s' % keys)
+ValueError: Unrecognised argument(s): encoding

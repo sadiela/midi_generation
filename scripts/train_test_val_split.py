@@ -14,9 +14,9 @@ import shutil
 #from midi_utility import *
 
 full_dir = '/projectnb/textconv/sadiela/midi_generation/data/all_midi_tensors_sparse/'
-train_dir = '/projectnb/textconv/sadiela/midi_generation/data/all_midi_tensors_ttv/'
-test_dir = '/projectnb/textconv/sadiela/midi_generation/data/all_midi_tensors_ttv/'
-val_dir = '/projectnb/textconv/sadiela/midi_generation/data/all_midi_tensors_ttv/'
+train_dir = '/projectnb/textconv/sadiela/midi_generation/data/all_midi_tensors_ttv/train/'
+test_dir = '/projectnb/textconv/sadiela/midi_generation/data/all_midi_tensors_ttv/test/'
+val_dir = '/projectnb/textconv/sadiela/midi_generation/data/all_midi_tensors_ttv/validate/'
 
 # get list of file names in full_dir
 file_list = os.listdir(full_dir)
