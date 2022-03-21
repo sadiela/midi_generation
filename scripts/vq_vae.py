@@ -299,7 +299,6 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
     max_tensor_size= 0 
 
     dynamic_loss = SparseDynamicLoss.apply
-    dynamic_loss.to(device)
 
     for i, data in tqdm(enumerate(training_data)):
         #name = midi_tensor_dataset.__getname__(i)
