@@ -19,7 +19,7 @@ from tqdm import tqdm
 import pickle
 import logging
 #from dp_loss import *
-from sparse_dp_loss import *
+from dp_loss.sparse_dp_loss import *
 from pathlib import Path
 #from midi_utility import * 
 
@@ -32,12 +32,12 @@ from pathlib import Path
 ##############################
 # MODEL/OPTIMIZER PARAMETERS #
 ##############################
-num_training_updates = 15000
+'''num_training_updates = 15000
 num_hiddens = 128
 num_residual_hiddens = 16
 num_residual_layers = 2
 l = 512 #1024 # batch length
-p= 36 #128
+p= 36 #128'''
 decay = 0.99
 learning_rate = 1e-3
 #num_embeddings = 64
@@ -298,7 +298,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
 
     dynamic_loss = SparseDynamicLoss.apply
 
-    for i, data in enumerate(training_data):
+    for i, data in tqdm(enumerate(training_data)):
         #name = midi_tensor_dataset.__getname__(i)
         # s x p x 1 x l
         data = data.to(device)
@@ -326,7 +326,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
           train_res_recon_error.append(recon_error.item())
           train_res_perplexity.append(perplexity.item())
         else:
-          total_loss.append(loss)
+          train_res_recon_error.append(loss)
           train_res_perplexity.append(perplexity)
 
         if pd.isna(recon_error.item()):
