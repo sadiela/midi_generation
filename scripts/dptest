@@ -16,7 +16,8 @@
 # Spec min gpu compute compatibility
 #$ -l gpu_c=6
 
+
 module load miniconda
 conda activate py3
 
-python3 train_vqvae.py -d 'tests/processed_data/sparse_mini' -m 'tests/models' -o 'tests/results' -r 'dplosstest' -b 10 -a 128 -u 1024 -e 36 -l 'dyn' -s
+python3 test_vqvae.py -l -r 'mae' 
