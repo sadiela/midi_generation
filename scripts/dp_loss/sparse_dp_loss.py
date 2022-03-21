@@ -58,15 +58,15 @@ def construct_theta_sparse(x, x_hat, device):
     for i in range(1,m):
             for j in range(1,n):
                 if (x[:, i-1] == x_hat[:, j-1]).all():
-                    theta = torch.add(theta, torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j, m,n)]], 0.01, (m*n, m*n))) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = 0
+                    theta = torch.add(theta, torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j, m,n)]], 0.01, (m*n, m*n)).to(device)) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = 0
                 else:
-                    theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j, m,n)]], note_diff(x[:, i-1] ,x_hat[:, j-1]), (m*n, m*n)) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = note_diff(x[:, i-1] ,x_hat[:, j-1]) # replacing; cost depends on ...?
-                    grad_theta = grad_theta + add_gradients(k_from_ij(i-1,j-1, m,n), k_from_ij(i,j, m,n), j-1, distance_derivative(x[:,i-1]-x_hat[:,j-1]), m,n)
+                    theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j, m,n)]], note_diff(x[:, i-1] ,x_hat[:, j-1]), (m*n, m*n)).to(device) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = note_diff(x[:, i-1] ,x_hat[:, j-1]) # replacing; cost depends on ...?
+                    grad_theta = grad_theta + add_gradients(k_from_ij(i-1,j-1, m,n), k_from_ij(i,j, m,n), j-1, distance_derivative(x[:,i-1]-x_hat[:,j-1]), m,n).to(device)
                     #grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)][:,j-1] = distance_derivative(x[:,i-1]-x_hat[:,j-1]) # FIX ZEROS
-                theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j-1, m,n)]], single_note_val(x_hat[:, j-1]), (m*n, m*n)) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)]= single_note_val(x_hat[:, j-1])# deletion
-                grad_theta = grad_theta + add_gradients(k_from_ij(i-1,j-1, m,n), k_from_ij(i,j-1, m,n), j-1, distance_derivative(-x_hat[:,j-1]), m,n)
+                theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j-1, m,n)]], single_note_val(x_hat[:, j-1]), (m*n, m*n)).to(device) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)]= single_note_val(x_hat[:, j-1])# deletion
+                grad_theta = grad_theta + add_gradients(k_from_ij(i-1,j-1, m,n), k_from_ij(i,j-1, m,n), j-1, distance_derivative(-x_hat[:,j-1]), m,n).to(device)
                 #grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)][:,j-1] = distance_derivative(-x_hat[:,j-1]) #, np.abs(-x_hat[:,j-1])) # FIX
-                theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i-1,j, m,n)]],  single_note_val(x[:, i-1]), (m*n, m*n)) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i-1,j, m,n)] = single_note_val(x[:, i-1]) # insertion I think i want these both dependent on x_hat... is that possible? 
+                theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i-1,j, m,n)]],  single_note_val(x[:, i-1]), (m*n, m*n)).to(device) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i-1,j, m,n)] = single_note_val(x[:, i-1]) # insertion I think i want these both dependent on x_hat... is that possible? 
                 # NOTHING (gradient w.r.t. x_hat)
                 # shifting?
                 # gradient is telling you how much to change each x value... we will have
@@ -116,13 +116,16 @@ def get_ijth_val(sparsemat, i,j):
             return values[idx]
     return 0
 
-def sparse_diffable_recursion(theta, gamma=0.3): # passed in sparse
+def sparse_diffable_recursion(theta, gamma=0.3, device): # passed in sparse
     N = theta.size()[0] # 
     e_bar = torch.zeros(N)
     e_bar[N-1]=1
     v = torch.zeros(N)
     q = torch.sparse_coo_tensor((N,N)) #torch.zeros((N,N)) # SPARSIFY
     E = torch.sparse_coo_tensor((N,N)) #torch.zeros((N,N)) # SPARSIFY
+    v.to(device)
+    q.to(device)
+    E.to(device)
     for j in range(2, N): # looping through and looking at PARENTS of j
         parent_indices = get_parent_indices(theta, j) # torch.where(theta[:,j]>np.NINF)[0] # CHANGE
         #print("Parents:", parent_indices)
@@ -131,13 +134,13 @@ def sparse_diffable_recursion(theta, gamma=0.3): # passed in sparse
         #print(i, u)
         v[j] = gamma * torch.log(torch.sum(torch.exp(u/gamma))) # this is fine
         q_vals = torch.exp(u/gamma)/torch.sum(torch.exp(u/gamma)) # this is fine
-        q = q + q_additions(parent_indices, q_vals, j, N)
+        q = q + q_additions(parent_indices, q_vals, j, N).to(device)
     for i in range(N-1,0, -1): # looping through and looking at CHILDREN of i
         children_indices = get_child_indices(theta, i) #torch.where(theta[i,:]>np.NINF)[0]
         for j in children_indices:
-            q_ij = get_ijth_val(q, i,j[0]) # value at ij
-            E += E_val(i, j[0], q_ij*e_bar[j[0]], N)
-            e_bar[i] += get_ijth_val(E, i, j[0])
+            q_ij = get_ijth_val(q, i,j[0]).to(device) # value at ij
+            E += E_val(i, j[0], q_ij*e_bar[j[0]], N).to(device)
+            e_bar[i] += get_ijth_val(E, i, j[0]).to(device)
     return -v[N-1], -E
 
 def has_values(sparse_mat, i, j):
