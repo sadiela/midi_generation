@@ -118,3 +118,33 @@ Traceback (most recent call last):
   File "/projectnb2/textconv/sadiela/midi_generation/scripts/dp_loss/sparse_dp_loss.py", line 61, in construct_theta_sparse
     theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j, m,n)]], note_diff(x[:, i-1] ,x_hat[:, j-1]), (m*n, m*n)) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = note_diff(x[:, i-1] ,x_hat[:, j-1]) # replacing; cost depends on ...?
 RuntimeError: add: expected 'self' to be CUDA, but got CPU
+START
+file exists
+no file
+DEVICE: cuda
+file exists
+no file
+0it [00:00, ?it/s]0it [00:00, ?it/s]
+tests/processed_data/sparse_mini/Barbara Ann_7.p
+tests/processed_data/sparse_mini/Believe_5.p
+tests/processed_data/sparse_mini/Barbara Ann_2.p
+tests/processed_data/sparse_mini/All the Things You Are_2.p
+tests/processed_data/sparse_mini/All the Things You Are_7.p
+tests/processed_data/sparse_mini/Believe_7.p
+tests/processed_data/sparse_mini/All the Things You Are_4.p
+tests/processed_data/sparse_mini/Barbara Ann_8.p
+tests/processed_data/sparse_mini/Barbara Ann_5.p
+tests/processed_data/sparse_mini/All the Things You Are_10.p
+TRAIN: torch.Size([673, 1, 128, 128])
+Traceback (most recent call last):
+  File "train_vqvae.py", line 119, in <module>
+    train(datadir, outdir, modeldir, fstub, loss, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim)
+  File "train_vqvae.py", line 52, in train
+    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, lossfunc=loss, bs=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse)
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/vq_vae.py", line 317, in train_model
+    recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/dp_loss/sparse_dp_loss.py", line 169, in forward
+    theta, grad_theta_xhat = construct_theta_sparse(X[i][0], X_hat[i][0], device)
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/dp_loss/sparse_dp_loss.py", line 63, in construct_theta_sparse
+    theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j, m,n)]], note_diff(x[:, i-1] ,x_hat[:, j-1]), (m*n, m*n)) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = note_diff(x[:, i-1] ,x_hat[:, j-1]) # replacing; cost depends on ...?
+RuntimeError: add: expected 'self' to be CUDA, but got CPU
