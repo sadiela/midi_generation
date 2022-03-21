@@ -123,9 +123,9 @@ def sparse_diffable_recursion(theta, device, gamma=0.3): # passed in sparse
     v = torch.zeros(N)
     q = torch.sparse_coo_tensor((N,N)) #torch.zeros((N,N)) # SPARSIFY
     E = torch.sparse_coo_tensor((N,N)) #torch.zeros((N,N)) # SPARSIFY
-    v.to(device)
-    q.to(device)
-    E.to(device)
+    v = v.to(device)
+    q = q.to(device)
+    E = E.to(device)
     for j in range(2, N): # looping through and looking at PARENTS of j
         parent_indices = get_parent_indices(theta, j) # torch.where(theta[:,j]>np.NINF)[0] # CHANGE
         #print("Parents:", parent_indices)
