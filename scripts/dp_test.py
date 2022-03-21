@@ -11,7 +11,7 @@ import torch.nn.functional as F
 import os
 
 from midi_preprocessing import preprocess
-from vq_vae import DynamicLoss
+#from vq_vae import DynamicLoss
 from dp_loss.sparse_dp_loss import *
 import train_vqvae 
 import logging
@@ -22,7 +22,7 @@ outDir = homeDirectory / 'tests' / 'results'
 modelDir = homeDirectory / 'tests' / 'models'
 testingLog = homeDirectory / 'tests' / 'test_logs' / 'unit_tests.log'
 batchsize = 10
-batchlength = 128
+batchlength = 1024
 sparse = True
 fstub = "dpTEST"
 
