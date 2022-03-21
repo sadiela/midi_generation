@@ -116,7 +116,7 @@ def get_ijth_val(sparsemat, i,j):
             return values[idx]
     return 0
 
-def sparse_diffable_recursion(theta, gamma=0.3, device): # passed in sparse
+def sparse_diffable_recursion(theta, device, gamma=0.3): # passed in sparse
     N = theta.size()[0] # 
     e_bar = torch.zeros(N)
     e_bar[N-1]=1
@@ -174,7 +174,7 @@ class SparseDynamicLoss(torch.autograd.Function):
         theta = theta.coalesce()
         grad_theta_xhat = grad_theta_xhat.coalesce()
         #print("THETA:", theta)
-        loss, grad_L_theta = sparse_diffable_recursion(theta)
+        loss, grad_L_theta = sparse_diffable_recursion(theta, device)
         grad_L_theta.coalesce()
         #loss_exact = exact_recursive_formula(theta.shape[0]-1, theta)
         #print("LOSSES:", loss, -loss_exact)
