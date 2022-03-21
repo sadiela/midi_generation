@@ -43,3 +43,78 @@ Traceback (most recent call last):
   File "/projectnb/textconv/sadiela/.conda/envs/py3/lib/python3.8/logging/__init__.py", line 2009, in basicConfig
     raise ValueError('Unrecognised argument(s): %s' % keys)
 ValueError: Unrecognised argument(s): encoding
+START
+file exists
+no file
+Traceback (most recent call last):
+  File "train_vqvae.py", line 102, in <module>
+    logging.basicConfig(filename=logfile, encoding='utf-8', level=numeric_level)
+  File "/projectnb/textconv/sadiela/.conda/envs/py3/lib/python3.8/logging/__init__.py", line 2009, in basicConfig
+    raise ValueError('Unrecognised argument(s): %s' % keys)
+ValueError: Unrecognised argument(s): encoding
+START
+file exists
+file exists
+file exists
+file exists
+file exists
+no file
+DEVICE: cuda
+file exists
+file exists
+file exists
+no file
+tests/processed_data/sparse_mini/Believe_2.p
+tests/processed_data/sparse_mini/Barbara Ann_6.p
+tests/processed_data/sparse_mini/All the Things You Are_8.p
+tests/processed_data/sparse_mini/All the Things You Are_12.p
+tests/processed_data/sparse_mini/Barbara Ann_3.p
+tests/processed_data/sparse_mini/Believe_6.p
+tests/processed_data/sparse_mini/All the Things You Are_7.p
+tests/processed_data/sparse_mini/Barbara Ann_5.p
+tests/processed_data/sparse_mini/Barbara Ann_2.p
+tests/processed_data/sparse_mini/Barbara Ann_8.p
+TRAIN: torch.Size([588, 1, 128, 128])
+Traceback (most recent call last):
+  File "train_vqvae.py", line 119, in <module>
+    train(datadir, outdir, modeldir, fstub, loss, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim)
+  File "train_vqvae.py", line 52, in train
+    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, lossfunc=loss, bs=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse)
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/vq_vae.py", line 317, in train_model
+    recon_error = dynamic_loss(data_recon, data) #X_hat, then X!!!
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/dp_loss/sparse_dp_loss.py", line 169, in forward
+    theta, grad_theta_xhat = construct_theta_sparse(X[i][0], X_hat[i][0])
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/dp_loss/sparse_dp_loss.py", line 61, in construct_theta_sparse
+    theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j, m,n)]], note_diff(x[:, i-1] ,x_hat[:, j-1]), (m*n, m*n)) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = note_diff(x[:, i-1] ,x_hat[:, j-1]) # replacing; cost depends on ...?
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/dp_loss/sparse_dp_loss.py", line 16, in note_diff
+    not_equal = np.where(np.not_equal(a,b))
+  File "/projectnb/textconv/sadiela/.conda/envs/py3/lib/python3.8/site-packages/torch/_tensor.py", line 678, in __array__
+    return self.numpy()
+TypeError: can't convert cuda:0 device type tensor to numpy. Use Tensor.cpu() to copy the tensor to host memory first.
+START
+no file
+DEVICE: cuda
+no file
+tests/processed_data/sparse_mini/Believe_6.p
+tests/processed_data/sparse_mini/Believe_9.p
+tests/processed_data/sparse_mini/Barbara Ann_4.p
+tests/processed_data/sparse_mini/Barbara Ann_5.p
+tests/processed_data/sparse_mini/Barbara Ann_3.p
+tests/processed_data/sparse_mini/All the Things You Are_12.p
+tests/processed_data/sparse_mini/All the Things You Are_1.p
+tests/processed_data/sparse_mini/All the Things You Are_10.p
+tests/processed_data/sparse_mini/All the Things You Are_8.p
+tests/processed_data/sparse_mini/Believe_1.p
+TRAIN: torch.Size([619, 1, 128, 128])
+Traceback (most recent call last):
+  File "train_vqvae.py", line 119, in <module>
+    train(datadir, outdir, modeldir, fstub, loss, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim)
+  File "train_vqvae.py", line 52, in train
+    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, lossfunc=loss, bs=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse)
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/vq_vae.py", line 317, in train_model
+    recon_error = dynamic_loss(data_recon, data) #X_hat, then X!!!
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/dp_loss/sparse_dp_loss.py", line 169, in forward
+    theta, grad_theta_xhat = construct_theta_sparse(X[i][0], X_hat[i][0])
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/dp_loss/sparse_dp_loss.py", line 61, in construct_theta_sparse
+    theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j, m,n)]], note_diff(x[:, i-1] ,x_hat[:, j-1]), (m*n, m*n)) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = note_diff(x[:, i-1] ,x_hat[:, j-1]) # replacing; cost depends on ...?
+RuntimeError: add: expected 'self' to be CUDA, but got CPU

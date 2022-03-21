@@ -13,7 +13,7 @@ def k_from_ij(i,j,m,n):
 def note_diff(a,b):
     #a[a>0] = 1
     #b[b>0] = 1
-    not_equal = np.where(np.not_equal(a,b))
+    not_equal = torch.where(torch.not_equal(a,b))
     return max(torch.sum(torch.abs(a[not_equal] - b[not_equal])), 0.1) # scalar
 
 def single_note_val(a):
@@ -46,13 +46,15 @@ def add_gradients(idx1, idx2, idx4, deriv, m,n,):
             indices[3].append(idx4)
     return torch.sparse_coo_tensor(indices, v, (m*n,m*n,deriv.shape[0], n-1))
 
-def construct_theta_sparse(x, x_hat):
+def construct_theta_sparse(x, x_hat, device):
     # theta: only adding one entry at a time
     # grad_theta: add rows of entries
     m = x.shape[1] + 1
     n = x_hat.shape[1] + 1
     theta = torch.sparse_coo_tensor((m*n, m*n))
     grad_theta = torch.sparse_coo_tensor((m*n, m*n,  x_hat.shape[0], x_hat.shape[1]))
+    theta.to(device)
+    grad_theta.to(device)
     for i in range(1,m):
             for j in range(1,n):
                 if (x[:, i-1] == x_hat[:, j-1]).all():
@@ -159,12 +161,12 @@ def get_slice(sparse_mat, idx1,idx2):
 
 class SparseDynamicLoss(torch.autograd.Function):
   @staticmethod
-  def forward(ctx, X_hat, X):
+  def forward(ctx, X_hat, X, device):
     # X_hat, X are bigger than we thought...
     # build theta from original data and reconstruction
     grad_L_x = torch.zeros((X.shape[0], X.shape[1], X.shape[2], X.shape[3])) # THIS SIZE FINE
     for i in range(X_hat.shape[0]):
-        theta, grad_theta_xhat = construct_theta_sparse(X[i][0], X_hat[i][0])
+        theta, grad_theta_xhat = construct_theta_sparse(X[i][0], X_hat[i][0], device)
         theta = theta.coalesce()
         grad_theta_xhat = grad_theta_xhat.coalesce()
         #print("THETA:", theta)
