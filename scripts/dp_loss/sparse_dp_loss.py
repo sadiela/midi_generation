@@ -122,7 +122,6 @@ def sparse_diffable_recursion(theta, gamma=0.3): # passed in sparse
     q = torch.sparse_coo_tensor((N,N)) #torch.zeros((N,N)) # SPARSIFY
     E = torch.sparse_coo_tensor((N,N)) #torch.zeros((N,N)) # SPARSIFY
     for j in range(2, N): # looping through and looking at PARENTS of j
-        print()
         parent_indices = get_parent_indices(theta, j) # torch.where(theta[:,j]>np.NINF)[0] # CHANGE
         #print("Parents:", parent_indices)
         u = torch.tensor(np.asarray([(i[1] + v[i[0]]) for i in parent_indices])) # CHANGE
@@ -131,7 +130,6 @@ def sparse_diffable_recursion(theta, gamma=0.3): # passed in sparse
         v[j] = gamma * torch.log(torch.sum(torch.exp(u/gamma))) # this is fine
         q_vals = torch.exp(u/gamma)/torch.sum(torch.exp(u/gamma)) # this is fine
         q = q + q_additions(parent_indices, q_vals, j, N)
-    print("q:", q)
     for i in range(N-1,0, -1): # looping through and looking at CHILDREN of i
         children_indices = get_child_indices(theta, i) #torch.where(theta[i,:]>np.NINF)[0]
         for j in children_indices:
@@ -187,7 +185,7 @@ class SparseDynamicLoss(torch.autograd.Function):
                     grad_L_x[i][0] = torch.add(grad_L_x[i][0], cur_grad)
 
     #grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
-    print('FINAL GRADIENT:', grad_L_x)
+    #print('FINAL GRADIENT:', grad_L_x)
     ctx.save_for_backward(grad_L_x)
     # determine answer
     return loss
@@ -219,7 +217,7 @@ class SparseDynamicLossSingle(torch.autograd.Function):
                 grad_L_x = torch.add(grad_L_x, cur_grad)
 
     #grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
-    print('FINAL GRADIENT:', grad_L_x)
+    #print('FINAL GRADIENT:', grad_L_x)
     ctx.save_for_backward(grad_L_x)
     # determine answer
     return loss
