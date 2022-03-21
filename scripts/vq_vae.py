@@ -77,7 +77,7 @@ class MidiDataset(Dataset):
 
         # convert to torch tensor (vs numpy tensor)
         cur_data = torch.tensor(cur_tensor)
-        cur_data = cur_data[46:-46,:]
+        #cur_data = cur_data[46:-46,:]
         p, l_i = cur_data.shape
         
         # normalize if specified
@@ -244,6 +244,8 @@ class Model(nn.Module):
         self.quantize = quantize
 
     def forward(self, x):
+      #print("INPUT DIMENSION", x.shape)
+      #input('Continue...')
       if not self.quantize:
         z = self._encoder(x)
         x_recon = self._decoder(z)
@@ -307,12 +309,12 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
           max_tensor_size = cursize
           logging.info("NEW MAX BATCH SIZE: %d", max_tensor_size)
 
-        #print('TRAIN:')
+        print('TRAIN:', data.shape)
         vq_loss, data_recon, perplexity = model(data)
         if lossfunc=='mse':
           recon_error = F.mse_loss(data_recon, data) #/ data_variance
         elif lossfunc=='dyn':
-          recon_error = dynamic_loss(data_recon, data) #X_hat, then X!!!
+          recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
         else: # loss function = mae
           recon_error = F.l1_loss(data_recon, data)
         loss = recon_error + vq_loss # will be 0 if no quantization
