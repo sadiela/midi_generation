@@ -99,7 +99,7 @@ if __name__ == "__main__":
     date = now.strftime("%m-%d-%Y")
     logfile = get_free_filename('vq_vae_training-' + date, logpath, suffix='.log')
 
-    logging.basicConfig(filename=logfile, encoding='utf-8', level=numeric_level)
+    logging.basicConfig(filename=logfile, level=numeric_level)
 
     logging.info("ARGS: %s", str(args))
     #input("Continue...")

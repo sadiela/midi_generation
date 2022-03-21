@@ -244,8 +244,8 @@ class Model(nn.Module):
         self.quantize = quantize
 
     def forward(self, x):
-      print("INPUT DIMENSION", x.shape)
-      input('Continue...')
+      #print("INPUT DIMENSION", x.shape)
+      #input('Continue...')
       if not self.quantize:
         z = self._encoder(x)
         x_recon = self._decoder(z)

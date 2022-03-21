@@ -13,7 +13,7 @@ def k_from_ij(i,j,m,n):
 def note_diff(a,b):
     #a[a>0] = 1
     #b[b>0] = 1
-    not_equal = np.where(np.not_equal(a,b))
+    not_equal = torch.where(torch.not_equal(a,b))
     return max(torch.sum(torch.abs(a[not_equal] - b[not_equal])), 0.1) # scalar
 
 def single_note_val(a):
