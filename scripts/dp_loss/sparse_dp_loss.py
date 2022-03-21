@@ -129,7 +129,7 @@ def sparse_diffable_recursion(theta, device, gamma=0.3): # passed in sparse
     for j in range(2, N): # looping through and looking at PARENTS of j
         parent_indices = get_parent_indices(theta, j) # torch.where(theta[:,j]>np.NINF)[0] # CHANGE
         #print("Parents:", parent_indices)
-        u = torch.tensor(np.asarray([(i[1] + v[i[0]]) for i in parent_indices])) # CHANGE
+        u = torch.tensor(np.asarray([(i[1] + v[i[0]]) for i in parent_indices], dtype=np.float32)) # CHANGE
         # u, v should be able to stay the same 
         #print(i, u)
         v[j] = gamma * torch.log(torch.sum(torch.exp(u/gamma))) # this is fine
