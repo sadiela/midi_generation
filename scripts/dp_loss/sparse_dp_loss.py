@@ -123,7 +123,7 @@ def sparse_diffable_recursion(theta, device, gamma=0.3): # passed in sparse
     v = torch.zeros(N)
     q = torch.sparse_coo_tensor((N,N)) #torch.zeros((N,N)) # SPARSIFY
     E = torch.sparse_coo_tensor((N,N)) #torch.zeros((N,N)) # SPARSIFY
-    e_bar.to(device)
+    e_bar = e_bar.to(device)
     v = v.to(device)
     q = q.to(device)
     E = E.to(device)
