@@ -27,7 +27,7 @@ def distance_derivative(x):
 def pitch_shift_distance(a,b):
     return 0
 
-def add_gradients(idx1, idx2, idx4, deriv, m,n,device):
+def add_gradients(idx1, idx2, idx4, deriv, m, n, device):
     indices= [[],
         [],
         [],
