@@ -314,7 +314,10 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
         if lossfunc=='mse':
           recon_error = F.mse_loss(data_recon, data) #/ data_variance
         elif lossfunc=='dyn':
+          print("ENTERING LOSS!", i)
           recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
+        elif lossfunc=='l1reg':
+          recon_error = F.mse_loss(data_recon, data) # +  ADD L1 norm
         else: # loss function = mae
           recon_error = F.l1_loss(data_recon, data)
         loss = recon_error + vq_loss # will be 0 if no quantization
@@ -334,7 +337,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
         if pd.isna(recon_error.item()):
           nanfiles.append(midi_tensor_dataset.__getname__(i))
 
-        if (i+1) % 5000 == 0:
+        if (i+1) % 100 == 0:
             logging.info('%d iterations' % (i+1))
             logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
             #print('total_loss: %3f' % np.mean(total_loss[-100:]))

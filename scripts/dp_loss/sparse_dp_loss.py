@@ -170,11 +170,14 @@ class SparseDynamicLoss(torch.autograd.Function):
     # build theta from original data and reconstruction
     grad_L_x = torch.zeros((X.shape[0], X.shape[1], X.shape[2], X.shape[3])) # THIS SIZE FINE
     grad_L_x.to(device)
+    print(X_hat.shape[0])
     for i in range(X_hat.shape[0]):
+        print(i)
         theta, grad_theta_xhat = construct_theta_sparse(X[i][0], X_hat[i][0], device)
         theta = theta.coalesce()
         grad_theta_xhat = grad_theta_xhat.coalesce()
         #print("THETA:", theta)
+        print("RECURSION")
         loss, grad_L_theta = sparse_diffable_recursion(theta, device)
         grad_L_theta.coalesce()
         #loss_exact = exact_recursive_formula(theta.shape[0]-1, theta)
@@ -184,6 +187,7 @@ class SparseDynamicLoss(torch.autograd.Function):
         #print(n_2)
         #print("DL_DTheta:", torch.count_nonzero(grad_L_theta), grad_L_theta)
         #print("DTheta_Dx:", torch.count_nonzero(grad_theta_xhat)) #, grad_L_theta)
+        print("ADD TO DERIV")
         for j in range(n_2):
             for k in range(n_2): ##### NOT DONE W THIS PART!!!! ####
                 grad_L_theta_val = get_ijth_val(grad_L_theta, j,k)
