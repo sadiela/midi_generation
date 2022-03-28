@@ -46,30 +46,50 @@ def add_gradients(idx1, idx2, idx4, deriv, m,n,device):
     return torch.sparse_coo_tensor(indices, v, (m*n,m*n,deriv.shape[0], n-1), device=device)
 
 def construct_theta_sparse(x, x_hat, device):
-    print("CONSTRUCT THETA SPARSE DEVICE:", device)
     # theta: only adding one entry at a time
     # grad_theta: add rows of entries
     m = x.shape[1] + 1
     n = x_hat.shape[1] + 1
-    theta = torch.sparse_coo_tensor((m*n, m*n))
-    grad_theta = torch.sparse_coo_tensor((m*n, m*n,  x_hat.shape[0], x_hat.shape[1]))
-    theta = theta.to(device)
-    grad_theta = grad_theta.to(device)
+    theta = torch.sparse_coo_tensor((m*n, m*n), device=device)
+    grad_theta = torch.sparse_coo_tensor((m*n, m*n,  x_hat.shape[0], x_hat.shape[1]), device=device)
     for i in range(1,m):
             for j in range(1,n):
+                print(i,j)
                 if (x[:, i-1] == x_hat[:, j-1]).all():
                     theta = torch.add(theta, torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j, m,n)]], 0.01, (m*n, m*n), device=device)) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = 0
                 else:
                     theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j, m,n)]], note_diff(x[:, i-1] ,x_hat[:, j-1]), (m*n, m*n), device=device) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = note_diff(x[:, i-1] ,x_hat[:, j-1]) # replacing; cost depends on ...?
-                    grad_theta = grad_theta + add_gradients(k_from_ij(i-1,j-1, m,n), k_from_ij(i,j, m,n), j-1, distance_derivative(x[:,i-1]-x_hat[:,j-1]), m,n)
+                    grad_theta = grad_theta + add_gradients(k_from_ij(i-1,j-1, m,n), k_from_ij(i,j, m,n), j-1, distance_derivative(x[:,i-1]-x_hat[:,j-1]), m,n, device=device)
                     #grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)][:,j-1] = distance_derivative(x[:,i-1]-x_hat[:,j-1]) # FIX ZEROS
                 theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j-1, m,n)]], single_note_val(x_hat[:, j-1]), (m*n, m*n), device=device) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)]= single_note_val(x_hat[:, j-1])# deletion
-                grad_theta = grad_theta + add_gradients(k_from_ij(i-1,j-1, m,n), k_from_ij(i,j-1, m,n), j-1, distance_derivative(-x_hat[:,j-1]), m,n)
+                grad_theta = grad_theta + add_gradients(k_from_ij(i-1,j-1, m,n), k_from_ij(i,j-1, m,n), j-1, distance_derivative(-x_hat[:,j-1]), m,n, device=device)
                 #grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)][:,j-1] = distance_derivative(-x_hat[:,j-1]) #, np.abs(-x_hat[:,j-1])) # FIX
-                theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i-1,j, m,n)]],  single_note_val(x[:, i-1]), (m*n, m*n), , device=device)#theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i-1,j, m,n)] = single_note_val(x[:, i-1]) # insertion I think i want these both dependent on x_hat... is that possible? 
+                theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i-1,j, m,n)]],  single_note_val(x[:, i-1]), (m*n, m*n), device=device)#theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i-1,j, m,n)] = single_note_val(x[:, i-1]) # insertion I think i want these both dependent on x_hat... is that possible? 
                 # NOTHING (gradient w.r.t. x_hat)
                 # shifting?
                 # gradient is telling you how much to change each x value... we will have
+    return -theta, -grad_theta
+
+def construct_theta_sparse_k_loop(x, x_hat, device):
+    # theta: only adding one entry at a time
+    # grad_theta: add rows of entries
+    m = x.shape[1] + 1
+    n = x_hat.shape[1] + 1
+    theta = torch.sparse_coo_tensor((m*n, m*n), device=device)
+    grad_theta = torch.sparse_coo_tensor((m*n, m*n,  x_hat.shape[0], x_hat.shape[1]), device=device)
+    for k in range(0,m*n):
+        i, j = ij_from_k(k,m*n)
+        #print("k,i,j:", k, i, j)
+        if i > 0 and j > 0:
+            if (x[:, i-1] == x_hat[:, j-1]).all():
+                theta = torch.add(theta, torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j, m,n)]], 0.01, (m*n, m*n), device=device)) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = 0
+            else:
+                theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k]], note_diff(x[:, i-1] ,x_hat[:, j-1]), (m*n, m*n), device=device) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = note_diff(x[:, i-1] ,x_hat[:, j-1]) # replacing; cost depends on ...?
+                grad_theta = grad_theta + add_gradients(k_from_ij(i-1,j-1, m,n), k, j-1, distance_derivative(x[:,i-1]-x_hat[:,j-1]), m,n, device=device)
+            theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j-1, m,n)]], single_note_val(x_hat[:, j-1]), (m*n, m*n), device=device) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)]= single_note_val(x_hat[:, j-1])# deletion
+            grad_theta = grad_theta + add_gradients(k_from_ij(i-1,j-1, m,n), k_from_ij(i,j-1, m,n), j-1, distance_derivative(-x_hat[:,j-1]), m,n, device=device)
+            #grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)][:,j-1] = distance_derivative(-x_hat[:,j-1]) #, np.abs(-x_hat[:,j-1])) # FIX
+            theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i-1,j, m,n)]],  single_note_val(x[:, i-1]), (m*n, m*n), device=device)#theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i-1,j, m,n)] = single_note_val(x[:, i-1]) # insertion I think i want these both dependent on x_hat... is that possible? 
     return -theta, -grad_theta
 
 def get_parent_indices(theta, j):
@@ -153,10 +173,10 @@ def get_slice(sparse_mat, idx1,idx2):
     sparse_mat = sparse_mat.coalesce()
     indices = sparse_mat.indices()
     vals = sparse_mat.values()
-    result = torch.zeros((m,n))
+    result = torch.zeros((m,n), device=device)
     for i, j, k, l, v in zip(indices[0],indices[1],indices[2],indices[3], vals):
         if i==idx1 and j==idx2:
-            result[k][l] == v
+            result[k][l] = v
     return result
 
 class SparseDynamicLoss(torch.autograd.Function):
@@ -169,29 +189,28 @@ class SparseDynamicLoss(torch.autograd.Function):
     print(X_hat.shape[0])
     for i in range(X_hat.shape[0]):
         print(i)
-        theta, grad_theta_xhat = construct_theta_sparse(X[i][0], X_hat[i][0], device)
+        theta, grad_theta_xhat = construct_theta_sparse_k_loop(X[i][0], X_hat[i][0], device)
         theta = theta.coalesce()
         grad_theta_xhat = grad_theta_xhat.coalesce()
         #print("THETA:", theta)
-        print("RECURSION")
         loss, grad_L_theta = sparse_diffable_recursion(theta, device)
         grad_L_theta.coalesce()
         #loss_exact = exact_recursive_formula(theta.shape[0]-1, theta)
         #print("LOSSES:", loss, -loss_exact)
-        #print(grad_L_theta)
         n_2 = grad_L_theta.size()[0]
         #print(n_2)
-        #print("DL_DTheta:", torch.count_nonzero(grad_L_theta), grad_L_theta)
-        #print("DTheta_Dx:", torch.count_nonzero(grad_theta_xhat)) #, grad_L_theta)
-        print("ADD TO DERIV")
-        for j in range(n_2):
-            for k in range(n_2): ##### NOT DONE W THIS PART!!!! ####
-                grad_L_theta_val = get_ijth_val(grad_L_theta, j,k)
-                if grad_L_theta_val != 0 and has_values(grad_theta_xhat, j,k): #torch.count_nonzero(grad_theta_xhat[j][k]) != 0:
-                    cur_grad = grad_L_theta_val * get_slice(grad_theta_xhat, j,k) # scalar times pxn
-                    grad_L_x[i][0] = torch.add(grad_L_x[i][0], cur_grad)
+        # Just loop through sparse index pairs!
+        grad_L_theta = grad_L_theta.coalesce()
+        nonzero_indices = grad_L_theta.indices()
+        nonzero_vals = grad_L_theta.values()
+        for idx in range(nonzero_indices.size()[1]):
+            j = nonzero_indices[0,idx] 
+            k = nonzero_indices[1,idx] 
+            grad_L_theta_val = nonzero_vals[idx]
+            if has_values(grad_theta_xhat, j,k): #torch.count_nonzero(grad_theta_xhat[j][k]) != 0:
+                cur_grad = grad_L_theta_val *  get_slice(grad_theta_xhat, j,k)# scalar times pxn
+                grad_L_x[i][0] += cur_grad
 
-    #grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
     #print('FINAL GRADIENT:', grad_L_x)
     ctx.save_for_backward(grad_L_x)
     # determine answer
@@ -205,26 +224,25 @@ class SparseDynamicLossSingle(torch.autograd.Function):
     theta, grad_theta_xhat = construct_theta_sparse(X, X_hat, device)
     theta = theta.coalesce()
     grad_theta_xhat = grad_theta_xhat.coalesce()
-    #print("THETA:", theta)
-    loss, grad_L_theta = sparse_diffable_recursion(theta)
+    print("GRADTHETA:", torch.count_nonzero(grad_theta_xhat.to_dense()))
+    loss, grad_L_theta = sparse_diffable_recursion(theta, device)
     grad_L_theta.coalesce()
+    print("GRADLTHETA:", torch.count_nonzero(grad_L_theta.to_dense()))
     #loss_exact = exact_recursive_formula(theta.shape[0]-1, theta)
     #print("LOSSES:", loss, -loss_exact)
     #print(grad_L_theta)
     n_2 = grad_L_theta.size()[0]
     #print(n_2)
-    #print("DL_DTheta:", torch.count_nonzero(grad_L_theta), grad_L_theta)
-    #print("DTheta_Dx:", torch.count_nonzero(grad_theta_xhat)) #, grad_L_theta)
     grad_L_x = torch.zeros((X_hat.shape[0], X_hat.shape[1]))
     for j in range(n_2):
         for k in range(n_2): ##### NOT DONE W THIS PART!!!! ####
             grad_L_theta_val = get_ijth_val(grad_L_theta, j,k)
             if grad_L_theta_val != 0 and has_values(grad_theta_xhat, j,k): #torch.count_nonzero(grad_theta_xhat[j][k]) != 0:
-                cur_grad = grad_L_theta_val * get_slice(grad_theta_xhat, j,k) # scalar times pxn
-                grad_L_x = torch.add(grad_L_x, cur_grad)
+                cur_grad = grad_L_theta_val *  get_slice(grad_theta_xhat, j,k) # scalar times pxn
+                grad_L_x += cur_grad
 
     #grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
-    #print('FINAL GRADIENT:', grad_L_x)
+    print('FINAL GRADIENT:', grad_L_x)
     ctx.save_for_backward(grad_L_x)
     # determine answer
     return loss
@@ -234,28 +252,33 @@ class SparseDynamicLossSingle(torch.autograd.Function):
     grad_L_x, = ctx.saved_tensors
     return grad_L_x, None
 
-
 if __name__ == "__main__":
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     mid1 = torch.tensor([
-            [1,1],#,0,3],
-            [1,0]#,1,0],
+            [1,1, 0],#,0,3],
+            [1,0, 0]#,1,0],
             ], dtype=torch.float32)  
 
     mid2 = torch.tensor([
-            [1,0],#,1,8],
-            [0,1],#0,0],
+            [1,0, 0],#,1,8],
+            [0,1, 1],#0,0],
             ], dtype=torch.float32) 
 
     #origtheta, gradtheta = construct_theta(mid1, mid2)
-    sparsetheta, sparsegradtheta = construct_theta_sparse(mid1, mid2)
-    sparsetheta = sparsetheta.coalesce()
-
+    #sparsetheta, sparsegradtheta = construct_theta_sparse(mid1, mid2, device=device)
+    #sparsetheta = sparsetheta.coalesce()
+    #print(sparsegradtheta)
     #loss_orig, lossgrad = diffable_recursion(origtheta, gamma=0.3)
 
-    loss_sparse, sparselossgrad = sparse_diffable_recursion(sparsetheta, gamma=0.3)
+    #loss_sparse, sparselossgrad = sparse_diffable_recursion(sparsetheta, device, gamma=0.3)
 
-    sparsetheta = sparsetheta.to_dense()
-    sparsetheta[sparsetheta==0] = np.NINF
+    sparsedyn = SparseDynamicLossSingle.apply 
+    sparse_dyn_loss = sparsedyn(mid2,mid1, device)
+    print(sparse_dyn_loss)
+    #sparsetheta = sparsetheta.to_dense()
+    #sparsegradtheta = sparsegradtheta.to_dense()
+    #sparsetheta[sparsetheta==0] = np.NINF
+    #print(sparsegradtheta)
 
     '''print("LOSSES:", loss_orig, loss_sparse)
     print("LOSSES EQUAL:", torch.equal(loss_orig, loss_sparse))

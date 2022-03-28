@@ -1,0 +1,4 @@
+INFO:root:ARGS: {'datadir': 'tests/processed_data/sparse_mini', 'modeldir': 'tests/models', 'outdir': 'tests/results', 'resname': 'dplosstest', 'norm': False, 'batchsize': '10', 'batchlength': '128', 'numembed': '1024', 'embeddim': '128', 'lossfunc': 'dyn', 'quant': True, 'loglevel': 'INFO', 'sparse': True}
+INFO:root:Model will be saved to: tests/models/model_dplosstest-2022-03-28-3.pt
+INFO:root:Device: cpu
+INFO:root:NEW MAX BATCH SIZE: 10256384

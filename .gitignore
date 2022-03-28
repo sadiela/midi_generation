@@ -6,3 +6,4 @@ scripts/__pycache__/
 scripts/tests/models/
 /log_files/
 *.pyc
+.venv/
