@@ -299,6 +299,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
     max_tensor_size= 0 
 
     dynamic_loss = SparseDynamicLoss.apply
+    lam = 5
 
     for i, data in tqdm(enumerate(training_data)):
         #name = midi_tensor_dataset.__getname__(i)
@@ -317,7 +318,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
           print("ENTERING LOSS!", i)
           recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
         elif lossfunc=='l1reg':
-          recon_error = F.mse_loss(data_recon, data) # +  ADD L1 norm
+          recon_error = F.mse_loss(data_recon, data) + lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
         else: # loss function = mae
           recon_error = F.l1_loss(data_recon, data)
         loss = recon_error + vq_loss # will be 0 if no quantization
@@ -338,11 +339,15 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
           nanfiles.append(midi_tensor_dataset.__getname__(i))
 
         if (i+1) % 100 == 0:
-            logging.info('%d iterations' % (i+1))
-            logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
-            #print('total_loss: %3f' % np.mean(total_loss[-100:]))
-            #print('perplexity: %.3f' % np.mean(train_res_perplexity[-100:]))
-            logging.info('\n')
+          torch.save({
+                      'iteration': i,
+                      'model_state_dict': model.state_dict(),
+                      'optimizer_state_dict': optimizer.state_dict(),
+                      'loss': train_res_recon_error[-1],
+                      }, save_path)
+          logging.info('%d iterations' % (i+1))
+          logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
+          logging.info('\n')
 
     logging.info("saving model to %s"%save_path)
     torch.save(model.state_dict(), save_path)
