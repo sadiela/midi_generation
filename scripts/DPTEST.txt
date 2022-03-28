@@ -1,5 +1,0 @@
-START
-no file
-DEVICE: cuda
-no file
-0it [00:00, ?it/s]

@@ -12,6 +12,7 @@
 
 # Request 1 gpu
 #$ -l gpus=8
+#$ -l gpus=2
 
 # Spec min gpu compute compatibility
 #$ -l gpu_c=6
