@@ -312,28 +312,28 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
 
         print('TRAIN:', data.shape)
 
-        with profile(
+        '''with profile(
           activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
           with_stack=True,
-        ) as prof:
-              vq_loss, data_recon, perplexity = model(data)
-              if lossfunc=='mse':
-                recon_error = F.mse_loss(data_recon, data) #/ data_variance
-              elif lossfunc=='dyn':
-                print("ENTERING LOSS!", i)
-                recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
-              elif lossfunc=='l1reg':
-                recon_error = F.mse_loss(data_recon, data) + lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
-              else: # loss function = mae
-                recon_error = F.l1_loss(data_recon, data)
-              loss = recon_error + vq_loss # will be 0 if no quantization
-              loss.backward()
-              #print("backpropagated")
-              torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
-              optimizer.step()
+        ) as prof:'''
+        vq_loss, data_recon, perplexity = model(data)
+        if lossfunc=='mse':
+          recon_error = F.mse_loss(data_recon, data) #/ data_variance
+        elif lossfunc=='dyn':
+          print("ENTERING LOSS!", i)
+          recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
+        elif lossfunc=='l1reg':
+          recon_error = F.mse_loss(data_recon, data) + lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
+        else: # loss function = mae
+          recon_error = F.l1_loss(data_recon, data)
+        loss = recon_error + vq_loss # will be 0 if no quantization
+        loss.backward()
+        #print("backpropagated")
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
+        optimizer.step()
 
-        output = prof.key_averages().table(sort_by="self_cuda_time_total", row_limit=10)
-        print(output) 
+        #output = prof.key_averages().table(sort_by="self_cuda_time_total", row_limit=10)
+        #print(output) 
         
         total_loss.append(loss.item())
         if quantize:
