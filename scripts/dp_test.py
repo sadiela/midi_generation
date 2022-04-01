@@ -20,10 +20,18 @@ homeDirectory = Path('.')
 dataDir = homeDirectory / 'tests' / 'processed_data' / 'sparse_mini'
 outDir = homeDirectory / 'tests' / 'results' 
 modelDir = homeDirectory / 'tests' / 'models'
+<<<<<<< HEAD
 testingLog = homeDirectory / 'tests' / 'test_logs' / 'unit_tests.log'
 batchsize = 10
 batchlength = 1024
 sparse = True
 fstub = "dpTEST"
+=======
+testingLog = homeDirectory / 'tests' / 'test_logs' / 'DPTEST1.log'
+batchsize = 10
+batchlength = 1024
+sparse = True
+fstub = "DPTEST1"
+>>>>>>> b5ec2cd7b009cf575f3e6015ca76cfb616642876
 
 train_vqvae.train(dataDir, outDir, modelDir, fstub=fstub, loss='dyn', batchsize=batchsize, batchlength=batchlength, normalize=True, quantize=True, sparse=sparse, num_embeddings=1024, embedding_dim=36)
