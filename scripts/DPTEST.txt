@@ -43,8 +43,6 @@ Traceback (most recent call last):
   File "/projectnb/textconv/sadiela/.conda/envs/py3/lib/python3.8/logging/__init__.py", line 2009, in basicConfig
     raise ValueError('Unrecognised argument(s): %s' % keys)
 ValueError: Unrecognised argument(s): encoding
-<<<<<<< HEAD
-=======
 START
 file exists
 no file
@@ -120,4 +118,3 @@ Traceback (most recent call last):
   File "/projectnb2/textconv/sadiela/midi_generation/scripts/dp_loss/sparse_dp_loss.py", line 61, in construct_theta_sparse
     theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j, m,n)]], note_diff(x[:, i-1] ,x_hat[:, j-1]), (m*n, m*n)) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = note_diff(x[:, i-1] ,x_hat[:, j-1]) # replacing; cost depends on ...?
 RuntimeError: add: expected 'self' to be CUDA, but got CPU
->>>>>>> b5ec2cd7b009cf575f3e6015ca76cfb616642876

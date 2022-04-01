@@ -186,7 +186,7 @@ class DynamicLossSingle(torch.autograd.Function):
                 #  print(grad_theta_xhat[i][j])
                 #if torch.count_nonzero(grad_theta_xhat[i][j]) != 0:
                 #  print('DX IJ NON ZERO', i,j, grad_theta_xhat[i][j])
-                cur_grad = grad_L_theta[i][j] * grad_theta_xhat[i][j]
+                cur_grad = grad_L_theta[j][k] * grad_theta_xhat[j][k]
                 grad_L_x = torch.add(grad_L_x, cur_grad)
 
     #grad =torch.einsum('ij,ijkl->kl', grad.double(), grad_theta.double())
@@ -243,10 +243,11 @@ if __name__ == "__main__":
         [0,0,0,10]
         ])  
 
-    mid1 = torch.from_numpy(mid1, requires_grad=True)
-    mid2 = torch.from_numpy(mid2, requires_grad=True)
+    mid1 = torch.from_numpy(mid1)#, requires_grad=True)
+    mid2 = torch.from_numpy(mid2)#, requires_grad=True)
 
     theta, grad_theta = construct_theta(mid1, mid2)
+    print(theta, grad_theta)
     ans1 = exact_recursive_formula(theta.shape[0]-1,theta)
     ans2, E = diffable_recursion(theta, gamma=0.1)
     print(-ans1, -ans2)

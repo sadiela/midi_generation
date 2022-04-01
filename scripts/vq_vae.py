@@ -4,7 +4,7 @@ This file contains the VQ-VAE model class
 ###########
 # Imports #
 ###########
-
+from torch.profiler import profile, record_function, ProfilerActivity
 import numpy as np
 from numpy.core.numeric import full
 import pandas as pd
@@ -287,7 +287,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
     total_loss = []
     nanfiles = []
 
-    training_data = DataLoader(midi_tensor_dataset, collate_fn=collate_fn, batch_size=bs, shuffle=True)
+    training_data = DataLoader(midi_tensor_dataset, collate_fn=collate_fn, batch_size=bs, shuffle=True, num_workers=2)
 
       # Let # of tensors = n
       # each tensor is pxl_i, where l_i is the length of the nth tensor
@@ -300,6 +300,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
     max_tensor_size= 0 
 
     dynamic_loss = SparseDynamicLoss.apply
+    lam = 5
 
     for i, data in tqdm(enumerate(training_data)):
         #name = midi_tensor_dataset.__getname__(i)
@@ -311,11 +312,19 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
           logging.info("NEW MAX BATCH SIZE: %d", max_tensor_size)
 
         print('TRAIN:', data.shape)
+
+        '''with profile(
+          activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+          with_stack=True,
+        ) as prof:'''
         vq_loss, data_recon, perplexity = model(data)
         if lossfunc=='mse':
           recon_error = F.mse_loss(data_recon, data) #/ data_variance
         elif lossfunc=='dyn':
+          print("ENTERING LOSS!", i)
           recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
+        elif lossfunc=='l1reg':
+          recon_error = F.mse_loss(data_recon, data) + lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
         else: # loss function = mae
           recon_error = F.l1_loss(data_recon, data)
         loss = recon_error + vq_loss # will be 0 if no quantization
@@ -323,6 +332,9 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
         #print("backpropagated")
         torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
         optimizer.step()
+
+        #output = prof.key_averages().table(sort_by="self_cuda_time_total", row_limit=10)
+        #print(output) 
         
         total_loss.append(loss.item())
         if quantize:
@@ -335,12 +347,16 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
         if pd.isna(recon_error.item()):
           nanfiles.append(midi_tensor_dataset.__getname__(i))
 
-        if (i+1) % 5000 == 0:
-            logging.info('%d iterations' % (i+1))
-            logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
-            #print('total_loss: %3f' % np.mean(total_loss[-100:]))
-            #print('perplexity: %.3f' % np.mean(train_res_perplexity[-100:]))
-            logging.info('\n')
+        if (i+1) % 100 == 0:
+          torch.save({
+                      'iteration': i,
+                      'model_state_dict': model.state_dict(),
+                      'optimizer_state_dict': optimizer.state_dict(),
+                      'loss': train_res_recon_error[-1],
+                      }, save_path)
+          logging.info('%d iterations' % (i+1))
+          logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
+          logging.info('\n')
 
     logging.info("saving model to %s"%save_path)
     torch.save(model.state_dict(), save_path)
