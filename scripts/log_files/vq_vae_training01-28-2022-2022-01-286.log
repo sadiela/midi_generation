@@ -1,5 +1,0 @@
-INFO:root:ARGS: {'datadir': '.\\tests\\processed_data\\sparse\\', 'modeldir': '.\\tests\\models\\', 'outdir': '.\\tests\\results\\', 'resname': 'mse_test', 'norm': False, 'batchsize': 10, 'lossfunc': 'mse', 'quant': True, 'loglevel': 'INFO', 'sparse': True}
-INFO:root:Model will be saved to: .\tests\models\/model_mse_test-2022-01-286.pt
-INFO:root:Device: cpu
-INFO:root:NEW MAX BATCH SIZE: 11141120
-INFO:root:MIDI VECTOR QUANTIZER FORWARD PASS
