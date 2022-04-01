@@ -37,11 +37,8 @@ num_hiddens = 128
 num_residual_hiddens = 16
 num_residual_layers = 2
 l = 512 #1024 # batch length
-<<<<<<< HEAD
 p= 36 #128
-=======
 p= 36 #128'''
->>>>>>> b5ec2cd7b009cf575f3e6015ca76cfb616642876
 decay = 0.99
 learning_rate = 1e-3
 #num_embeddings = 64
@@ -248,13 +245,8 @@ class Model(nn.Module):
         self.quantize = quantize
 
     def forward(self, x):
-<<<<<<< HEAD
-      print("INPUT DIMENSION", x.shape)
-      input('Continue...')
-=======
       #print("INPUT DIMENSION", x.shape)
       #input('Continue...')
->>>>>>> b5ec2cd7b009cf575f3e6015ca76cfb616642876
       if not self.quantize:
         z = self._encoder(x)
         x_recon = self._decoder(z)
@@ -309,11 +301,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
 
     dynamic_loss = SparseDynamicLoss.apply
 
-<<<<<<< HEAD
-    for i, data in enumerate(training_data):
-=======
     for i, data in tqdm(enumerate(training_data)):
->>>>>>> b5ec2cd7b009cf575f3e6015ca76cfb616642876
         #name = midi_tensor_dataset.__getname__(i)
         # s x p x 1 x l
         data = data.to(device)
@@ -327,11 +315,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
         if lossfunc=='mse':
           recon_error = F.mse_loss(data_recon, data) #/ data_variance
         elif lossfunc=='dyn':
-<<<<<<< HEAD
-          recon_error = dynamic_loss(data_recon, data) #X_hat, then X!!!
-=======
           recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
->>>>>>> b5ec2cd7b009cf575f3e6015ca76cfb616642876
         else: # loss function = mae
           recon_error = F.l1_loss(data_recon, data)
         loss = recon_error + vq_loss # will be 0 if no quantization
