@@ -26,7 +26,7 @@ Driver script for training VQ-VAE models. Takes the following command line argum
 # DEFAULT FILEPATHS #
 #####################
 #data_folder = Path("source_data/text_files/")
-datpath = PROJECT_DIRECTORY  / 'data' / 'all_midi_tensors'  # '..\\midi_data\\full_dataset_midis_normalized\\'
+datpath = PROJECT_DIRECTORY  / 'data' / 'all_midi_tensors_ttv' / 'train'  # '..\\midi_data\\full_dataset_midis_normalized\\'
 desktopdatpath = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'midi_tensors_2'
 modpath = PROJECT_DIRECTORY / 'models'
 respath = PROJECT_DIRECTORY / 'results'

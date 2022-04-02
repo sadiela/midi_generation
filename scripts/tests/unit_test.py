@@ -99,11 +99,7 @@ if __name__ == "__main__":
     mid2 = torch.tensor([
         [0,0,0,0],
         [0,0,0,0],
-<<<<<<< HEAD
         ], dtype=torch.float32) 
-=======
-        ], dtype=torch.float32)  
->>>>>>> dynamicloss
 
     mid3 = torch.tensor([
         [0,0,1,0],
@@ -137,15 +133,12 @@ if __name__ == "__main__":
     mid6.requires_grad_()
 
 
-<<<<<<< HEAD
     compare_losses(mid2, mid1)
     compare_losses(mid1, mid2)
     compare_losses(mid3, mid1)  
-=======
     #compare_losses(mid1, mid2)
     compare_losses(mid1, mid2)
     #compare_losses(mid1, mid4)  
->>>>>>> dynamicloss
     #compare_losses(mid1, mid5)
     #compare_losses(mid1, mid6)  
     #compare_losses(mid1, mid7)
