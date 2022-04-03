@@ -37,10 +37,7 @@ num_hiddens = 128
 num_residual_hiddens = 16
 num_residual_layers = 2
 l = 512 #1024 # batch length
-<<<<<<< HEAD
-=======
 p= 36 #128
->>>>>>> d34803d735ac971341aaa5e7cd75d61126b9cc15
 p= 36 #128'''
 decay = 0.99
 learning_rate = 1e-3
@@ -307,14 +304,10 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
         if lossfunc=='mse':
           recon_error = F.mse_loss(data_recon, data) #/ data_variance
         elif lossfunc=='dyn':
-<<<<<<< HEAD
-          recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
-=======
           print("ENTERING LOSS!", i)
           recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
         elif lossfunc=='l1reg':
           recon_error = F.mse_loss(data_recon, data) + lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
->>>>>>> d34803d735ac971341aaa5e7cd75d61126b9cc15
         else: # loss function = mae
           recon_error = F.l1_loss(data_recon, data)
         loss = recon_error + vq_loss # will be 0 if no quantization
