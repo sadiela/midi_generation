@@ -7,8 +7,6 @@ import argparse
 import time
 from pathlib import Path
 import logging
-from datetime import datetime
-
 
 '''
 Driver script for training VQ-VAE models. Takes the following command line arguments (all optional):
@@ -28,7 +26,7 @@ Driver script for training VQ-VAE models. Takes the following command line argum
 # DEFAULT FILEPATHS #
 #####################
 #data_folder = Path("source_data/text_files/")
-datpath = PROJECT_DIRECTORY  / 'data' / 'all_midi_tensors'  # '..\\midi_data\\full_dataset_midis_normalized\\'
+datpath = PROJECT_DIRECTORY  / 'data' / 'all_midi_tensors_ttv' / 'train'  # '..\\midi_data\\full_dataset_midis_normalized\\'
 desktopdatpath = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'midi_tensors_2'
 modpath = PROJECT_DIRECTORY / 'models'
 respath = PROJECT_DIRECTORY / 'results'
@@ -44,7 +42,7 @@ def train(datapath, resultspath, modelpath, fstub, loss, batchsize=10, batchleng
     # i think num embeddings was 64 before? 
     # Declare model
     print("DEVICE:", device)
-    model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
+    model = Model(num_embeddings=num_embeddings, embedding_dim=128, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
     model_file = get_free_filename('model_' + fstub, modelpath, suffix='.pt')
     logging.info("Model will be saved to: %s", model_file)
 
@@ -73,7 +71,7 @@ if __name__ == "__main__":
     parser.add_argument('-b', '--batchsize', help='Number of songs in a batch', default=10)
     parser.add_argument('-a', '--batchlength', help='Length of midi object', default=128)
     parser.add_argument('-u', '--numembed', help='Number of embeddings', default=1024)
-    parser.add_argument('-e', '--embeddim', help='Number of embeddings', default=36)
+    parser.add_argument('-e', '--embeddim', help='Embedding dimension', default=36)
 
     # run a single label experiment by default, if --multi flag is added, run a multilabel experiment!
     parser.add_argument('-l','--lossfunc', help='loss function to use', default='mse')
@@ -84,9 +82,6 @@ if __name__ == "__main__":
     #                    action='store_const', const='full', default='summary')
     parser.add_argument('-v', '--verbosity', dest='loglevel', action='store_const', const='DEBUG',
                         default='INFO',help='specify level of detail for log file')
-    # IMPLEMENT THIS!
-    #parser.add_argument('-l' '--labels', dest='print_labels', action='store_const', const=True, default=False,
-    #                    help='Print missed labels')
     parser.add_argument('-s', '--sparse', dest='sparse', action='store_const', const=True, 
                         default=False, help='whether or not to tensors are sparse')
 
@@ -95,9 +90,7 @@ if __name__ == "__main__":
     loglevel = args['loglevel']
     numeric_level = getattr(logging, loglevel.upper(), None) # put it into uppercase
 
-    now = datetime.now()
-    date = now.strftime("%m-%d-%Y")
-    logfile = get_free_filename('vq_vae_training-' + date, logpath, suffix='.log')
+    logfile = get_free_filename('vq_vae_training-', logpath, suffix='.log')
 
     logging.basicConfig(filename=logfile, level=numeric_level)
 
