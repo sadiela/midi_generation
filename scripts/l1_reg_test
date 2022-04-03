@@ -2,7 +2,7 @@
 
 # Set project
 #$ -P textconv
-#$ -o DPTEST.txt
+#$ -o L1REGTEST.txt
 #$ -m ea
 #$ -j y
 #$ -V

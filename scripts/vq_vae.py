@@ -119,7 +119,7 @@ class MIDIVectorQuantizer(nn.Module):
     self._embedding.weight.data.uniform_(-1/self._num_embeddings, 1/self._num_embeddings) # randomize embeddings to start
 
   def forward(self, inputs):
-    logging.info("MIDI VECTOR QUANTIZER FORWARD PASS")
+    logging.debug("MIDI VECTOR QUANTIZER FORWARD PASS")
     # PASS ONE SONG AT A TIME
     # inputting convolved midi tensors
     # batch dependent on song length, train one song at a time 
@@ -150,7 +150,7 @@ class MIDIVectorQuantizer(nn.Module):
     
     # Quantize and unflatten
     quantized = torch.matmul(encodings, self._embedding.weight).view(input_shape)
-    logging.info(str(quantized) + str(quantized.shape))
+    logging.debug(str(quantized) + str(quantized.shape))
 
      # Loss
     e_latent_loss = F.mse_loss(quantized.detach(), inputs)
@@ -282,65 +282,68 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
     max_tensor_size= 0 
 
     dynamic_loss = SparseDynamicLoss.apply
-    lam = 5
+    lam = 0.5
+    epochs = 3
 
-    for i, data in tqdm(enumerate(training_data)):
-        #name = midi_tensor_dataset.__getname__(i)
-        # s x p x 1 x l
-        data = data.to(device)
-        cursize = torch.numel(data)
-        if cursize > max_tensor_size:
-          max_tensor_size = cursize
-          logging.info("NEW MAX BATCH SIZE: %d", max_tensor_size)
+    for ep in range(epochs): 
+      print("EPOCH:", ep)
+      for i, data in tqdm(enumerate(training_data)):
+          #name = midi_tensor_dataset.__getname__(i)
+          # s x p x 1 x l
+          data = data.to(device)
+          cursize = torch.numel(data)
+          if cursize > max_tensor_size:
+            max_tensor_size = cursize
+            logging.info("NEW MAX BATCH SIZE: %d", max_tensor_size)
 
-        print('TRAIN:', data.shape)
+          print('TRAIN:', data.shape)
 
-        '''with profile(
-          activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
-          with_stack=True,
-        ) as prof:'''
+          '''with profile(
+            activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+            with_stack=True,
+          ) as prof:'''
 
-        vq_loss, data_recon, perplexity = model(data)
-        if lossfunc=='mse':
-          recon_error = F.mse_loss(data_recon, data) #/ data_variance
-        elif lossfunc=='dyn':
-          print("ENTERING LOSS!", i)
-          recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
-        elif lossfunc=='l1reg':
-          recon_error = F.mse_loss(data_recon, data) + lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
-        else: # loss function = mae
-          recon_error = F.l1_loss(data_recon, data)
-        loss = recon_error + vq_loss # will be 0 if no quantization
-        loss.backward()
-        #print("backpropagated")
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
-        optimizer.step()
+          vq_loss, data_recon, perplexity = model(data)
+          if lossfunc=='mse':
+            recon_error = F.mse_loss(data_recon, data) #/ data_variance
+          elif lossfunc=='dyn':
+            print("ENTERING LOSS!", i)
+            recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
+          elif lossfunc=='l1reg':
+            recon_error = F.mse_loss(data_recon, data) + lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
+          else: # loss function = mae
+            recon_error = F.l1_loss(data_recon, data)
+          loss = recon_error + vq_loss # will be 0 if no quantization
+          loss.backward()
+          #print("backpropagated")
+          torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
+          optimizer.step()
 
-        #output = prof.key_averages().table(sort_by="self_cuda_time_total", row_limit=10)
-        #print(output) 
-        
-        total_loss.append(loss.item())
-        if quantize:
-          train_res_recon_error.append(recon_error.item())
-          train_res_perplexity.append(perplexity.item())
-        else:
-          train_res_recon_error.append(loss)
-          train_res_perplexity.append(perplexity)
+          #output = prof.key_averages().table(sort_by="self_cuda_time_total", row_limit=10)
+          #print(output) 
+          
+          total_loss.append(loss.item())
+          if quantize:
+            train_res_recon_error.append(recon_error.item())
+            train_res_perplexity.append(perplexity.item())
+          else:
+            train_res_recon_error.append(loss)
+            train_res_perplexity.append(perplexity)
 
-        if pd.isna(recon_error.item()):
-          nanfiles.append(midi_tensor_dataset.__getname__(i))
+          if pd.isna(recon_error.item()):
+            nanfiles.append(midi_tensor_dataset.__getname__(i))
 
-        if (i+1) % 100 == 0:
-          torch.save({
-                      'iteration': i,
-                      'model_state_dict': model.state_dict(),
-                      'optimizer_state_dict': optimizer.state_dict(),
-                      'loss': train_res_recon_error[-1],
-                      }, save_path)
-          logging.info('%d iterations' % (i+1))
-          logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
-          logging.info('\n')
+          if (i+1) % 1000 == 0:
+            torch.save({
+                        'iteration': i,
+                        'model_state_dict': model.state_dict(),
+                        'optimizer_state_dict': optimizer.state_dict(),
+                        'loss': train_res_recon_error[-1],
+                        }, save_path)
+            logging.info('%d iterations' % (i+1))
+            logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
+            logging.info('\n')
 
-    logging.info("saving model to %s"%save_path)
+    logging.info(f"saving model to {save_path}")
     torch.save(model.state_dict(), save_path)
     return train_res_recon_error, train_res_perplexity, nanfiles
