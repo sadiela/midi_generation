@@ -1,6 +1,7 @@
 import torch
 import numpy as np 
-from shared_functions import *
+from dp_loss.shared_functions import *
+from torch.profiler import profile, record_function, ProfilerActivity
 
 def construct_theta_sparse_k_loop(x, x_hat, device):
     # theta: only adding one entry at a time
@@ -11,6 +12,7 @@ def construct_theta_sparse_k_loop(x, x_hat, device):
     grad_theta = torch.sparse_coo_tensor((m*n, m*n,  x_hat.shape[0], x_hat.shape[1]), device=device)
     for k in range(0,m*n): # should hit all ij combos here!
         i, j = ij_from_k(k,m,n)
+        print(k,i,j)
         if i > 0 and j > 0:
             if (x[:, i-1] == x_hat[:, j-1]).all():
                 theta = torch.add(theta, torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k]], 0.001, (m*n, m*n), device=device))
@@ -44,32 +46,48 @@ def speedy_sparse_diffable_recursion(theta, device, gamma=0.3): # passed in spar
             e_bar[i] += get_ijth_val(E, i, j[0]).to(device) # do i have to do this for an int? 
     return -v[N-1], -E
 
+def forward_loop(i, X, X_hat, device, grad_L_x):
+    theta, grad_theta_xhat = construct_theta_sparse_k_loop(X[i][0], X_hat[i][0], device)
+    print("theta constructed")
+    theta = theta.coalesce()
+    grad_theta_xhat = grad_theta_xhat.coalesce()
+    loss, grad_L_theta = speedy_sparse_diffable_recursion(theta, device)
+    grad_L_theta.coalesce()
+    # Just loop through sparse index pairs!
+    grad_L_theta = grad_L_theta.coalesce()
+    nonzero_indices = grad_L_theta.indices()
+    nonzero_vals = grad_L_theta.values()
+    for idx in range(nonzero_indices.size()[1]):
+        j = nonzero_indices[0,idx] 
+        k = nonzero_indices[1,idx] 
+        grad_L_theta_val = nonzero_vals[idx]
+        if has_values(grad_theta_xhat, j,k): #torch.count_nonzero(grad_theta_xhat[j][k]) != 0:
+            cur_grad = grad_L_theta_val *  get_slice(grad_theta_xhat, j,k, device)# scalar times pxn
+            grad_L_x[i][0] += cur_grad
+    return loss, grad_L_x
+
 class SpeedySparseDynamicLoss(torch.autograd.Function):
   @staticmethod
   def forward(ctx, X_hat, X, device):
     # X_hat, X are bigger than we thought...
     # build theta from original data and reconstruction
+    full_loss = 0
     grad_L_x = torch.zeros((X.shape[0], X.shape[1], X.shape[2], X.shape[3])) # THIS SIZE FINE
     grad_L_x.to(device)
     print(X_hat.shape[0])
     for i in range(X_hat.shape[0]):
         print(i)
-        theta, grad_theta_xhat = construct_theta_sparse_k_loop(X[i][0], X_hat[i][0], device)
-        theta = theta.coalesce()
-        grad_theta_xhat = grad_theta_xhat.coalesce()
-        loss, grad_L_theta = speedy_sparse_diffable_recursion(theta, device)
-        grad_L_theta.coalesce()
-        # Just loop through sparse index pairs!
-        grad_L_theta = grad_L_theta.coalesce()
-        nonzero_indices = grad_L_theta.indices()
-        nonzero_vals = grad_L_theta.values()
-        for idx in range(nonzero_indices.size()[1]):
-            j = nonzero_indices[0,idx] 
-            k = nonzero_indices[1,idx] 
-            grad_L_theta_val = nonzero_vals[idx]
-            if has_values(grad_theta_xhat, j,k): #torch.count_nonzero(grad_theta_xhat[j][k]) != 0:
-                cur_grad = grad_L_theta_val *  get_slice(grad_theta_xhat, j,k, device)# scalar times pxn
-                grad_L_x[i][0] += cur_grad
+        if i == 0: 
+            with profile(
+                activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+                with_stack=True,
+            ) as prof:
+                loss, grad_L_x = forward_loop(i, X, X_hat, device, grad_L_x)
+                full_loss += loss
+                print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
+        else:
+            loss, grad_L_x = forward_loop(i, X, X_hat, device, grad_L_x)
+            full_loss += loss
 
     #print('FINAL GRADIENT:', grad_L_x)
     ctx.save_for_backward(grad_L_x)
