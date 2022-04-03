@@ -1,0 +1,9 @@
+nan_reconstruction_files: []
+perplexity:
+- 2.1074435710906982
+- 1.805261254310608
+- 2.61708664894104
+reconstruction_error:
+- 5386988.0
+- 4410458.0
+- 4005466.5
