@@ -13,7 +13,7 @@ def construct_theta_sparse(x, x_hat, device):
     grad_theta = torch.sparse_coo_tensor((m*n, m*n,  x_hat.shape[0], x_hat.shape[1]), device=device)
     for i in range(1,m):
             for j in range(1,n):
-                print(i,j)
+                #print(i,j)
                 if (x[:, i-1] == x_hat[:, j-1]).all():
                     theta = torch.add(theta, torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j, m,n)]], 0.001, (m*n, m*n), device=device)) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = 0
                 else:
@@ -92,13 +92,8 @@ class SparseDynamicLossSingle(torch.autograd.Function):
     theta, grad_theta_xhat = construct_theta_sparse(X, X_hat, device)
     theta = theta.coalesce()
     grad_theta_xhat = grad_theta_xhat.coalesce()
-    print("GRADTHETA:", torch.count_nonzero(grad_theta_xhat.to_dense()))
     loss, grad_L_theta = sparse_diffable_recursion(theta, device)
     grad_L_theta.coalesce()
-    print("GRADLTHETA:", torch.count_nonzero(grad_L_theta.to_dense()))
-    #loss_exact = exact_recursive_formula(theta.shape[0]-1, theta)
-    #print("LOSSES:", loss, -loss_exact)
-    #print(grad_L_theta)
     n_2 = grad_L_theta.size()[0]
     #print(n_2)
     grad_L_x = torch.zeros((X_hat.shape[0], X_hat.shape[1]))
@@ -106,12 +101,11 @@ class SparseDynamicLossSingle(torch.autograd.Function):
         for k in range(n_2): ##### NOT DONE W THIS PART!!!! ####
             grad_L_theta_val = get_ijth_val(grad_L_theta, j,k)
             if grad_L_theta_val != 0 and has_values(grad_theta_xhat, j,k): #torch.count_nonzero(grad_theta_xhat[j][k]) != 0:
-                cur_grad = grad_L_theta_val *  get_slice(grad_theta_xhat, j,k) # scalar times pxn
+                cur_grad = grad_L_theta_val *  get_slice(grad_theta_xhat, j,k, device) # scalar times pxn
                 grad_L_x += cur_grad
-    print('FINAL GRADIENT:', grad_L_x)
     ctx.save_for_backward(grad_L_x)
     # determine answer
-    return loss
+    return loss, grad_L_x, theta, grad_L_theta
   
   @staticmethod
   def backward(ctx, grad_output):
@@ -119,16 +113,6 @@ class SparseDynamicLossSingle(torch.autograd.Function):
     return grad_L_x, None
 
 if __name__ == "__main__":
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    mid1 = torch.tensor([
-            [1,1, 0],#,0,3],
-            [1,0, 0]#,1,0],
-            ], dtype=torch.float32)  
-
-    mid2 = torch.tensor([
-            [1,0, 0],#,1,8],
-            [0,1, 1],#0,0],
-            ], dtype=torch.float32) 
 
     #origtheta, gradtheta = construct_theta(mid1, mid2)
     #sparsetheta, sparsegradtheta = construct_theta_sparse(mid1, mid2, device=device)
