@@ -11,13 +11,13 @@ def construct_theta_sparse_k_loop(x, x_hat, device):
     grad_theta = torch.sparse_coo_tensor((m*n, m*n,  x_hat.shape[0], x_hat.shape[1]), device=device)
     for k in range(0,m*n):
         i, j = ij_from_k(k,m*n)
-        print("k,i,j:", k, i, j)
+        #print("k,i,j:", k, i, j)
         if i > 0 and j > 0:
             if (x[:, i-1] == x_hat[:, j-1]).all():
-                print("ADDING!")
+                #print("ADDING!")
                 theta = torch.add(theta, torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k]], 0.001, (m*n, m*n), device=device)) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = 0
             else:
-                print("ADDING!")
+                #print("ADDING!")
                 theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k]], note_diff(x[:, i-1] ,x_hat[:, j-1]), (m*n, m*n), device=device) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j, m,n)] = note_diff(x[:, i-1] ,x_hat[:, j-1]) # replacing; cost depends on ...?
                 grad_theta = grad_theta + sparse_add_gradients(k_from_ij(i-1,j-1, m,n), k, j-1, distance_derivative(x[:,i-1]-x_hat[:,j-1]), m,n, device=device)
             theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i,j-1, m,n)]], single_note_val(x_hat[:, j-1]), (m*n, m*n), device=device) #theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)]= single_note_val(x_hat[:, j-1])# deletion
@@ -63,13 +63,8 @@ class SpeedySparseDynamicLoss(torch.autograd.Function):
         theta, grad_theta_xhat = construct_theta_sparse_k_loop(X[i][0], X_hat[i][0], device)
         theta = theta.coalesce()
         grad_theta_xhat = grad_theta_xhat.coalesce()
-        #print("THETA:", theta)
         loss, grad_L_theta = speedy_sparse_diffable_recursion(theta, device)
         grad_L_theta.coalesce()
-        #loss_exact = exact_recursive_formula(theta.shape[0]-1, theta)
-        #print("LOSSES:", loss, -loss_exact)
-        n_2 = grad_L_theta.size()[0]
-        #print(n_2)
         # Just loop through sparse index pairs!
         grad_L_theta = grad_L_theta.coalesce()
         nonzero_indices = grad_L_theta.indices()
@@ -86,22 +81,22 @@ class SpeedySparseDynamicLoss(torch.autograd.Function):
     ctx.save_for_backward(grad_L_x)
     # determine answer
     return loss
+
+  @staticmethod
+  def backward(ctx, grad_output):
+    grad_L_x, = ctx.saved_tensors
+    return grad_L_x, None
     
 class SpeedySparseDynamicLossSingle(torch.autograd.Function):
   @staticmethod
   def forward(ctx, X_hat, X, device):
-    # X_hat, X are bigger than we thought...
-    # build theta from original data and reconstruction
     theta, grad_theta_xhat = construct_theta_sparse_k_loop(X, X_hat, device)
     theta = theta.coalesce()
     grad_theta_xhat = grad_theta_xhat.coalesce()
-    print("GRADTHETA:", torch.count_nonzero(grad_theta_xhat.to_dense()))
+    #print("GRADTHETA:", torch.count_nonzero(grad_theta_xhat.to_dense()))
     loss, grad_L_theta = speedy_sparse_diffable_recursion(theta, device)
     grad_L_theta.coalesce()
-    print("GRADLTHETA:", torch.count_nonzero(grad_L_theta.to_dense()))
-    #loss_exact = exact_recursive_formula(theta.shape[0]-1, theta)
-    #print("LOSSES:", loss, -loss_exact)
-    #print(grad_L_theta)
+    #print("GRADLTHETA:", torch.count_nonzero(grad_L_theta.to_dense()))
     n_2 = grad_L_theta.size()[0]
     grad_L_x = torch.zeros((X_hat.shape[0], X_hat.shape[1]))
     grad_L_theta = grad_L_theta.coalesce()
@@ -117,5 +112,9 @@ class SpeedySparseDynamicLossSingle(torch.autograd.Function):
     #print('FINAL GRADIENT:', grad_L_x)
     ctx.save_for_backward(grad_L_x)
     # determine answer
-    return loss
+    return loss, grad_L_x, theta, grad_L_theta
     
+  @staticmethod
+  def backward(ctx, grad_output):
+    grad_L_x, = ctx.saved_tensors
+    return grad_L_x, None

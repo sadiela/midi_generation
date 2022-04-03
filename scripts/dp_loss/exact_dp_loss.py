@@ -12,7 +12,6 @@ def exact_recursive_formula(j, theta):
         # get list of parents of j --> parents of j are all >-infinity
         parent_indices = np.where(theta[:,j]>np.NINF)[0]
         #print(j, " PARENTS:", parent_indices)
-
         # just get the max length path
         answer = max([theta[idx,j] + exact_recursive_formula(idx,theta) for idx in parent_indices]) 
         return answer

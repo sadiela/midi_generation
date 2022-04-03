@@ -36,11 +36,10 @@ logpath = PROJECT_DIRECTORY / 'scripts' / 'log_files'
 ##############################
 # MODEL/OPTIMIZER PARAMETERS #
 ##############################
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 def train(datapath, resultspath, modelpath, fstub, loss, batchsize=10, batchlength=256, normalize=False, quantize=True, sparse=False, num_embeddings=1024, embedding_dim=36):
     # i think num embeddings was 64 before? 
     # Declare model
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("DEVICE:", device)
     model = Model(num_embeddings=num_embeddings, embedding_dim=128, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
     model_file = get_free_filename('model_' + fstub, modelpath, suffix='.pt')
@@ -78,8 +77,6 @@ if __name__ == "__main__":
     parser.add_argument('-q', '--quantize', dest='quant', action='store_const', const=False,
                         default=True, help="True=VQVAE, false=VAE")
     #parser.add_argument('-n', '--nfolds', help='number of folds to use in cross validation', default=1) # make default 1?
-    #parser.add_argument('-f', '--fullres', help='generate full result file.', dest='result',
-    #                    action='store_const', const='full', default='summary')
     parser.add_argument('-v', '--verbosity', dest='loglevel', action='store_const', const='DEBUG',
                         default='INFO',help='specify level of detail for log file')
     parser.add_argument('-s', '--sparse', dest='sparse', action='store_const', const=True, 
@@ -90,7 +87,7 @@ if __name__ == "__main__":
     loglevel = args['loglevel']
     numeric_level = getattr(logging, loglevel.upper(), None) # put it into uppercase
 
-    logfile = get_free_filename('vq_vae_training-', logpath, suffix='.log')
+    logfile = get_free_filename('vq_vae_training', logpath, suffix='.log')
 
     logging.basicConfig(filename=logfile, level=numeric_level)
 

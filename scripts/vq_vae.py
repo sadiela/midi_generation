@@ -20,6 +20,7 @@ import pickle
 import logging
 #from dp_loss import *
 from dp_loss.sparse_dp_loss import *
+from dp_loss.shared_functions import *
 from pathlib import Path
 #from midi_utility import * 
 
@@ -27,7 +28,6 @@ from pathlib import Path
 # is reconstruction error going down? 
 # Run w/ more data
 # Increase # of embedding vectors? 
-# shuffle chunks? 
 
 ##############################
 # MODEL/OPTIMIZER PARAMETERS #
@@ -184,22 +184,13 @@ class Encoder(nn.Module):
                                  kernel_size=(1,8))
         self.pool = nn.MaxPool2d((1, 2))
   def forward(self, inputs):
-          #print(inputs.shape)
           x = self._conv_1(inputs)
-          #print(x.shape)
-          #x = self.pool(x)
-          #print(x.shape)
           x = F.relu(x)
-          #print(x.shape)
 
           x = self._conv_2(x)
-          #print(x.shape)
           #x = self.pool(x)
-          #print(x.shape)
           x = F.relu(x)
-          #print(x.shape)
           x = self._conv_3(x)
-          #print(x.shape)
           return x
 
 class Decoder(nn.Module):
@@ -216,22 +207,13 @@ class Decoder(nn.Module):
                                  kernel_size=(1,32))
         self.pool = nn.MaxPool2d((1, 2))
   def forward(self, inputs):
-          #print(inputs.shape)
           x = self._conv_trans_1(inputs)
-          #print(x.shape)
-          #x = self.pool(x)
-          #print(x.shape)
-          x = F.relu(x)
-          #print(x.shape)
 
-          x = self._conv_trans_2(x)
-          #print(x.shape)
-          #x = self.pool(x)
-          #print(x.shape)
           x = F.relu(x)
-          #print(x.shape)
+          x = self._conv_trans_2(x)
+          #x = self.pool(x)
+          x = F.relu(x)
           x = self._conv_trans_3(x)
-          #print(x.shape)
           return x
 
 class Model(nn.Module):
@@ -292,12 +274,12 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
 
     training_data = DataLoader(midi_tensor_dataset, collate_fn=collate_fn, batch_size=bs, shuffle=True, num_workers=2)
 
-      # Let # of tensors = n
-      # each tensor is pxl_i, where l_i is the length of the nth tensor
-      # when we chunk the data, it becomes (l_i//l = s_i) x 1 x p x l 
-      # so we want a big (sum(s_i)) x 1 x p x l tensor. 
-      # Then we want to shuffle along axis=0 so two adjacent pxl guys aren't 
-      # necessarily from the same song
+    # Let # of tensors = n
+    # each tensor is pxl_i, where l_i is the length of the nth tensor
+    # when we chunk the data, it becomes (l_i//l = s_i) x 1 x p x l 
+    # so we want a big (sum(s_i)) x 1 x p x l tensor. 
+    # Then we want to shuffle along axis=0 so two adjacent pxl guys aren't 
+    # necessarily from the same song
 
     logging.info("Device: %s" , device)
     max_tensor_size= 0 
@@ -320,6 +302,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
           activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
           with_stack=True,
         ) as prof:'''
+
         vq_loss, data_recon, perplexity = model(data)
         if lossfunc=='mse':
           recon_error = F.mse_loss(data_recon, data) #/ data_variance
