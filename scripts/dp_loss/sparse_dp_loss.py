@@ -2,7 +2,7 @@ import torch
 import numpy as np 
 #from dp_loss import *
 import torch.nn.functional as F
-from dp_loss.shared_functions import *
+from shared_functions import *
 
 def construct_theta_sparse(x, x_hat, device):
     # theta: only adding one entry at a time
@@ -25,7 +25,6 @@ def construct_theta_sparse(x, x_hat, device):
                 #grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)][:,j-1] = distance_derivative(-x_hat[:,j-1]) #, np.abs(-x_hat[:,j-1])) # FIX
                 theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i-1,j, m,n)]],  single_note_val(x[:, i-1]), (m*n, m*n), device=device)#theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i-1,j, m,n)] = single_note_val(x[:, i-1]) # insertion I think i want these both dependent on x_hat... is that possible? 
                 # NOTHING (gradient w.r.t. x_hat)
-                # shifting?
                 # gradient is telling you how much to change each x value... we will have
     return -theta, -grad_theta
 

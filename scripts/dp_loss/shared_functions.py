@@ -3,11 +3,17 @@ import numpy as np
 #from dp_loss import *
 #import torch.nn.functional as F
 
-def ij_from_k(k, N):
-    return k//N, k%N - 1
+def ij_from_k(k, m,n):
+    return k//n, k%n
 
 def k_from_ij(i,j,m,n):
     return n*i + j 
+
+def new_ij_from_k(k, m,n):
+    return k//n -1 , k%n - 1
+
+def new_k_from_ij(i,j,m,n):
+    return n*(i+1) + j +1
 
 def note_diff(a,b):
     not_equal = torch.where(torch.not_equal(a,b))
@@ -107,3 +113,18 @@ def get_slice(sparse_mat, idx1,idx2, device):
         if i==idx1 and j==idx2:
             result[k][l] = v
     return result
+
+if __name__ == "__main__":
+    m = 3+1
+    n = 3+1
+
+    for i in range(m):
+        for j in range(n):
+            k =  k_from_ij(i,j,m,n)
+            ii,jj = ij_from_k(k,m,n)
+            print(i,j,k,ii,jj)
+
+    
+    for k in range(m*n): # should hit all ij combos here!
+        i, j = ij_from_k(k,m,n)
+        print("k,i,j:", k, i, j)

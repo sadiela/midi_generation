@@ -10,8 +10,7 @@ def construct_theta_sparse_k_loop(x, x_hat, device):
     theta = torch.sparse_coo_tensor((m*n, m*n), device=device)
     grad_theta = torch.sparse_coo_tensor((m*n, m*n,  x_hat.shape[0], x_hat.shape[1]), device=device)
     for k in range(0,m*n): # should hit all ij combos here!
-        i, j = ij_from_k(k,m*n)
-        #print("k,i,j:", k, i, j)
+        i, j = ij_from_k(k,m,n)
         if i > 0 and j > 0:
             if (x[:, i-1] == x_hat[:, j-1]).all():
                 theta = torch.add(theta, torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k]], 0.001, (m*n, m*n), device=device))
@@ -69,7 +68,7 @@ class SpeedySparseDynamicLoss(torch.autograd.Function):
             k = nonzero_indices[1,idx] 
             grad_L_theta_val = nonzero_vals[idx]
             if has_values(grad_theta_xhat, j,k): #torch.count_nonzero(grad_theta_xhat[j][k]) != 0:
-                cur_grad = grad_L_theta_val *  get_slice(grad_theta_xhat, j,k)# scalar times pxn
+                cur_grad = grad_L_theta_val *  get_slice(grad_theta_xhat, j,k, device)# scalar times pxn
                 grad_L_x[i][0] += cur_grad
 
     #print('FINAL GRADIENT:', grad_L_x)
@@ -102,7 +101,7 @@ class SpeedySparseDynamicLossSingle(torch.autograd.Function):
         k = nonzero_indices[1,idx] 
         grad_L_theta_val = nonzero_vals[idx]
         if has_values(grad_theta_xhat, j,k): #torch.count_nonzero(grad_theta_xhat[j][k]) != 0:
-            cur_grad = grad_L_theta_val *  get_slice(grad_theta_xhat, j,k)# scalar times pxn
+            cur_grad = grad_L_theta_val *  get_slice(grad_theta_xhat, j,k, device)# scalar times pxn
             grad_L_x += cur_grad
     #print('FINAL GRADIENT:', grad_L_x)
     ctx.save_for_backward(grad_L_x)
