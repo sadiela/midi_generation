@@ -3,6 +3,7 @@ import numpy as np
 #from dp_loss import *
 import torch.nn.functional as F
 from shared_functions import *
+from torch.profiler import profile, record_function, ProfilerActivity
 
 def construct_theta_sparse(x, x_hat, device):
     # theta: only adding one entry at a time
@@ -78,21 +79,26 @@ class SparseDynamicLoss(torch.autograd.Function):
 class SparseDynamicLossSingle(torch.autograd.Function):
   @staticmethod
   def forward(ctx, X_hat, X, device):
-    # X_hat, X are bigger than we thought...
-    # build theta from original data and reconstruction
-    theta, grad_theta_xhat = construct_theta_sparse(X, X_hat, device)
-    theta = theta.coalesce()
-    grad_theta_xhat = grad_theta_xhat.coalesce()
-    loss, grad_L_theta = sparse_diffable_recursion(theta, device)
-    grad_L_theta.coalesce()
-    n_2 = grad_L_theta.size()[0]
-    grad_L_x = torch.zeros((X_hat.shape[0], X_hat.shape[1]))
-    for j in range(n_2):
-        for k in range(n_2): ##### NOT DONE W THIS PART!!!! ####
-            grad_L_theta_val = get_ijth_val(grad_L_theta, j,k)
-            if grad_L_theta_val != 0 and has_values(grad_theta_xhat, j,k): #torch.count_nonzero(grad_theta_xhat[j][k]) != 0:
-                cur_grad = grad_L_theta_val *  get_slice(grad_theta_xhat, j,k, device) # scalar times pxn
-                grad_L_x += cur_grad
+    with profile(
+            activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+            with_stack=True,
+        ) as prof:
+        # X_hat, X are bigger than we thought...
+        # build theta from original data and reconstruction
+        theta, grad_theta_xhat = construct_theta_sparse(X, X_hat, device)
+        theta = theta.coalesce()
+        grad_theta_xhat = grad_theta_xhat.coalesce()
+        loss, grad_L_theta = sparse_diffable_recursion(theta, device)
+        grad_L_theta.coalesce()
+        n_2 = grad_L_theta.size()[0]
+        grad_L_x = torch.zeros((X_hat.shape[0], X_hat.shape[1]))
+        for j in range(n_2):
+            for k in range(n_2): ##### NOT DONE W THIS PART!!!! ####
+                grad_L_theta_val = get_ijth_val(grad_L_theta, j,k)
+                if grad_L_theta_val != 0 and has_values(grad_theta_xhat, j,k): #torch.count_nonzero(grad_theta_xhat[j][k]) != 0:
+                    cur_grad = grad_L_theta_val *  get_slice(grad_theta_xhat, j,k, device) # scalar times pxn
+                    grad_L_x += cur_grad
+    print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
     ctx.save_for_backward(grad_L_x)
     # determine answer
     return loss, grad_L_x, theta, grad_L_theta

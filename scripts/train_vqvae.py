@@ -36,17 +36,17 @@ logpath = PROJECT_DIRECTORY / 'scripts' / 'log_files'
 ##############################
 # MODEL/OPTIMIZER PARAMETERS #
 ##############################
-def train(datapath, resultspath, modelpath, fstub, loss, batchsize=10, batchlength=256, normalize=False, quantize=True, sparse=False, num_embeddings=1024, embedding_dim=36):
+def train(datapath, resultspath, modelpath, fstub, loss, batchsize=10, batchlength=256, normalize=False, quantize=True, sparse=False, num_embeddings=1024, embedding_dim=128, lam=1):
     # i think num embeddings was 64 before? 
     # Declare model
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("DEVICE:", device)
-    model = Model(num_embeddings=num_embeddings, embedding_dim=128, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
+    model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
     model_file = get_free_filename('model_' + fstub, modelpath, suffix='.pt')
     logging.info("Model will be saved to: %s", model_file)
 
     # train model
-    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, lossfunc=loss, bs=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse)
+    recon_error, perplex, nan_recon_files = train_model(datapath, model, model_file, lossfunc=loss, bs=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, lam=lam)
     
     # save losses to file
     logging.info("NUM NAN FILES: %d", len(nan_recon_files))
@@ -81,7 +81,7 @@ if __name__ == "__main__":
                         default='INFO',help='specify level of detail for log file')
     parser.add_argument('-s', '--sparse', dest='sparse', action='store_const', const=True, 
                         default=False, help='whether or not to tensors are sparse')
-
+    parser.add_argument('-k', '--lambda', help='L1 Hyperparam', default='1')
     args = vars(parser.parse_args())
 
     loglevel = args['loglevel']
@@ -105,6 +105,7 @@ if __name__ == "__main__":
     quantize = args['quant']
     embeddim = int(args['embeddim'])
     numembed = int(args['numembed'])
+    lam = int(args['lambda'])
     
-    train(datadir, outdir, modeldir, fstub, loss, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim)
+    train(datadir, outdir, modeldir, fstub, loss, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
     logging.info("All done! TOTAL TIME: %s", str(time.time()-prog_start))

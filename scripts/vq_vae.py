@@ -254,7 +254,7 @@ def collate_fn(data, collate_shuffle=True):
   else:
     return full_list
 
-def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfunc='mse', bs=10, batchlength=256, normalize=False, quantize=True, sparse=False):
+def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfunc='mse', bs=10, batchlength=256, normalize=False, quantize=True, sparse=False, lam=1):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     midi_tensor_dataset = MidiDataset(datapath, l=batchlength, norm=normalize, sparse=sparse)
@@ -282,7 +282,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
     max_tensor_size= 0 
 
     dynamic_loss = SpeedySparseDynamicLoss.apply
-    lam = 0.5
+    #lam = 0.5
     epochs = 3
 
     for ep in range(epochs): 
