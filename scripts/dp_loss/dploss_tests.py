@@ -146,5 +146,5 @@ if __name__ == "__main__":
     #test_speedy_sparse_dp()
     #compare_thetas()
     #vary_gamma()
-    #compare_losses()
+    compare_losses()
     compare_gradients()

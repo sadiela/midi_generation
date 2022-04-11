@@ -2,7 +2,7 @@ import torch
 import numpy as np 
 #from dp_loss import *
 import torch.nn.functional as F
-from dp_loss.shared_functions import *
+from shared_functions import *
 
 
 def construct_theta_sparse(x, x_hat, device):

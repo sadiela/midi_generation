@@ -19,7 +19,7 @@ from tqdm import tqdm
 import pickle
 import logging
 #from dp_loss import *
-from dp_loss.sparse_dp_loss import *
+from dp_loss.speedy_sparse_dp_loss import *
 from dp_loss.shared_functions import *
 from pathlib import Path
 #from midi_utility import * 
@@ -281,7 +281,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
     logging.info("Device: %s" , device)
     max_tensor_size= 0 
 
-    dynamic_loss = SparseDynamicLoss.apply
+    dynamic_loss = SpeedySparseDynamicLoss.apply
     lam = 0.5
     epochs = 3
 
