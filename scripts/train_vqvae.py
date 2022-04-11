@@ -105,7 +105,7 @@ if __name__ == "__main__":
     quantize = args['quant']
     embeddim = int(args['embeddim'])
     numembed = int(args['numembed'])
-    lam = int(args['lambda'])
+    lam = float(args['lambda'])
     
     train(datadir, outdir, modeldir, fstub, loss, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
     logging.info("All done! TOTAL TIME: %s", str(time.time()-prog_start))

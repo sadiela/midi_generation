@@ -19,4 +19,4 @@
 module load miniconda
 conda activate py3
 
-python3 train_vqvae.py -r 'l1reglosstest' -b 10 -a 128 -u 1024 -e 128 -l 'l1reg' -s
+python3 train_vqvae.py -r 'l1reglosstest' -b 10 -a 128 -u 1024 -e 128 -l 'l1reg' -s -k 0.5
