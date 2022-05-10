@@ -3,7 +3,7 @@ import torch
 import numpy as np 
 from dp_loss.shared_functions import *
 from torch.profiler import profile, record_function, ProfilerActivity
-
+import time
 '''
 i = [[0, 1, 1],
          [2, 0, 2]]
@@ -106,7 +106,6 @@ def speedy_sparse_diffable_recursion(theta, device, gamma=0.3): # passed in spar
         u = torch.tensor(np.asarray([(i[1] + v[i[0]]) for i in parent_indices], dtype=np.float32)) # CHANGE
         v[j] = gamma * torch.log(torch.sum(torch.exp(u/gamma))) # this is fine
         q_vals = torch.exp(u/gamma)/torch.sum(torch.exp(u/gamma)) # this is fine
-        #q = q + q_additions(parent_indices, q_vals, j, N, device) # creates a new tensor each time !!!
         q0, q1, qs = q_additions_speedy(parent_indices, q_vals, j)
         q_indices[0] += q0
         q_indices[1] += q1
@@ -116,8 +115,6 @@ def speedy_sparse_diffable_recursion(theta, device, gamma=0.3): # passed in spar
         children_indices = get_child_indices(theta, i) #torch.where(theta[i,:]>np.NINF)[0]
         for j in children_indices:
             q_ij = get_ijth_val(prealloc_q, i,j[0]).to(device) # value at ij
-            #E += E_val(i, j[0], q_ij*e_bar[j[0]], N, device) # creates a new tensor each time !!!!!
-            #E0, E1, Es = E_val_speedy(i, j[0], q_ij*e_bar[j[0]])
             E_indices[0] += [i]
             E_indices[1] += [j[0]]
             E_v += [q_ij*e_bar[j[0]]]
@@ -135,7 +132,7 @@ class SpeedySparseDynamicLoss(torch.autograd.Function):
     grad_L_x = torch.zeros((X.shape[0], X.shape[1], X.shape[2], X.shape[3])) # THIS SIZE FINE
     grad_L_x.to(device)
     print(X_hat.shape[0])
-    for i in range(X_hat.shape[0]):
+    for i in range(X_hat.shape[0]): # get rid of batch loop?
         theta, grad_theta_xhat = construct_theta_sparse_k_loop(X[i][0], X_hat[i][0], device)
         print("theta constructed")
         theta = theta.coalesce()
@@ -170,12 +167,17 @@ class SpeedySparseDynamicLossSingle(torch.autograd.Function):
                 activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
                 with_stack=True,
             ) as prof:
+        construct_theta_start = time.time()
         theta, grad_theta_xhat = construct_theta_sparse_k_loop(X, X_hat, device)
         theta = theta.coalesce()
         grad_theta_xhat = grad_theta_xhat.coalesce()
+        print("CONSTRUCT THETA:", str(time.time()-construct_theta_start))
         #print("GRADTHETA:", torch.count_nonzero(grad_theta_xhat.to_dense()))
+        calc_loss_start = time.time()
         loss, grad_L_theta = speedy_sparse_diffable_recursion(theta, device)
+        print("CALC LOSS:", str(time.time()-calc_loss_start))
         #print("GRADLTHETA:", torch.count_nonzero(grad_L_theta.to_dense()))
+        chain_rule_start = time.time()
         n_2 = grad_L_theta.size()[0]
         grad_L_x = torch.zeros((X_hat.shape[0], X_hat.shape[1]))
         grad_L_theta = grad_L_theta.coalesce()
@@ -188,6 +190,7 @@ class SpeedySparseDynamicLossSingle(torch.autograd.Function):
             if has_values(grad_theta_xhat, j,k): #torch.count_nonzero(grad_theta_xhat[j][k]) != 0:
                 cur_grad = grad_L_theta_val *  get_slice(grad_theta_xhat, j,k, device)# scalar times pxn
                 grad_L_x += cur_grad
+        print("CHAIN RULE", str(time.time()- chain_rule_start))
     print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
     #print('FINAL GRADIENT:', grad_L_x)
     ctx.save_for_backward(grad_L_x)

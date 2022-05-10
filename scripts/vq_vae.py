@@ -51,7 +51,7 @@ learning_rate = 1e-3
 class MidiDataset(Dataset):
     """Midi dataset."""
 
-    def __init__(self, npy_file_dir, l=512, sparse=False, norm=False):
+    def __init__(self, npy_file_dir, l=1024, sparse=False, norm=False):
         """
         Args:
             npy_file_dir (string): Path to the npy file directory
@@ -126,10 +126,13 @@ class MIDIVectorQuantizer(nn.Module):
     # input = b x p x l
 
     logging.debug("Original input shape: %s", str(inputs.shape))
+    print("ORIGINAL INPUT SHAPE:",inputs.shape)
     inputs = inputs.squeeze(1) # need to be 2d
-    
+    print("INPUT SHAPE SQUEEZED:",inputs.shape)
+
     # we will embed along dim p 
     inputs = inputs.permute(0,2,1).contiguous() # now bxlxp
+    print("INPUT SHAPE PERMUTED:",inputs.shape)
     # flatten input
     input_shape = inputs.shape 
     flat_input = inputs.view(-1, self._embedding_dim)
@@ -139,6 +142,7 @@ class MIDIVectorQuantizer(nn.Module):
     distances = (torch.sum(flat_input**2, dim=1, keepdim=True) 
                     + torch.sum(self._embedding.weight**2, dim=1)
                     - 2 * torch.matmul(flat_input, self._embedding.weight.t()))
+    logging.debug("DISTANCES: %s %s", str(distances), str(distances.shape))
     logging.debug("DISTANCES: %s %s", str(distances), str(distances.shape))
 
     # Encoding
@@ -310,7 +314,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
             print("ENTERING LOSS!", i)
             recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
           elif lossfunc=='l1reg':
-            recon_error = F.mse_loss(data_recon, data) + lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
+            recon_error = F.mse_loss(data_recon, data) + lam*torch.norm(data_recon, p=1) # normalize wrt input size? Match up w MSE
           else: # loss function = mae
             recon_error = F.l1_loss(data_recon, data)
           loss = recon_error + vq_loss # will be 0 if no quantization

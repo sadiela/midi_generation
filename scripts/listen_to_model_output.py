@@ -32,6 +32,7 @@ import numpy as np
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils
 
+from statistics import mean, pstdev
 import random
 import sys
 from pathlib import Path
@@ -43,10 +44,10 @@ datapath = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'midi_tensors'
 outpath = PROJECT_DIRECTORY / 'midi_data' / 'output_data'
 respath = PROJECT_DIRECTORY / 'results'
 
-num_hiddens = 128
-embedding_dim = 128
-commitment_cost = 0.5
-num_embeddings = 1024
+#num_hiddens = 128
+#embedding_dim = 128
+#commitment_cost = 0.5
+#num_embeddings = 1024
 maxlength = 16*32
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -84,7 +85,7 @@ def reconstruct_song(orig_tensor_path, model_path, clip_val=0, norm=False):
     if norm:
         data = data / maxlength
     
-    model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=commitment_cost)
+    model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=0.5)
     model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
     model.eval()
 
@@ -92,7 +93,7 @@ def reconstruct_song(orig_tensor_path, model_path, clip_val=0, norm=False):
     print(data.shape)
     p, n = data.shape
 
-    l = 1024 # batch length
+    l = 128 #1024 # batch length
 
     data = data[:,:(data.shape[1]-(data.shape[1]%l))]
     p, n_2 = data.shape
@@ -127,45 +128,47 @@ def reconstruct_song(orig_tensor_path, model_path, clip_val=0, norm=False):
 def show_result_graphs(yaml_name):
     with open(yaml_name) as file: 
         res_dic = yaml.load(file) #, Loader=yaml.FullLoader)
-    plt.plot(res_dic['reconstruction_error'][0:1000])
-    plt.title("Reconstruction Error")
-    plt.xlabel("Iteration")
-    plt.show()
+    #plt.plot(res_dic['reconstruction_error']) #[0:1000])
+    print(mean(res_dic['reconstruction_error'][-1000:]), pstdev(res_dic['reconstruction_error'][-1000:]))
 
-    plt.plot(res_dic['perplexity'])
-    plt.title("Perplexity")
-    plt.xlabel("Iteration")
-    plt.show()
+    #plt.title("Reconstruction Error")
+    #plt.xlabel("Iteration")
+    #plt.show()
+
+    #plt.plot(res_dic['perplexity'])
+    #plt.title("Perplexity")
+    #plt.xlabel("Iteration")
+    #plt.show()
 
 def main():
-    '''
+
     # Load model from memory
     ### MODELS ###
     mse_model_path = PROJECT_DIRECTORY / 'models' / 'model_mse-2021-11-282.pt'
-    mae_model_path = PROJECT_DIRECTORY / 'models' / 'model_mae-2021-11-280.pt'
-    msenorm_model_path = PROJECT_DIRECTORY / 'models' / 'model_msenorm-2021-11-280.pt'
-    maenorm_model_path = PROJECT_DIRECTORY / 'models' / 'model_maenorm-2021-11-280.pt'
+    #mae_model_path = PROJECT_DIRECTORY / 'models' / 'model_mae-2021-11-280.pt'
+    #msenorm_model_path = PROJECT_DIRECTORY / 'models' / 'model_msenorm-2021-11-280.pt'
+    #maenorm_model_path = PROJECT_DIRECTORY / 'models' / 'model_maenorm-2021-11-280.pt'
 
     ### TENSORS ###
     orig_tensor = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'originals'
     mse_tensor = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'mse_tensor'
-    mae_tensor = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'mae_tensor'
-    msenorm_tensor = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'msenorm_tensor'
-    maenorm_tensor = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'maenorm_tensor'
+    #mae_tensor = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'mae_tensor'
+    #msenorm_tensor = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'msenorm_tensor'
+    #maenorm_tensor = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'maenorm_tensor'
 
     ### MIDIS ###
     old_midi = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'old_midi'
     mse_midi = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'mse_midi'
-    mae_midi = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'mae_midi'
-    msenorm_midi = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'msenorm_midi'
-    maenorm_midi = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'maenorm_midi'
+    #mae_midi = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'mae_midi'
+    #msenorm_midi = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'msenorm_midi'
+    #maenorm_midi = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'listening_test' / 'maenorm_midi'
 
     ### PIANOROLLS ###
     orig_pianorolls = PROJECT_DIRECTORY / 'results' / 'original_midi_pianorolls'
     mse_res = PROJECT_DIRECTORY / 'results' / 'mse_midi_pianorolls'
-    mae_res = PROJECT_DIRECTORY / 'results' / 'mae_midi_pianorolls'
-    msenorm_res = PROJECT_DIRECTORY / 'results' / 'msenorm_midi_pianorolls'
-    maenorm_res = PROJECT_DIRECTORY / 'results' / 'maenorm_midi_pianorolls'
+    #mae_res = PROJECT_DIRECTORY / 'results' / 'mae_midi_pianorolls'
+    #msenorm_res = PROJECT_DIRECTORY / 'results' / 'msenorm_midi_pianorolls'
+    #maenorm_res = PROJECT_DIRECTORY / 'results' / 'maenorm_midi_pianorolls'
 
     # Save original pianoroll images
     print("Saving og pianorolls")
@@ -174,13 +177,15 @@ def main():
     # Reconstruct songs in accordance to each model
     print("Reconstructing")
     reconstruct_songs(orig_tensor, mse_tensor, mse_midi, mse_model_path, clip_val=0)
-    print("Reconstructing")
+    '''print("Reconstructing")
     reconstruct_songs(orig_tensor, mae_tensor, mae_midi, mae_model_path, clip_val=0)
     print("Reconstructing")
     reconstruct_songs(orig_tensor, msenorm_tensor, msenorm_midi, msenorm_model_path, clip_val=0, norm=True)
     print("Reconstructing")
     reconstruct_songs(orig_tensor, maenorm_tensor, maenorm_midi, maenorm_model_path, clip_val=0, norm=True)
+    '''
 
+    '''
     # save midis for each reconstruction
     print("Saving new pianorolls")
     #save_graphs(mse_midi, mse_res)
@@ -189,13 +194,13 @@ def main():
     #save_graphs(maenorm_midi, maenorm_res)
 
     print("DONE!")
-    '''
-    '''results={"reconstruction_error": recon_error, "perplexity": perplex, "nan_reconstruction_files": nan_recon_files}
+    
+    results={"reconstruction_error": recon_error, "perplexity": perplex, "nan_reconstruction_files": nan_recon_files}
     savefile = get_free_filename('results_' + fstub, resultspath, suffix='.yaml')
     print("SAVING FILE TO:", savefile)
     with open(savefile, 'w') as outfile:
-        yaml.dump(results, outfile, default_flow_style=False)'''
-
+        yaml.dump(results, outfile, default_flow_style=False)
+    '''
 
     #orig_npy = song_dir + 'Gimme! Gimme! Gimme!_0.npy'
     #orig_midi = outputs + "gimme_midi.mid"
@@ -254,15 +259,31 @@ def main():
 
 
 if __name__ == "__main__":
-    #main()
-    #respath = r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\results\\results_l1reglosstest-2022-04-03-1.yaml'
+    # main()
+    #respath = r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\results\\L1_REG_TESTS\\results_l1reglosstest000_1-2022-04-17-0.yaml'
     #show_result_graphs(respath)
-    model_path = Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\results\\model_l1reglosstest-2022-04-03-1.pt')
-    res_folder = Path(r'C:\\Users\\sadie\\Documents\BU\\fall_2021\\research\\music\\midi_data\\new_data\\listening_test\\L1reg')
-    orig_tensor = Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\listening_test\\originals')
-    #reconstruct_songs(orig_tensor, res_folder, res_folder, model_path, clip_val=0)
-    #save_graphs(res_folder, res_folder)
+    #respath = r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\results\\L1_REG_TESTS\\results_l1reglosstest000_5-2022-04-17-0.yaml'
+    #show_result_graphs(respath)
+    #respath = r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\results\\L1_REG_TESTS\\results_l1reglosstest00_1-2022-04-17-0.yaml'
+    #show_result_graphs(respath)
 
-    recon = pypianoroll.read(Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\listening_test\\L1reg\\AcrosstheUniverse_0_cropped.mid'))
-    recon.trim(0, 64*recon.resolution)
-    recon.plot()
+    model_path = Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\results\\models\\model_l1reglosstest00_1-2022-04-11-0.pt')
+    res_folder = Path(r'C:\\Users\\sadie\\Documents\BU\\fall_2021\\research\\music\\midi_data\\new_data\\listening_test\\L1_reg_small_lambda')
+    orig_tensor = Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\listening_test\\originals')
+    reconstruct_songs(orig_tensor, res_folder, res_folder, model_path, clip_val=0)
+    save_graphs(res_folder, res_folder)
+
+    '''
+    midi_path = r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\listening_test\\L1reg_smaller\\AllMyLoving_2_cropped.mid'
+    midi_data = pretty_midi.PrettyMIDI(midi_path)
+    try: 
+        print(midi_data.estimate_tempo())
+    except Exception as e:
+        print(e)
+    for instrument in midi_data.instruments:
+        print(instrument.notes)
+    '''
+    #recon = pypianoroll.read()
+    #recon.trim(0, 64*recon.resolution)
+    #recon.plot()
+    
