@@ -63,7 +63,7 @@ class MidiDataset(Dataset):
 
     def __getitem__(self, index):
         # choose random file path from directory (not already chosen), chunk it 
-        print(str(self.paths[index]))
+        #print(str(self.paths[index]))
         # load in tensor
         if self.sparse:
           with open(self.paths[index], 'rb') as f:
@@ -253,8 +253,8 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # pick device
     logging.info("Device: %s" , device)
 
-    midi_tensor_dataset = MidiDataset(datapath / "train", l=batchlength, norm=normalize, sparse=sparse) # dataset declaration
-    midi_tensor_validation = MidiDataset(datapath / "validate", l=batchlength, norm=normalize, sparse=sparse) 
+    midi_tensor_dataset = MidiDataset(Path(datapath) / "train", l=batchlength, norm=normalize, sparse=sparse) # dataset declaration
+    midi_tensor_validation = MidiDataset(Path(datapath) / "validate", l=batchlength, norm=normalize, sparse=sparse) 
 
     ### Declare model ### 
     model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5, quantize=quantize).to(device) 
@@ -335,17 +335,18 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
         # VALIDATION LOOP
         valid_loss=0.0
         model.eval() # change to eval mode
-        for i, vdata in tqdm(enumerate(validation_data)):
+        for i, vdata in enumerate(validation_data):
           vq_loss, data_recon, perplexity = model(vdata)
           if lossfunc=='mse':
             recon_error = F.mse_loss(data_recon, vdata)
           elif lossfunc=='l1reg':
-            recon_error = F.mse_loss(data_recon, data) + (1.0/data.shape[0])*lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
+            recon_error = F.mse_loss(data_recon, vdata) + (1.0/data.shape[0])*lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
           else: # loss function = mae
             recon_error = F.l1_loss(data_recon, vdata)
           validation_recon_error.append(recon_error)
           if (i+1) % 10 == 0:
-            logging.info('validation recon_error: %.3f' % np.mean(validation_recon_error[-10:]))
+            print("Val recon:", recon_error)
+            #logging.info('validation recon_error: %.3f' % np.mean(validation_recon_error[-1]))
 
     logging.info("saving model to %s"%model_save_path)
     torch.save(model.state_dict(), model_save_path)
