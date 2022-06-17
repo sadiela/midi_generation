@@ -267,8 +267,9 @@ if __name__ == "__main__":
     #respath = r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\results\\L1_REG_TESTS\\results_l1reglosstest00_1-2022-04-17-0.yaml'
     #show_result_graphs(respath)
 
-    model_path = Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\results\\models\\model_l1reglosstest00_1-2022-04-11-0.pt')
-    res_folder = Path(r'C:\\Users\\sadie\\Documents\BU\\fall_2021\\research\\music\\midi_data\\new_data\\listening_test\\L1_reg_small_lambda')
+    model_path = Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\models\\new_l1_test_models\\model_mse_test-2022-05-08-0.pt')
+    #res_folder = Path(r'C:\\Users\\sadie\\Documents\BU\\fall_2021\\research\\music\\midi_data\\new_data\\listening_test\\L1_reg_small_lambda')
+    res_folder = Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\results\\L1_result_reconstructions')
     orig_tensor = Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\listening_test\\originals')
     reconstruct_songs(orig_tensor, res_folder, res_folder, model_path, clip_val=0)
     save_graphs(res_folder, res_folder)
