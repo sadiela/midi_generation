@@ -5,6 +5,8 @@
 scripts/__pycache__/
 scripts/dp_loss/__pycache__/
 scripts/tests/models/
+__pycache__
+scripts/log_files/
 /log_files/
 *.pyc
 scripts/.venv/

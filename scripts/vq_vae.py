@@ -63,7 +63,7 @@ class MidiDataset(Dataset):
 
     def __getitem__(self, index):
         # choose random file path from directory (not already chosen), chunk it 
-        print(str(self.paths[index]))
+        #print(str(self.paths[index]))
         # load in tensor
         if self.sparse:
           with open(self.paths[index], 'rb') as f:
@@ -257,8 +257,8 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # pick device
     logging.info("Device: %s" , device)
 
-    midi_tensor_dataset = MidiDataset(datapath / "train", l=batchlength, norm=normalize, sparse=sparse) # dataset declaration
-    midi_tensor_validation = MidiDataset(datapath / "validate", l=batchlength, norm=normalize, sparse=sparse) 
+    midi_tensor_dataset = MidiDataset(Path(datapath) / "train", l=batchlength, norm=normalize, sparse=sparse) # dataset declaration
+    midi_tensor_validation = MidiDataset(Path(datapath) / "validate", l=batchlength, norm=normalize, sparse=sparse) 
 
     ### Declare model ### 
     model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5, quantize=quantize).to(device) 
@@ -286,69 +286,72 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     # necessarily from the same song
 
     max_tensor_size= 0 
-    #dynamic_loss = SparseDynamicLoss.apply
+    #dynamic_loss = SpeedySparseDynamicLoss.apply
 
-    for i, data in tqdm(enumerate(training_data)):
-        #name = midi_tensor_dataset.__getname__(i)
-        # s x p x 1 x l
-        data = data.to(device)
-        cursize = torch.numel(data)
-        if cursize > max_tensor_size:
-          max_tensor_size = cursize
-          logging.info("NEW MAX BATCH SIZE: %d", max_tensor_size)
+    for e in range(2):
+      # train loop
+      for i, data in tqdm(enumerate(training_data)):
+          #name = midi_tensor_dataset.__getname__(i)
+          # s x p x 1 x l
+          data = data.to(device)
+          cursize = torch.numel(data)
+          if cursize > max_tensor_size:
+            max_tensor_size = cursize
+            logging.info("NEW MAX BATCH SIZE: %d", max_tensor_size)
 
-        print('TRAIN:', data.shape)
+          print('TRAIN:', data.shape)
 
-        vq_loss, data_recon, perplexity = model(data)
-        if lossfunc=='mse':
-          recon_error = F.mse_loss(data_recon, data) #/ data_variance
-        #elif lossfunc=='dyn':
-        #  recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
-        elif lossfunc=='l1reg':
-          recon_error = F.mse_loss(data_recon, data) + (1.0/data.shape[0])*lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
-        else: # loss function = mae
-          recon_error = F.l1_loss(data_recon, data)
-        loss = recon_error + vq_loss # will be 0 if no quantization
-        loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
-        optimizer.step()
-        
-        ### RECORD LOSSES ###
-        total_loss.append(loss.item())
-        if quantize:
-          train_res_recon_error.append(recon_error.item())
-          train_res_perplexity.append(perplexity.item())
-        else:
-          train_res_recon_error.append(loss)
-          train_res_perplexity.append(perplexity)
-
-        if pd.isna(recon_error.item()):
-          nanfiles.append(midi_tensor_dataset.__getname__(i))
-
-        if (i+1) % 100 == 0:
-          torch.save({
-                      'iteration': i,
-                      'model_state_dict': model.state_dict(),
-                      'optimizer_state_dict': optimizer.state_dict(),
-                      'loss': train_res_recon_error[-1],
-                      }, model_save_path) # incremental saves
-          logging.info('%d iterations' % (i+1))
-          logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
-          logging.info('\n')
-
-        # VALIDATION LOOP
-        model.eval() # change to eval mode
-        for i, vdata in tqdm(enumerate(validation_data)):
-          vq_loss, data_recon, perplexity = model(vdata)
+          vq_loss, data_recon, perplexity = model(data)
           if lossfunc=='mse':
-            recon_error = F.mse_loss(data_recon, vdata)
+            recon_error = F.mse_loss(data_recon, data) #/ data_variance
+          #elif lossfunc=='dyn':
+          #  recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
           elif lossfunc=='l1reg':
-            recon_error = F.mse_loss(data_recon, vdata) + (1.0/vdata.shape[0])*lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
+            recon_error = F.mse_loss(data_recon, data) + (1.0/data.shape[0])*lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
           else: # loss function = mae
-            recon_error = F.l1_loss(data_recon, vdata)
-          validation_recon_error.append(recon_error)
-          if (i+1) % 10 == 0:
-            logging.info('validation recon_error: %.3f' % np.mean(validation_recon_error[-10:]))
+            recon_error = F.l1_loss(data_recon, data)
+          loss = recon_error + vq_loss # will be 0 if no quantization
+          loss.backward()
+          torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
+          optimizer.step()
+          
+          ### RECORD LOSSES ###
+          total_loss.append(loss.item())
+          if quantize:
+            train_res_recon_error.append(recon_error.item())
+            train_res_perplexity.append(perplexity.item())
+          else:
+            train_res_recon_error.append(loss)
+            train_res_perplexity.append(perplexity)
+
+          if pd.isna(recon_error.item()):
+            nanfiles.append(midi_tensor_dataset.__getname__(i))
+
+          if (i+1) % 100 == 0:
+            torch.save({
+                        'iteration': i,
+                        'model_state_dict': model.state_dict(),
+                        'optimizer_state_dict': optimizer.state_dict(),
+                        'loss': train_res_recon_error[-1],
+                        }, model_save_path) # incremental saves
+            logging.info('%d iterations' % (i+1))
+            logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
+            logging.info('\n')
+
+      # VALIDATION LOOP
+      model.eval() # change to eval mode
+      for i, vdata in enumerate(validation_data):
+        vq_loss, data_recon, perplexity = model(vdata)
+        if lossfunc=='mse':
+          recon_error = F.mse_loss(data_recon, vdata)
+        elif lossfunc=='l1reg':
+          recon_error = F.mse_loss(data_recon, vdata) + (1.0/data.shape[0])*lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
+        else: # loss function = mae
+          recon_error = F.l1_loss(data_recon, vdata)
+        validation_recon_error.append(recon_error)
+        if (i+1) % 10 == 0:
+          print("Val recon:", recon_error)
+          #logging.info('validation recon_error: %.3f' % np.mean(validation_recon_error[-1]))
 
     logging.info("saving model to %s"%model_save_path)
     torch.save(model.state_dict(), model_save_path)

@@ -5,6 +5,7 @@ import torch.nn.functional as F
 from shared_functions import *
 from torch.profiler import profile, record_function, ProfilerActivity
 
+
 def construct_theta_sparse(x, x_hat, device):
     # theta: only adding one entry at a time
     # grad_theta: add rows of entries
@@ -25,16 +26,19 @@ def construct_theta_sparse(x, x_hat, device):
                 grad_theta = grad_theta + sparse_add_gradients(k_from_ij(i-1,j-1, m,n), k_from_ij(i,j-1, m,n), j-1, distance_derivative(-x_hat[:,j-1]), m,n, device=device)
                 #grad_theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i,j-1, m,n)][:,j-1] = distance_derivative(-x_hat[:,j-1]) #, np.abs(-x_hat[:,j-1])) # FIX
                 theta = theta + torch.sparse_coo_tensor([[k_from_ij(i-1,j-1, m,n)],[k_from_ij(i-1,j, m,n)]],  single_note_val(x[:, i-1]), (m*n, m*n), device=device)#theta[k_from_ij(i-1,j-1, m,n)][k_from_ij(i-1,j, m,n)] = single_note_val(x[:, i-1]) # insertion I think i want these both dependent on x_hat... is that possible? 
+<<<<<<< HEAD
                 # gradient is telling you how much to change each x value... we will have
+=======
+>>>>>>> 32441e0c34dc8dc78e31f87a9df9d97ea22dcf41
     return -theta, -grad_theta
 
 def sparse_diffable_recursion(theta, device, gamma=0.3): # passed in sparse
     N = theta.size()[0] # 
     e_bar = torch.zeros(N, device=device)
-    e_bar[N-1]=1
+    e_bar[N-1] = 1
     v = torch.zeros(N, device=device)
-    q = torch.sparse_coo_tensor((N,N), device=device) 
-    E = torch.sparse_coo_tensor((N,N), device=device) 
+    q = torch.sparse_coo_tensor((N,N), device=device) #torch.zeros((N,N)) # SPARSIFY
+    E = torch.sparse_coo_tensor((N,N), device=device) #torch.zeros((N,N)) # SPARSIFY
     for j in range(2, N): # looping through and looking at PARENTS of j
         parent_indices = get_parent_indices(theta, j) # torch.where(theta[:,j]>np.NINF)[0] # CHANGE
         u = torch.tensor(np.asarray([(i[1] + v[i[0]]) for i in parent_indices], dtype=np.float32)) # CHANGE
@@ -69,7 +73,7 @@ class SparseDynamicLoss(torch.autograd.Function):
             for k in range(n_2): ##### NOT DONE W THIS PART!!!! ####
                 grad_L_theta_val = get_ijth_val(grad_L_theta, j,k)
                 if grad_L_theta_val != 0 and has_values(grad_theta_xhat, j,k): #torch.count_nonzero(grad_theta_xhat[j][k]) != 0:
-                    cur_grad = grad_L_theta_val *  get_slice(grad_theta_xhat, j,k) # scalar times pxn
+                    cur_grad = grad_L_theta_val * get_slice(grad_theta_xhat, j,k) # scalar times pxn
                     grad_L_x[i][0] += cur_grad
     ctx.save_for_backward(grad_L_x)
     # determine answer

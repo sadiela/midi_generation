@@ -2,7 +2,7 @@
 
 # Set project
 #$ -P textconv
-#$ -o DPTEST.txt
+#$ -o DPTESTMOREGPU.txt
 #$ -m ea
 #$ -j y
 #$ -V
@@ -11,6 +11,7 @@
 #$ -pe omp 4
 
 # Request 1 gpu
+#$ -l gpus=8
 #$ -l gpus=2
 
 # Spec min gpu compute compatibility

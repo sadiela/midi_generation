@@ -1,0 +1,22 @@
+#!/bin/bash -l
+
+# Set project
+#$ -P textconv
+#$ -o MSETEST.txt
+#$ -m ea
+#$ -j y
+#$ -V
+# Request 4 cpus
+
+#$ -pe omp 4
+
+# Request 1 gpu
+#$ -l gpus=2
+
+# Spec min gpu compute compatibility
+#$ -l gpu_c=6
+
+module load miniconda
+conda activate py3
+
+python3 train_vqvae.py -r 'mse_test' -b 10 -a 128 -u 1024 -e 128 -s
