@@ -11,3 +11,5 @@ scripts/log_files/
 *.pyc
 scripts/.venv/
 scripts/log_files/
+/results/
+*.DS_Store
