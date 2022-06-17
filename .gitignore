@@ -8,3 +8,5 @@ scripts/tests/models/
 *.pyc
 scripts/.venv/
 scripts/log_files/
+/results/
+*.DS_Store

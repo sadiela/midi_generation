@@ -8,33 +8,40 @@
 ###########
 # Imports #
 ###########
+import sys
+#sys.path.append('/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages')
+import os
+#print("PYTHONPATH:", os.environ.get('PYTHONPATH'))
+#print("PATH:", os.environ.get('PATH'))
 # From my other files:
-from midi_utility import *
-from vq_vae import * 
+#from midi_utility import *
+#from vq_vae import * 
 
 # General:
 #from __future__ import print_function
 import matplotlib.pyplot as plt
-import pypianoroll
+#import pypianoroll
 import yaml
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.utils.data import DataLoader
-import torch.optim as optim
+#import torch
+#import torch.nn as nn
+#import torch.nn.functional as F
+#from torch.utils.data import DataLoader
+#import torch.optim as optim
 
 import os
-from tqdm import tqdm
+#from tqdm import tqdm
 #import pandas as pd
 #from skimage import io, transform
-import numpy as np
-from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms, utils
+#import numpy as np
+#from torch.utils.data import Dataset, DataLoader
+#from torchvision import transforms, utils
 
-import random
+#import random
 import sys
 from pathlib import Path
 #from mido import MidiFile, Message, MidiFile, MidiTrack, MAX_PITCHWHEEL
+
+PROJECT_DIRECTORY = Path('..')
 
 
 modelpath = PROJECT_DIRECTORY / 'models'
@@ -47,7 +54,7 @@ embedding_dim = 128
 commitment_cost = 0.5
 num_embeddings = 1024
 maxlength = 16*32
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def save_graphs(midi_path, save_path):
     print('saving pianoroll images/')
@@ -125,22 +132,35 @@ def reconstruct_song(orig_tensor_path, model_path, clip_val=0, norm=False):
 
     return unchunked_recon, loss, recon_error, zero_recon
 
-def show_result_graphs(yaml_name):
-    with open(yaml_name) as file: 
-        res_dic = yaml.load(file) #, Loader=yaml.FullLoader)
+def show_result_graphs(yaml_dir, yaml_name, plot_dir):
+    root_name = yaml_name.split(".")[0]
+    with open(yaml_dir / yaml_name) as file: 
+        res_dic = yaml.load(file, Loader=yaml.FullLoader)
     plt.plot(res_dic['reconstruction_error'])
-    plt.title("Reconstruction Error")
+    plt.title("Reconstruction Error" + root_name)
     plt.xlabel("Iteration")
-    plt.show()
+    #plt.show()
+    print("SAVING")
+    plt.savefig(str(plot_dir / str(root_name+".png")))
 
-    plt.plot(res_dic['perplexity'])
-    plt.title("Perplexity")
-    plt.xlabel("Iteration")
-    plt.show()
+    plt.clf()
+
 
 def main():
     # Load model from memory
     ### MODELS ###
+    MODEL_DIRECTORY = PROJECT_DIRECTORY / "models"
+    YAML_DIRECTORY = PROJECT_DIRECTORY / "results" / "l1_reg_test_yamls"
+    PLOT_DIRECTORY = PROJECT_DIRECTORY / "results" / "l1_reg_test_error_plots"
+
+    yaml_list = os.listdir(YAML_DIRECTORY)
+    for yaml_file in yaml_list:
+        print(yaml_file)
+        show_result_graphs(YAML_DIRECTORY, yaml_file, PLOT_DIRECTORY)
+
+    print("DONE")
+
+    '''
     mse_model_path = PROJECT_DIRECTORY / 'models' / 'model_mse-2021-11-282.pt'
     mae_model_path = PROJECT_DIRECTORY / 'models' / 'model_mae-2021-11-280.pt'
     msenorm_model_path = PROJECT_DIRECTORY / 'models' / 'model_msenorm-2021-11-280.pt'
@@ -188,7 +208,7 @@ def main():
     #save_graphs(msenorm_midi, msenorm_res)
     #save_graphs(maenorm_midi, maenorm_res)
 
-    print("DONE!")
+    print("DONE!")'''
 
     '''results={"reconstruction_error": recon_error, "perplexity": perplex, "nan_reconstruction_files": nan_recon_files}
     savefile = get_free_filename('results_' + fstub, resultspath, suffix='.yaml')
