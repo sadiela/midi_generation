@@ -32,26 +32,22 @@ from pathlib import Path
 ##############################
 # MODEL/OPTIMIZER PARAMETERS #
 ##############################
-'''num_training_updates = 15000
+'''
 num_hiddens = 128
 num_residual_hiddens = 16
 num_residual_layers = 2
 l = 512 #1024 # batch length
 p= 36 #128
 p= 36 #128'''
-decay = 0.99
-learning_rate = 1e-3
-#num_embeddings = 64
-#embedding_dim = 128
-#commitment_cost = 0.5
+#decay=0.99? WHAT DOES THIS DOO???
 
-#####################
-# CUSTOM DATALOADER #
-#####################
+###############################
+# CUSTOM DATALOADER/COLLATION #
+###############################
 class MidiDataset(Dataset):
     """Midi dataset."""
 
-    def __init__(self, npy_file_dir, l=512, sparse=False, norm=False):
+    def __init__(self, npy_file_dir, l=256, sparse=True, norm=False):
         """
         Args:
             npy_file_dir (string): Path to the npy file directory
@@ -105,7 +101,19 @@ class MidiDataset(Dataset):
     def __len__(self):
         return len(self.paths)
 
+def collate_fn(data, collate_shuffle=True):
+  # data is a list of tensors
+  # concatenate and shuffle all list items
+  full_list = torch.cat(data, 0)
+  if collate_shuffle:
+    idx = torch.randperm(full_list.shape[0])
+    return  full_list[idx].view(full_list.size())
+  else:
+    return full_list
+
+###########################
 # MODEL CLASS DEFINITIONS #
+###########################
 # input: p x t, t variable! p=128
 class MIDIVectorQuantizer(nn.Module):
   def __init__(self, num_embeddings=1024, embedding_dim=128, commitment_cost=0.5):
@@ -218,12 +226,9 @@ class Model(nn.Module):
         super(Model, self).__init__()
         
         self._encoder = Encoder(1)
-
         self._vq_vae = MIDIVectorQuantizer(num_embeddings, embedding_dim,
                                            commitment_cost)
-
         self._decoder = Decoder(embedding_dim)
-
         self.quantize = quantize
 
     def forward(self, x):
@@ -244,32 +249,30 @@ class Model(nn.Module):
           x_recon = self._decoder(z)
           return 0, x_recon, 0
 
-def collate_fn(data, collate_shuffle=True):
-  # data is a list of tensors
-  # concatenate and shuffle all list items
-  full_list = torch.cat(data, 0)
-  if collate_shuffle:
-    idx = torch.randperm(full_list.shape[0])
-    return  full_list[idx].view(full_list.size())
-  else:
-    return full_list
+def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=128, learning_rate=1e-3, lossfunc='mse', bs=10, batchlength=256, normalize=False, quantize=True, sparse=False, lam=1):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # pick device
+    logging.info("Device: %s" , device)
 
-def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfunc='mse', bs=10, batchlength=256, normalize=False, quantize=True, sparse=False, lam=1):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    midi_tensor_dataset = MidiDataset(datapath / "train", l=batchlength, norm=normalize, sparse=sparse) # dataset declaration
+    midi_tensor_validation = MidiDataset(datapath / "validate", l=batchlength, norm=normalize, sparse=sparse) 
 
-    midi_tensor_dataset = MidiDataset(datapath, l=batchlength, norm=normalize, sparse=sparse)
+    ### Declare model ### 
+    model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5, quantize=quantize).to(device) 
 
-    # declare model and optimizer
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate, amsgrad=False)
+    ### Declare optimizer ###
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate, amsgrad=False) # optimizer declaration
+
 
     model.float()
-    model.train()
+    model.train() # training mode
     train_res_recon_error = []
+    validation_recon_error = []
     train_res_perplexity = []
     total_loss = []
     nanfiles = []
 
     training_data = DataLoader(midi_tensor_dataset, collate_fn=collate_fn, batch_size=bs, shuffle=True, num_workers=2)
+    validation_data = DataLoader(midi_tensor_validation, collate_fn=collate_fn, batch_size=bs, shuffle=True, num_workers=2)
 
     # Let # of tensors = n
     # each tensor is pxl_i, where l_i is the length of the nth tensor
@@ -278,72 +281,72 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
     # Then we want to shuffle along axis=0 so two adjacent pxl guys aren't 
     # necessarily from the same song
 
-    logging.info("Device: %s" , device)
     max_tensor_size= 0 
+    #dynamic_loss = SparseDynamicLoss.apply
 
-    dynamic_loss = SpeedySparseDynamicLoss.apply
-    #lam = 0.5
-    epochs = 3
+    for i, data in tqdm(enumerate(training_data)):
+        #name = midi_tensor_dataset.__getname__(i)
+        # s x p x 1 x l
+        data = data.to(device)
+        cursize = torch.numel(data)
+        if cursize > max_tensor_size:
+          max_tensor_size = cursize
+          logging.info("NEW MAX BATCH SIZE: %d", max_tensor_size)
 
-    for ep in range(epochs): 
-      print("EPOCH:", ep)
-      for i, data in tqdm(enumerate(training_data)):
-          #name = midi_tensor_dataset.__getname__(i)
-          # s x p x 1 x l
-          data = data.to(device)
-          cursize = torch.numel(data)
-          if cursize > max_tensor_size:
-            max_tensor_size = cursize
-            logging.info("NEW MAX BATCH SIZE: %d", max_tensor_size)
+        print('TRAIN:', data.shape)
 
-          print('TRAIN:', data.shape)
+        vq_loss, data_recon, perplexity = model(data)
+        if lossfunc=='mse':
+          recon_error = F.mse_loss(data_recon, data) #/ data_variance
+        #elif lossfunc=='dyn':
+        #  recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
+        elif lossfunc=='l1reg':
+          recon_error = F.mse_loss(data_recon, data) + (1.0/data.shape[0])*lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
+        else: # loss function = mae
+          recon_error = F.l1_loss(data_recon, data)
+        loss = recon_error + vq_loss # will be 0 if no quantization
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
+        optimizer.step()
+        
+        ### RECORD LOSSES ###
+        total_loss.append(loss.item())
+        if quantize:
+          train_res_recon_error.append(recon_error.item())
+          train_res_perplexity.append(perplexity.item())
+        else:
+          train_res_recon_error.append(loss)
+          train_res_perplexity.append(perplexity)
 
-          '''with profile(
-            activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
-            with_stack=True,
-          ) as prof:'''
+        if pd.isna(recon_error.item()):
+          nanfiles.append(midi_tensor_dataset.__getname__(i))
 
-          vq_loss, data_recon, perplexity = model(data)
+        if (i+1) % 100 == 0:
+          torch.save({
+                      'iteration': i,
+                      'model_state_dict': model.state_dict(),
+                      'optimizer_state_dict': optimizer.state_dict(),
+                      'loss': train_res_recon_error[-1],
+                      }, model_save_path) # incremental saves
+          logging.info('%d iterations' % (i+1))
+          logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
+          logging.info('\n')
+
+        # VALIDATION LOOP
+        valid_loss=0.0
+        model.eval() # change to eval mode
+        for i, vdata in tqdm(enumerate(validation_data)):
+          vq_loss, data_recon, perplexity = model(vdata)
           if lossfunc=='mse':
-            recon_error = F.mse_loss(data_recon, data) #/ data_variance
-          elif lossfunc=='dyn':
-            print("ENTERING LOSS!", i)
-            recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
+            recon_error = F.mse_loss(data_recon, vdata)
           elif lossfunc=='l1reg':
-            recon_error = F.mse_loss(data_recon, data) + lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
+            recon_error = F.mse_loss(data_recon, vdata) + (1.0/vdata.shape[0])*lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
           else: # loss function = mae
-            recon_error = F.l1_loss(data_recon, data)
-          loss = recon_error + vq_loss # will be 0 if no quantization
-          loss.backward()
-          #print("backpropagated")
-          torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
-          optimizer.step()
+            recon_error = F.l1_loss(data_recon, vdata)
+          validation_recon_error.append(recon_error)
+          if (i+1) % 10 == 0:
+            logging.info('validation recon_error: %.3f' % np.mean(validation_recon_error[-10:]))
 
-          #output = prof.key_averages().table(sort_by="self_cuda_time_total", row_limit=10)
-          #print(output) 
-          
-          total_loss.append(loss.item())
-          if quantize:
-            train_res_recon_error.append(recon_error.item())
-            train_res_perplexity.append(perplexity.item())
-          else:
-            train_res_recon_error.append(loss)
-            train_res_perplexity.append(perplexity)
-
-          if pd.isna(recon_error.item()):
-            nanfiles.append(midi_tensor_dataset.__getname__(i))
-
-          if (i+1) % 1000 == 0:
-            torch.save({
-                        'iteration': i,
-                        'model_state_dict': model.state_dict(),
-                        'optimizer_state_dict': optimizer.state_dict(),
-                        'loss': train_res_recon_error[-1],
-                        }, save_path)
-            logging.info('%d iterations' % (i+1))
-            logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
-            logging.info('\n')
-
-    logging.info(f"saving model to {save_path}")
-    torch.save(model.state_dict(), save_path)
+    logging.info("saving model to %s"%model_save_path)
+    torch.save(model.state_dict(), model_save_path)
     return train_res_recon_error, train_res_perplexity, nanfiles
