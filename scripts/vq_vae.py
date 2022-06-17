@@ -254,7 +254,7 @@ def collate_fn(data, collate_shuffle=True):
   else:
     return full_list
 
-def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfunc='mse', bs=10, batchlength=256, normalize=False, quantize=True, sparse=False):
+def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfunc='mse', bs=10, batchlength=256, normalize=False, quantize=True, sparse=False, lam=1):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     midi_tensor_dataset = MidiDataset(datapath, l=batchlength, norm=normalize, sparse=sparse)
@@ -282,8 +282,8 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
     max_tensor_size= 0 
 
     dynamic_loss = SpeedySparseDynamicLoss.apply
-    lam = 0.5
-    epochs = 3
+    #lam = 0.5
+    epochs = 2
 
     for ep in range(epochs): 
       print("EPOCH:", ep)
@@ -310,7 +310,7 @@ def train_model(datapath, model, save_path, learning_rate=learning_rate, lossfun
             print("ENTERING LOSS!", i)
             recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
           elif lossfunc=='l1reg':
-            recon_error = F.mse_loss(data_recon, data) + lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
+            recon_error = F.mse_loss(data_recon, data) + (1.0/data.shape[0])*lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
           else: # loss function = mae
             recon_error = F.l1_loss(data_recon, data)
           loss = recon_error + vq_loss # will be 0 if no quantization

@@ -1,0 +1,16 @@
+START
+file exists
+file exists
+file exists
+file exists
+no file
+Traceback (most recent call last):
+  File "train_vqvae.py", line 90, in <module>
+    logfile = get_free_filename('vq_vae_training', logpath, suffix='.log')
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/gen_utility.py", line 22, in get_free_filename
+    Path(file_candidate).touch()
+  File "/projectnb/textconv/sadiela/.conda/envs/py3/lib/python3.8/pathlib.py", line 1278, in touch
+    fd = self._raw_open(flags, mode)
+  File "/projectnb/textconv/sadiela/.conda/envs/py3/lib/python3.8/pathlib.py", line 1087, in _raw_open
+    return self._accessor.open(self, flags, mode)
+FileExistsError: [Errno 17] File exists: '../scripts/log_files/vq_vae_training-2022-05-08-4.log'

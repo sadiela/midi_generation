@@ -4,7 +4,8 @@
 - Plot loss/perplexity for a model: show_result_graphs(yaml_name)
 - Listen to midi reconstructions: play_music(midi_filename)
 '''
-
+import sys
+sys.path.append("..") 
 ###########
 # Imports #
 ###########
@@ -55,16 +56,14 @@ def save_graphs(midi_path, save_path):
     for file in tqdm(file_list):
         try:
             recon = pypianoroll.read(midi_path / file)
-        except:
-            pass
-        try:
             recon.trim(0, 64*recon.resolution)
+            recon.plot()
+            plt.title(file)
+            # FIX!
+            plt.savefig(str(save_path / str(file.split('.')[0] + '.png')))
         except:
             print("passed", file)
-        recon.plot()
-        plt.title(file)
-        # FIX!
-        plt.savefig(str(save_path / str(file.split('.')[0] + '.png')))
+        
 
 def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False):
     res_string = "RECON ERRORS!\n"
@@ -73,10 +72,10 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
         cur_tensor, loss, recon_err, zero_recon = reconstruct_song(orig_tensor_dir / file, model_path, clip_val=clip_val, norm=norm)
         res_string += str(file) + ' recon error: ' + str(recon_err.item()) + ' loss: ' + str(loss.item()) + ' zero recon:' + str(zero_recon.item()) + '\n'
         # save tensor
-        #np.save(new_tensor_dir / str(file.split('.')[0] + '_conv.npy'), cur_tensor)
+        np.save(new_tensor_dir / str(file.split('.')[0] + '_conv.npy'), cur_tensor)
         # convert to midi and save midi 
-        #tensor_to_midi(cur_tensor, new_midi_dir / str(file.split('.')[0] + '.mid'))
-        input("continue...")
+        tensor_to_midi(cur_tensor, new_midi_dir / str(file.split('.')[0] + '.mid'))
+        #input("continue...")
     with open(new_midi_dir / 'recon_info.txt', 'w') as outfile:
         outfile.write(res_string)
 
@@ -128,7 +127,7 @@ def reconstruct_song(orig_tensor_path, model_path, clip_val=0, norm=False):
 def show_result_graphs(yaml_name):
     with open(yaml_name) as file: 
         res_dic = yaml.load(file) #, Loader=yaml.FullLoader)
-    plt.plot(res_dic['reconstruction_error'])
+    plt.plot(res_dic['reconstruction_error'][0:1000])
     plt.title("Reconstruction Error")
     plt.xlabel("Iteration")
     plt.show()
@@ -139,6 +138,7 @@ def show_result_graphs(yaml_name):
     plt.show()
 
 def main():
+    '''
     # Load model from memory
     ### MODELS ###
     mse_model_path = PROJECT_DIRECTORY / 'models' / 'model_mse-2021-11-282.pt'
@@ -189,7 +189,7 @@ def main():
     #save_graphs(maenorm_midi, maenorm_res)
 
     print("DONE!")
-
+    '''
     '''results={"reconstruction_error": recon_error, "perplexity": perplex, "nan_reconstruction_files": nan_recon_files}
     savefile = get_free_filename('results_' + fstub, resultspath, suffix='.yaml')
     print("SAVING FILE TO:", savefile)
@@ -254,4 +254,15 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    #main()
+    #respath = r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\results\\results_l1reglosstest-2022-04-03-1.yaml'
+    #show_result_graphs(respath)
+    model_path = Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\results\\model_l1reglosstest-2022-04-03-1.pt')
+    res_folder = Path(r'C:\\Users\\sadie\\Documents\BU\\fall_2021\\research\\music\\midi_data\\new_data\\listening_test\\L1reg')
+    orig_tensor = Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\listening_test\\originals')
+    #reconstruct_songs(orig_tensor, res_folder, res_folder, model_path, clip_val=0)
+    #save_graphs(res_folder, res_folder)
+
+    recon = pypianoroll.read(Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\listening_test\\L1reg\\AcrosstheUniverse_0_cropped.mid'))
+    recon.trim(0, 64*recon.resolution)
+    recon.plot()
