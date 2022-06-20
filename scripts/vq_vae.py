@@ -341,6 +341,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
       # VALIDATION LOOP
       model.eval() # change to eval mode
       for i, vdata in enumerate(validation_data):
+        vdata = vdata.to(device)
         vq_loss, data_recon, perplexity = model(vdata)
         if lossfunc=='mse':
           recon_error = F.mse_loss(data_recon, vdata)
