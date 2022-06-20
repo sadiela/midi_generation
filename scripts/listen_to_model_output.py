@@ -15,25 +15,25 @@ import os
 #print("PYTHONPATH:", os.environ.get('PYTHONPATH'))
 #print("PATH:", os.environ.get('PATH'))
 # From my other files:
-#from midi_utility import *
-#from vq_vae import * 
+from midi_utility import *
+from vq_vae import * 
 
 # General:
 #from __future__ import print_function
 import matplotlib.pyplot as plt
-#import pypianoroll
+import pypianoroll
 import yaml
-#import torch
-#import torch.nn as nn
-#import torch.nn.functional as F
-#from torch.utils.data import DataLoader
-#import torch.optim as optim
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.data import DataLoader
+import torch.optim as optim
 
 import os
 #from tqdm import tqdm
 #import pandas as pd
 #from skimage import io, transform
-#import numpy as np
+import numpy as np
 #from torch.utils.data import Dataset, DataLoader
 #from torchvision import transforms, utils
 
@@ -43,24 +43,10 @@ import random
 import sys
 from pathlib import Path
 #from mido import MidiFile, Message, MidiFile, MidiTrack, MAX_PITCHWHEEL
-
-PROJECT_DIRECTORY = Path('..')
-
-
-modelpath = PROJECT_DIRECTORY / 'models'
-datapath = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'midi_tensors'
-outpath = PROJECT_DIRECTORY / 'midi_data' / 'output_data'
-respath = PROJECT_DIRECTORY / 'results'
-
-#num_hiddens = 128
-#embedding_dim = 128
-#commitment_cost = 0.5
-#num_embeddings = 1024
 maxlength = 16*32
-#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def save_graphs(midi_path, save_path):
-    print('saving pianoroll images/')
+    print('saving pianoroll images')
     file_list = os.listdir(midi_path)
     for file in tqdm(file_list):
         try:
@@ -77,31 +63,38 @@ def save_graphs(midi_path, save_path):
 def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False):
     res_string = "RECON ERRORS!\n"
     file_list = os.listdir(orig_tensor_dir)
-    for file in tqdm(file_list):
-        cur_tensor, loss, recon_err, zero_recon = reconstruct_song(orig_tensor_dir / file, model_path, clip_val=clip_val, norm=norm)
-        res_string += str(file) + ' recon error: ' + str(recon_err.item()) + ' loss: ' + str(loss.item()) + ' zero recon:' + str(zero_recon.item()) + '\n'
-        # save tensor
-        np.save(new_tensor_dir / str(file.split('.')[0] + '_conv.npy'), cur_tensor)
-        # convert to midi and save midi 
-        tensor_to_midi(cur_tensor, new_midi_dir / str(file.split('.')[0] + '.mid'))
-        #input("continue...")
+
+    model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=0.5)
+    stat_dictionary = torch.load(model_path, map_location=torch.device('cpu'))
+    model_params = stat_dictionary["model_state_dict"]
+    model.load_state_dict(model_params)
+    model.eval()
+
+    for file in file_list:
+        # perform reconstruction
+        cur_tensor, loss, recon_err, zero_recon = reconstruct_song(orig_tensor_dir / file, model, clip_val=clip_val, norm=norm)
+        # record info
+        if (cur_tensor > 0).sum() > 0:
+            res_string += str(file) + ' recon error: ' + str(recon_err.item()) + ' loss: ' + str(loss.item()) + ' zero recon:' + str(zero_recon.item()) + '\n'
+            # save tensor
+            np.save(new_tensor_dir / str(file.split('.')[0] + '_conv.npy'), cur_tensor)
+            # convert to midi and save midi 
+            tensor_to_midi(cur_tensor, new_midi_dir / str(file.split('.')[0] + '.mid'))
+        else:
+            print(file, "reconstruction is all 0s")
     with open(new_midi_dir / 'recon_info.txt', 'w') as outfile:
         outfile.write(res_string)
 
-def reconstruct_song(orig_tensor_path, model_path, clip_val=0, norm=False):
+def reconstruct_song(orig_tensor_path, model, clip_val=0, norm=False):
     data = np.load(orig_tensor_path)
     if norm:
         data = data / maxlength
-    
-    model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=0.5)
-    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-    model.eval()
 
     # Test on a song
     print(data.shape)
     p, n = data.shape
 
-    l = 128 #1024 # batch length
+    l = 256 #1024 # batch length
 
     data = data[:,:(data.shape[1]-(data.shape[1]%l))]
     p, n_2 = data.shape
@@ -119,8 +112,8 @@ def reconstruct_song(orig_tensor_path, model_path, clip_val=0, norm=False):
 
     print("recon data shape:", data_recon.shape)
     print(data_recon)
-    for i in range(data_recon.shape[0]):
-        print(torch.max(data_recon[i,:,:,:]).item())
+    #for i in range(data_recon.shape[0]):
+    #    print(torch.max(data_recon[i,:,:,:]).item())
     print('Loss:', loss.item(), '\Perplexity:', perplexity.item())
 
     unchunked_recon = data_recon.view(p, n_2).detach().numpy()
@@ -147,6 +140,14 @@ def show_result_graphs(yaml_dir, yaml_name, plot_dir):
     plt.clf()
 
 def main():
+    '''
+    PROJECT_DIRECTORY = Path('..')
+    modelpath = PROJECT_DIRECTORY / 'models'
+    datapath = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'midi_tensors'
+    outpath = PROJECT_DIRECTORY / 'midi_data' / 'output_data'
+    respath = PROJECT_DIRECTORY / 'results'
+
+    reconstruct_songs(orig_tensor, maenorm_tensor, maenorm_midi, maenorm_model_path, clip_val=0, norm=True)
 
     # Load model from memory
     ### MODELS ###
@@ -154,13 +155,14 @@ def main():
     YAML_DIRECTORY = PROJECT_DIRECTORY / "results" / "l1_reg_test_yamls"
     PLOT_DIRECTORY = PROJECT_DIRECTORY / "results" / "l1_reg_test_error_plots"
 
+
     yaml_list = os.listdir(YAML_DIRECTORY)
     for yaml_file in yaml_list:
         print(yaml_file)
         show_result_graphs(YAML_DIRECTORY, yaml_file, PLOT_DIRECTORY)
 
     print("DONE")
-
+    '''
     '''
     mse_model_path = PROJECT_DIRECTORY / 'models' / 'model_mse-2021-11-282.pt'
     #mae_model_path = PROJECT_DIRECTORY / 'models' / 'model_mae-2021-11-280.pt'
@@ -195,15 +197,7 @@ def main():
     # Reconstruct songs in accordance to each model
     print("Reconstructing")
     reconstruct_songs(orig_tensor, mse_tensor, mse_midi, mse_model_path, clip_val=0)
-    '''print("Reconstructing")
-    reconstruct_songs(orig_tensor, mae_tensor, mae_midi, mae_model_path, clip_val=0)
-    print("Reconstructing")
-    reconstruct_songs(orig_tensor, msenorm_tensor, msenorm_midi, msenorm_model_path, clip_val=0, norm=True)
-    print("Reconstructing")
-    reconstruct_songs(orig_tensor, maenorm_tensor, maenorm_midi, maenorm_model_path, clip_val=0, norm=True)
-    '''
-
-    '''
+ 
     # save midis for each reconstruction
     print("Saving new pianorolls")
     #save_graphs(mse_midi, mse_res)
@@ -224,6 +218,7 @@ def main():
 
     #tensors_to_midis(orig_tensor_dir, old_midi_dir)
     
+    '''
     '''print("PLOT")
     file_list = os.listdir(old_midi_dir)
     for file in file_list:
@@ -261,17 +256,7 @@ def main():
     #multitrack = pypianoroll.read(outputs + 'gimme_cropped.mid')
     #multitrack.plot()
     #recon = pypianoroll.read(outputs + 'recon_2.mid')
-    
-    # PLOT RESULTS 
-    #yaml_name1 = Path('../results/results_mae-2021-11-280.yaml')
-    #yaml_name2 = Path('../results/results_mse-2021-11-280.yaml')
-    #yaml_name3 = Path('../results/results_maenorm-2021-11-280.yaml')
-    #yaml_name4 = Path('../results/results_msenorm-2021-11-290.yaml')
 
-    #show_result_graphs(yaml_name1)
-    #show_result_graphs(yaml_name2)
-    #show_result_graphs(yaml_name3)
-    #show_result_graphs(yaml_name4)
 
 
 if __name__ == "__main__":
@@ -282,12 +267,13 @@ if __name__ == "__main__":
     #show_result_graphs(respath)
     #respath = r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\results\\L1_REG_TESTS\\results_l1reglosstest00_1-2022-04-17-0.yaml'
     #show_result_graphs(respath)
-
-    model_path = Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\models\\new_l1_test_models\\model_mse_test-2022-05-08-0.pt')
+    print("Start")
+    model_path = Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\models\\model_small_test-2022-06-17-0.pt')
     #res_folder = Path(r'C:\\Users\\sadie\\Documents\BU\\fall_2021\\research\\music\\midi_data\\new_data\\listening_test\\L1_reg_small_lambda')
-    res_folder = Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\results\\L1_result_reconstructions')
+    res_folder = Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\results\\small_test_results')
     orig_tensor = Path(r'C:\\Users\\sadie\\Documents\\BU\\fall_2021\\research\\music\\midi_data\\new_data\\listening_test\\originals')
     reconstruct_songs(orig_tensor, res_folder, res_folder, model_path, clip_val=0)
+    "Save graphs"
     save_graphs(res_folder, res_folder)
 
     '''
