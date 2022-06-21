@@ -89,7 +89,7 @@ if __name__ == "__main__":
     parser.add_argument('-r', '--resname', help='Result and model stub', default="VQ_VAE_training")
     parser.add_argument('-n', '--normalize', dest='norm', action='store_const', const=True, 
                         default=False, help='whether or not to normalize the tensors')
-    parser.add_argument('-b', '--batchsize', help='Number of songs in a batch', default=10)
+    parser.add_argument('-b', '--batchsize', help='Number of songs in a batch', default=5)
     parser.add_argument('-a', '--batchlength', help='Length of midi object', default=256)
     parser.add_argument('-u', '--numembed', help='Number of embeddings', default=1024)
     parser.add_argument('-e', '--embeddim', help='Embedding dimension', default=128)
