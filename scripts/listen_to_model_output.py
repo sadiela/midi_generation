@@ -51,14 +51,14 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
 
     for file in file_list:
         # perform reconstruction
-        cur_tensor, loss, recon_err, zero_recon = reconstruct_song(orig_tensor_dir / file, model, clip_val=clip_val, norm=norm, batchlength=batchlength)
+        cur_tensor, loss, recon_err, zero_recon = reconstruct_song(Path(orig_tensor_dir) / file, model, clip_val=clip_val, norm=norm, batchlength=batchlength)
         # record info IF RECONSTRUCTION NOT ALL 0s
         if (cur_tensor > 0).sum() > 0: 
             res_string += str(file) + ' recon error: ' + str(recon_err.item()) + ' loss: ' + str(loss.item()) + ' zero recon:' + str(zero_recon.item()) + '\n'
             # save tensor
             np.save(new_tensor_dir / str(file.split('.')[0] + '_conv.npy'), cur_tensor)
             # convert to midi and save midi 
-            tensor_to_midi(cur_tensor, new_midi_dir / str(file.split('.')[0] + '.mid'))
+            tensor_to_midi(cur_tensor, Path(new_midi_dir) / str(file.split('.')[0] + '.mid'))
         else:
             print(file, "reconstruction is all 0s")
     with open(new_midi_dir / 'recon_info.txt', 'w') as outfile:
