@@ -134,13 +134,13 @@ class MIDIVectorQuantizer(nn.Module):
     # input = b x p x l
 
     logging.debug("Original input shape: %s", str(inputs.shape))
-    print("ORIGINAL INPUT SHAPE:",inputs.shape)
+    #print("ORIGINAL INPUT SHAPE:",inputs.shape)
     inputs = inputs.squeeze(1) # need to be 2d
-    print("INPUT SHAPE SQUEEZED:",inputs.shape)
+    #print("INPUT SHAPE SQUEEZED:",inputs.shape)
 
     # we will embed along dim p 
     inputs = inputs.permute(0,2,1).contiguous() # now bxlxp
-    print("INPUT SHAPE PERMUTED:",inputs.shape)
+    #print("INPUT SHAPE PERMUTED:",inputs.shape)
     # flatten input
     input_shape = inputs.shape 
     flat_input = inputs.view(-1, self._embedding_dim)
@@ -337,6 +337,8 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
             logging.info('%d iterations' % (i+1))
             logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
             logging.info('\n')
+            print(i, 'iterations')
+            print('recon_error:', np.mean(train_res_recon_error[-100:]))
 
       # VALIDATION LOOP
       model.eval() # change to eval mode
