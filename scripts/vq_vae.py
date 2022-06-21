@@ -341,7 +341,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
             print('recon_error:', np.mean(train_res_recon_error[-100:]))
 
       # VALIDATION LOOP
-      model.eval() # change to eval mode
+      '''model.eval() # change to eval mode
       for i, vdata in enumerate(validation_data):
         vdata = vdata.to(device)
         vq_loss, data_recon, perplexity = model(vdata)
@@ -355,7 +355,8 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
         if (i+1) % 10 == 0:
           print("Val recon:", recon_error)
           #logging.info('validation recon_error: %.3f' % np.mean(validation_recon_error[-1]))
-
+  '''
+  
     logging.info("saving model to %s"%model_save_path)
     torch.save(model.state_dict(), model_save_path)
     return train_res_recon_error, train_res_perplexity, nanfiles
