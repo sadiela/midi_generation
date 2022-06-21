@@ -61,7 +61,7 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
             tensor_to_midi(cur_tensor, Path(new_midi_dir) / str(file.split('.')[0] + '.mid'))
         else:
             print(file, "reconstruction is all 0s")
-    with open(new_midi_dir / 'recon_info.txt', 'w') as outfile:
+    with open(Path(new_midi_dir) / 'recon_info.txt', 'w') as outfile:
         outfile.write(res_string)
 
 def reconstruct_song(orig_tensor_path, model, clip_val=0, norm=False, batchlength=256):
