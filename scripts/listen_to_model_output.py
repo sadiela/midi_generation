@@ -29,7 +29,7 @@ def save_graphs(midi_path, save_path):
     file_list = os.listdir(midi_path)
     for file in tqdm(file_list):
         try:
-            recon = pypianoroll.read(midi_path / file)
+            recon = pypianoroll.read(Path(midi_path) / file)
             recon.trim(0, 64*recon.resolution)
             recon.plot()
             plt.title(file)
@@ -56,7 +56,7 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
         if (cur_tensor > 0).sum() > 0: 
             res_string += str(file) + ' recon error: ' + str(recon_err.item()) + ' loss: ' + str(loss.item()) + ' zero recon:' + str(zero_recon.item()) + '\n'
             # save tensor
-            np.save(new_tensor_dir / str(file.split('.')[0] + '_conv.npy'), cur_tensor)
+            np.save(Path(new_tensor_dir) / str(file.split('.')[0] + '_conv.npy'), cur_tensor)
             # convert to midi and save midi 
             tensor_to_midi(cur_tensor, Path(new_midi_dir) / str(file.split('.')[0] + '.mid'))
         else:
