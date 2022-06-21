@@ -119,7 +119,7 @@ def show_result_graphs(yaml_dir, yaml_name, plot_dir):
 
 if __name__ == "__main__":
     # Default paths:
-    original_tensors = PROJECT_DIRECTORY / "test_tensors"
+    original_tensors = PROJECT_DIRECTORY / "recon_tensors"
     model_path = PROJECT_DIRECTORY / "models"
     results_folder = PROJECT_DIRECTORY / "results"
     parser = argparse.ArgumentParser(description='Arguments for running VQ-VAE')
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     parser.add_argument('-b', '--batchlength', help='Length of midi object', default=256)
     args = vars(parser.parse_args())
 
-    loss = args['lossfunc'] # True or false
+    #loss = args['lossfunc'] # True or false
     tensor_dir = args['tensordir']
     model_name = args['modeldir']
     resdir = args['resdir']
