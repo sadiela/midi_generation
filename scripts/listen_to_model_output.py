@@ -146,3 +146,5 @@ if __name__ == "__main__":
     #reconstruct_songs(tensor_dir, resdir, resdir, model_name, clip_val=0, batchlength=batchlength)
     #"Save graphs"
     save_graphs(resdir, resdir)
+
+    # python3 listen_to_model_output.py -t "/projectnb/textconv/sadiela/midi_generation/recon_tensors/" -m "/projectnb/textconv/sadiela/midi_generation/models/model_small_test-2022-06-17-0.pt" -r "/projectnb/textconv/sadiela/midi_generation/reconstructions/small_test_recons/" -b 256C

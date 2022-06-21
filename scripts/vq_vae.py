@@ -299,7 +299,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
             max_tensor_size = cursize
             logging.info("NEW MAX BATCH SIZE: %d", max_tensor_size)
 
-          print('TRAIN:', data.shape)
+          #print('TRAIN:', data.shape)
 
           vq_loss, data_recon, perplexity = model(data)
           if lossfunc=='mse':
