@@ -137,7 +137,7 @@ if __name__ == "__main__":
     resdir = args['resdir']
 
     #fstub = args['resname']
-    issparse = args['sparse']
+    #issparse = args['sparse']
     normalize = args['norm']
     batchlength = int(args['batchlength'])
 
