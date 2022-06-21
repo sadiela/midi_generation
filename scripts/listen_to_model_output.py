@@ -35,7 +35,8 @@ def save_graphs(midi_path, save_path):
             plt.title(file)
             # FIX!
             plt.savefig(str(save_path / str(file.split('.')[0] + '.png')))
-        except:
+        except Exception as e:
+            print(e)
             print("passed", file)
         
 
@@ -142,6 +143,6 @@ if __name__ == "__main__":
     batchlength = int(args['batchlength'])
 
     print("Start")
-    reconstruct_songs(tensor_dir, resdir, resdir, model_name, clip_val=0, batchlength=batchlength)
+    #reconstruct_songs(tensor_dir, resdir, resdir, model_name, clip_val=0, batchlength=batchlength)
     #"Save graphs"
     save_graphs(resdir, resdir)
