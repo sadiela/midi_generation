@@ -34,7 +34,7 @@ def save_graphs(midi_path, save_path):
             recon.plot()
             plt.title(file)
             # FIX!
-            plt.savefig(str(save_path / str(file.split('.')[0] + '.png')))
+            plt.savefig(str(Path(save_path) / str(file.split('.')[0] + '.png')))
         except Exception as e:
             print(e)
             print("passed", file)
