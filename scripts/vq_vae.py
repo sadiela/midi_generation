@@ -18,6 +18,7 @@ import os
 from tqdm import tqdm
 import pickle
 import logging
+from gen_utility import *
 #from dp_loss import *
 from dp_loss.speedy_sparse_dp_loss import *
 from dp_loss.shared_functions import *
@@ -327,13 +328,16 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
           if pd.isna(recon_error.item()):
             nanfiles.append(midi_tensor_dataset.__getname__(i))
 
-          if (i+1) % 100 == 0:
+          if (i+1) % 200 == 0:
+            # new save path
+            cur_model_file = get_free_filename('model_' + str(i), model_save_path, suffix='.pt')
             torch.save({
+                        'epoch': e,
                         'iteration': i,
                         'model_state_dict': model.state_dict(),
                         'optimizer_state_dict': optimizer.state_dict(),
-                        'loss': train_res_recon_error[-1],
-                        }, model_save_path) # incremental saves
+                        'loss': np.mean(train_res_recon_error[-100:]),
+                        }, cur_model_file) # incremental saves
             logging.info('%d iterations' % (i+1))
             logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
             logging.info('\n')
@@ -356,7 +360,12 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
           print("Val recon:", recon_error)
           #logging.info('validation recon_error: %.3f' % np.mean(validation_recon_error[-1]))
   '''
-  
-    logging.info("saving model to %s"%model_save_path)
-    torch.save(model.state_dict(), model_save_path)
+    final_model_file = get_free_filename('model_FINAL', model_save_path, suffix='.pt')
+    logging.info("saving model to %s"%final_model_file)
+    torch.save(model.state_dict(), final_model_file)
+    torch.save({
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'loss': np.mean(train_res_recon_error[-100:]),
+                }, final_model_file) 
     return train_res_recon_error, train_res_perplexity, nanfiles
