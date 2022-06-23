@@ -58,11 +58,10 @@ def train(datapath, resultspath, modelpath, fstub, loss, lr=1e-3, batchsize=10, 
     print("DEVICE:", device)
     ### Declare model ###
     #model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
-    model_file = get_free_filename('model_' + fstub, modelpath, suffix='.pt')
-    logging.info("Model will be saved to: %s", model_file)
+    logging.info("Models will be saved in the directory: %s", modelpath)
 
     # train model
-    recon_error, perplex, nan_recon_files = train_model(datapath, model_file, 
+    recon_error, perplex, nan_recon_files = train_model(datapath, modelpath, 
                                                         num_embeddings=num_embeddings, 
                                                         embedding_dim=embedding_dim, 
                                                         learning_rate=lr, lossfunc=loss, 
