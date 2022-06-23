@@ -133,7 +133,7 @@ if __name__ == "__main__":
 
     logging.info("Chosen hyperparameters:")
     logging.info("Loss function: %s", loss)
-    logging.info("Data directory:%s \nModel directory:%s \nOutput directory:%s", datadir, modeldir, outdir)
+    logging.info("Data directory:%s \nModel/output directory:%s", datadir, modeldir)
     logging.info("File stub:%s",fstub)
     logging.info("Sparse:%s\nNormalize:%s\nQuantize:%s\n", str(sparse), str(normalize), str(quantize))
     logging.info("Batch size:%s\nBatch length:%s\n", batchsize, batchlength)
@@ -143,7 +143,7 @@ if __name__ == "__main__":
 
     print("Chosen hyperparameters:")
     print("Loss function:", loss)
-    print("Data directory:",datadir, "\nModel directory:",modeldir, "\nOutput directory:", outdir)
+    print("Data directory:",datadir, "\nModel/output directory:",modeldir) #"\nOutput directory:", outdir)
     print("File stub:",fstub)
     print("Sparse:", sparse, "\nNormalize:",normalize,"\nQuantize:",quantize)
     print("Batch size:", batchsize, "\nBatch length:",batchlength)
