@@ -328,7 +328,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
           if pd.isna(recon_error.item()):
             nanfiles.append(midi_tensor_dataset.__getname__(i))
 
-          if (i) % 500 == 0:
+          if (i) % 600 == 0:
             # new save path
             cur_model_file = get_free_filename('model_'+str(e) + '_' + str(i), model_save_path, suffix='.pt')
             torch.save({
