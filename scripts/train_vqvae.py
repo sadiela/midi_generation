@@ -129,27 +129,17 @@ if __name__ == "__main__":
 
     logging.basicConfig(filename=logfile, level=numeric_level)
 
-    logging.info("ARGS: %s", str(args))
+    hyperparameters = '\nData directory' + datadir + '\nModel/output directory' + modeldir + '\nFile stub:' + fstub
+    hyperparameters += '\nSparse:' + str(sparse) + "\nNormalize:" + str(normalize) + '\nQuantize:' + str(quantize)
+    hyperparameters += '\nBatch size:' + str(batchsize) + '\nBatch length:' + str(batchlength)
+    hyperparameters +=  '\nEmbedding dimension:' + str(embeddim) + '\nNumber of embeddings' + str(numembed)
+    hyperparameters += '\nLearning rate:' + str(lr) + '\nLambda:' + str(lam)
 
     logging.info("Chosen hyperparameters:")
-    logging.info("Loss function: %s", loss)
-    logging.info("Data directory:%s \nModel/output directory:%s", datadir, modeldir)
-    logging.info("File stub:%s",fstub)
-    logging.info("Sparse:%s\nNormalize:%s\nQuantize:%s\n", str(sparse), str(normalize), str(quantize))
-    logging.info("Batch size:%s\nBatch length:%s\n", batchsize, batchlength)
-    logging.info("Embedding dimension:%s\nNumber of embeddings:%s\n", embeddim, numembed)
-    logging.info("Learning Rate:%s", lr)
-    logging.info("Lambda:%d", lam)
+    logging.info(hyperparameters)
 
     print("Chosen hyperparameters:")
-    print("Loss function:", loss)
-    print("Data directory:",datadir, "\nModel/output directory:",modeldir) #"\nOutput directory:", outdir)
-    print("File stub:",fstub)
-    print("Sparse:", sparse, "\nNormalize:",normalize,"\nQuantize:",quantize)
-    print("Batch size:", batchsize, "\nBatch length:",batchlength)
-    print("Embedding dimension:", embeddim,"\nNumber of embeddings:", numembed)
-    print("Lambda:", lam)
-    print("Learning Rate:", lr)
+    print(hyperparameters)
     
     train(datadir, modeldir, fstub, loss, lr=lr, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
     logging.info("All done! TOTAL TIME: %s", str(time.time()-prog_start))
