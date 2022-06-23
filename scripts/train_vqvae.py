@@ -29,8 +29,8 @@ Driver script for training VQ-VAE models. Takes the following command line argum
 datpath = PROJECT_DIRECTORY  / 'data' / 'all_midi_tensors_ttv' / 'train'  # '..\\midi_data\\full_dataset_midis_normalized\\'
 desktopdatpath = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'midi_tensors_2'
 modpath = PROJECT_DIRECTORY / 'models'
-respath = PROJECT_DIRECTORY / 'results'
-logpath = PROJECT_DIRECTORY / 'scripts' / 'log_files'
+respath = PROJECT_DIRECTORY / 'models'
+#logpath = PROJECT_DIRECTORY / 'scripts' / 'log_files'
 #/usr3/graduate/sadiela/midi_generation/models/' #model_10_25_2.pt'
 
 
@@ -54,7 +54,7 @@ logpath = PROJECT_DIRECTORY / 'scripts' / 'log_files'
 ##############################
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def train(datapath, resultspath, modelpath, fstub, loss, lr=1e-3, batchsize=10, batchlength=256, normalize=False, quantize=True, sparse=False, num_embeddings=1024, embedding_dim=128, lam=1):
+def train(datapath, modelpath, fstub, loss, lr=1e-3, batchsize=10, batchlength=256, normalize=False, quantize=True, sparse=False, num_embeddings=1024, embedding_dim=128, lam=1):
     print("DEVICE:", device)
     ### Declare model ###
     #model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
@@ -72,7 +72,7 @@ def train(datapath, resultspath, modelpath, fstub, loss, lr=1e-3, batchsize=10, 
     # save losses to file
     logging.info("NUM NAN FILES: %d", len(nan_recon_files))
     results={"reconstruction_error": recon_error, "perplexity": perplex, "nan_reconstruction_files": nan_recon_files}
-    savefile = get_free_filename('results_' + fstub, resultspath, suffix='.yaml')
+    savefile = get_free_filename('results_' + fstub, modelpath, suffix='.yaml')
     logging.info("SAVING FILE TO: %s", savefile)
     with open(savefile, 'w') as outfile:
         yaml.dump(results, outfile, default_flow_style=False)
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     #parser.add_argument('-l','--lossfunc', help='Choose loss function.', default=True)
     parser.add_argument('-d', '--datadir', help='Path to training tensor data.', default=datpath)
     parser.add_argument('-m', '--modeldir', help='Path to desired model directory', default=modpath)
-    parser.add_argument('-o', '--outdir', help='Path to desired result directory', default=respath)
+    #parser.add_argument('-o', '--outdir', help='Path to desired result directory', default=respath)
     parser.add_argument('-r', '--resname', help='Result and model stub', default="VQ_VAE_training")
     parser.add_argument('-n', '--normalize', dest='norm', action='store_const', const=True, 
                         default=False, help='whether or not to normalize the tensors')
@@ -106,18 +106,12 @@ if __name__ == "__main__":
     args = vars(parser.parse_args())
 
     loglevel = args['loglevel']
-    numeric_level = getattr(logging, loglevel.upper(), None) # put it into uppercase
-
-    logfile = get_free_filename('vq_vae_training_log', logpath, suffix='.log')
-
-    logging.basicConfig(filename=logfile, level=numeric_level)
-
-    logging.info("ARGS: %s", str(args))
+    
     #input("Continue...")
     loss = args['lossfunc'] # True or false
     datadir = args['datadir']
     modeldir = args['modeldir']
-    outdir = args['outdir']
+    #outdir = args['outdir']
     fstub = args['resname']
     sparse = args['sparse']
     normalize = args['norm']
@@ -128,6 +122,14 @@ if __name__ == "__main__":
     numembed = int(args['numembed'])
     lam = int(args["lambda"])
     lr = 1e-3
+
+    numeric_level = getattr(logging, loglevel.upper(), None) # put it into uppercase
+
+    logfile = get_free_filename('vq_vae_training_log', modeldir, suffix='.log')
+
+    logging.basicConfig(filename=logfile, level=numeric_level)
+
+    logging.info("ARGS: %s", str(args))
 
     logging.info("Chosen hyperparameters:")
     logging.info("Loss function: %s", loss)
@@ -144,10 +146,10 @@ if __name__ == "__main__":
     print("Data directory:",datadir, "\nModel directory:",modeldir, "\nOutput directory:", outdir)
     print("File stub:",fstub)
     print("Sparse:", sparse, "\nNormalize:",normalize,"\nQuantize:",quantize)
-    print("Batch size:%s\nBatch length:%s\n", batchsize, batchlength)
+    print("Batch size:", batchsize, "\nBatch length:",batchlength)
     print("Embedding dimension:", embeddim,"\nNumber of embeddings:", numembed)
     print("Lambda:", lam)
     print("Learning Rate:", lr)
     
-    train(datadir, outdir, modeldir, fstub, loss, lr=lr, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
+    train(datadir, modeldir, fstub, loss, lr=lr, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
     logging.info("All done! TOTAL TIME: %s", str(time.time()-prog_start))
