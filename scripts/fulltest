@@ -11,7 +11,7 @@
 #$ -pe omp 4
 
 # Request 2 gpus
-#$ -l gpus=2
+#$ -l gpus=3
 
 # Spec min gpu compute compatibility
 #$ -l gpu_c=6

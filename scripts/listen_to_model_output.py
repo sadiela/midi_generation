@@ -46,7 +46,7 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
 
     model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=0.5)
     stat_dictionary = torch.load(model_path, map_location=torch.device('cpu'))
-    model_params = stat_dictionary["model_state_dict"]
+    model_params = stat_dictionary#["model_state_dict"]
     model.load_state_dict(model_params)
     model.eval()
 
@@ -143,7 +143,7 @@ if __name__ == "__main__":
     batchlength = int(args['batchlength'])
 
     print("Start")
-    #reconstruct_songs(tensor_dir, resdir, resdir, model_name, clip_val=0, batchlength=batchlength)
+    reconstruct_songs(tensor_dir, resdir, resdir, model_name, clip_val=0, batchlength=batchlength)
     #"Save graphs"
     save_graphs(resdir, resdir)
 
