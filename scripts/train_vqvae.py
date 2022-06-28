@@ -7,6 +7,7 @@ import argparse
 import time
 from pathlib import Path
 import logging
+from listen_to_model_output import *
 
 '''
 Driver script for training VQ-VAE models. Takes the following command line arguments (all optional):
@@ -61,7 +62,7 @@ def train(datapath, modelpath, fstub, loss, lr=1e-3, batchsize=10, batchlength=2
     logging.info("Models will be saved in the directory: %s", modelpath)
 
     # train model
-    recon_error, perplex, nan_recon_files = train_model(datapath, modelpath, 
+    recon_error, perplex, final_model_name = train_model(datapath, modelpath, 
                                                         num_embeddings=num_embeddings, 
                                                         embedding_dim=embedding_dim, 
                                                         learning_rate=lr, lossfunc=loss, 
@@ -70,12 +71,12 @@ def train(datapath, modelpath, fstub, loss, lr=1e-3, batchsize=10, batchlength=2
                                                         sparse=sparse, lam=lam)
     
     # save losses to file
-    logging.info("NUM NAN FILES: %d", len(nan_recon_files))
-    results={"reconstruction_error": recon_error, "perplexity": perplex, "nan_reconstruction_files": nan_recon_files}
+    results={"reconstruction_error": recon_error, "perplexity": perplex}
     savefile = get_free_filename('results_' + fstub, modelpath, suffix='.yaml')
     logging.info("SAVING FILE TO: %s", savefile)
     with open(savefile, 'w') as outfile:
         yaml.dump(results, outfile, default_flow_style=False)
+    return final_model_name
 
 if __name__ == "__main__":
     prog_start = time.time()
@@ -132,7 +133,7 @@ if __name__ == "__main__":
     hyperparameters = '\nData directory' + datadir + '\nModel/output directory' + modeldir + '\nFile stub:' + fstub
     hyperparameters += '\nSparse:' + str(sparse) + "\nNormalize:" + str(normalize) + '\nQuantize:' + str(quantize)
     hyperparameters += '\nBatch size:' + str(batchsize) + '\nBatch length:' + str(batchlength)
-    hyperparameters +=  '\nEmbedding dimension:' + str(embeddim) + '\nNumber of embeddings' + str(numembed)
+    hyperparameters +=  '\nEmbedding dimension:' + str(embeddim) + '\nNumber of embeddings:' + str(numembed)
     hyperparameters += '\nLearning rate:' + str(lr) + '\nLambda:' + str(lam)
 
     logging.info("Chosen hyperparameters:")
@@ -141,5 +142,18 @@ if __name__ == "__main__":
     print("Chosen hyperparameters:")
     print(hyperparameters)
     
-    train(datadir, modeldir, fstub, loss, lr=lr, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
+    final_model_name = train(datadir, modeldir, fstub, loss, lr=lr, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
     logging.info("All done! TOTAL TIME: %s", str(time.time()-prog_start))
+
+
+    # path 
+    tensor_dir = Path('..') / 'recon_tensors'
+    recon_res_dir = Path(modeldir) / 'final_recons'
+    try: 
+        recon_res_dir.mkdir()
+    except OSError as error: 
+        print(error)  
+
+    reconstruct_songs(str(tensor_dir), str(recon_res_dir), str(recon_res_dir), final_model_name, clip_val=0, batchlength=batchlength)
+    #"Save graphs"
+    save_graphs(str(recon_res_dir),str(recon_res_dir))
