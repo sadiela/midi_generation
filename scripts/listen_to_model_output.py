@@ -40,18 +40,18 @@ def save_graphs(midi_path, save_path):
             print("passed", file)
         
 
-def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False, batchlength=256):
+def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False, batchlength=256, num_embed=2048):
     res_string = "RECON ERRORS!\n"
     file_list = os.listdir(orig_tensor_dir)
 
-    model = Model(num_embeddings=1024, embedding_dim=128, commitment_cost=0.5)
+    model = Model(num_embeddings=num_embed, embedding_dim=128, commitment_cost=0.5)
     stat_dictionary = torch.load(model_path, map_location=torch.device('cpu'))
-    model_params = stat_dictionary#["model_state_dict"]
+    model_params = stat_dictionary["model_state_dict"]
     model.load_state_dict(model_params)
     model.eval()
 
     for file in file_list:
-        # perform reconstruction
+        print(file) # perform reconstruction
         cur_tensor, loss, recon_err, zero_recon = reconstruct_song(Path(orig_tensor_dir) / file, model, clip_val=clip_val, norm=norm, batchlength=batchlength)
         # record info IF RECONSTRUCTION NOT ALL 0s
         if (cur_tensor > 0).sum() > 0: 
@@ -71,27 +71,27 @@ def reconstruct_song(orig_tensor_path, model, clip_val=0, norm=False, batchlengt
         data = data / maxlength
 
     # Test on a song
-    print(data.shape)
+    #print(data.shape)
     p, n = data.shape
 
     l = batchlength #1024 # batch length
 
     data = data[:,:(data.shape[1]-(data.shape[1]%l))]
     p, n_2 = data.shape
-    print("Cropped data shape:", data.shape)
+    #print("Cropped data shape:", data.shape)
     data = torch.tensor(data).float()
 
     chunked_data = data.view((n//l, 1, p, l))
-    print("chunked data shape", chunked_data.shape)
-    print(data)
+    #print("chunked data shape", chunked_data.shape)
+    #print(data)
     
     vq_loss, data_recon, perplexity = model(chunked_data)
     recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
     zero_recon = F.mse_loss(torch.zeros(n//l, 1, p, l), chunked_data)
     loss = recon_error + vq_loss
 
-    print("recon data shape:", data_recon.shape)
-    print(data_recon)
+    #print("recon data shape:", data_recon.shape)
+    #print(data_recon)
     #for i in range(data_recon.shape[0]):
     #    print(torch.max(data_recon[i,:,:,:]).item())
     print('Loss:', loss.item(), '\Perplexity:', perplexity.item())
