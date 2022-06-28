@@ -254,12 +254,38 @@ class Model(nn.Module):
           x_recon = self._decoder(z)
           return 0, x_recon, 0
 
+def validate_model(model_path, data_path, batchlength= 256, normalize=False, sparse=True, num_embeddings=1024, lossfunc='mse', lam=1):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # pick device
+    midi_tensor_validation = MidiDataset(data_path, l=batchlength, norm=normalize, sparse=sparse) 
+    validation_data = DataLoader(midi_tensor_validation, collate_fn=collate_fn, batch_size=bs, shuffle=True, num_workers=2)
+
+    model = Model(num_embeddings=num_embeddings, embedding_dim=128, commitment_cost=0.5)
+    stat_dictionary = torch.load(model_path, map_location=device)
+    model_params = stat_dictionary["model_state_dict"]
+    model.load_state_dict(model_params)
+    model.eval()
+
+    validation_recon_error = []
+
+    for i, vdata in enumerate(validation_data):
+      vdata = vdata.to(device)
+      vq_loss, data_recon, perplexity = model(vdata)
+      if lossfunc=='mse':
+        recon_error = F.mse_loss(data_recon, vdata)
+      elif lossfunc=='l1reg':
+        recon_error = F.mse_loss(data_recon, vdata) + (1.0/vdata.shape[0])*lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
+      else: # loss function = mae
+        recon_error = F.l1_loss(data_recon, vdata)
+      validation_recon_error.append(recon_error)
+      if (i+1) % 10 == 0:
+        print("Val recon:", recon_error)
+        #logging.info('validation recon_error: %.3f' % np.mean(validation_recon_error[-1]))
+
 def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=128, learning_rate=1e-3, lossfunc='mse', bs=10, batchlength=256, normalize=False, quantize=True, sparse=False, lam=1):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # pick device
     logging.info("Device: %s" , device)
 
     midi_tensor_dataset = MidiDataset(Path(datapath) / "train", l=batchlength, norm=normalize, sparse=sparse) # dataset declaration
-    midi_tensor_validation = MidiDataset(Path(datapath) / "validate", l=batchlength, norm=normalize, sparse=sparse) 
 
     ### Declare model ### 
     model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5, quantize=quantize).to(device) 
@@ -267,18 +293,13 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     ### Declare optimizer ###
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, amsgrad=False) # optimizer declaration
 
-
     model.float()
     model.train() # training mode
     train_res_recon_error = []
-    validation_recon_error = []
     train_res_perplexity = []
     total_loss = []
-    nanfiles = []
 
     training_data = DataLoader(midi_tensor_dataset, collate_fn=collate_fn, batch_size=bs, shuffle=True, num_workers=2)
-    validation_data = DataLoader(midi_tensor_validation, collate_fn=collate_fn, batch_size=bs, shuffle=True, num_workers=2)
-
     # Let # of tensors = n
     # each tensor is pxl_i, where l_i is the length of the nth tensor
     # when we chunk the data, it becomes (l_i//l = s_i) x 1 x p x l 
@@ -288,7 +309,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
 
     max_tensor_size= 0 
     #dynamic_loss = SpeedySparseDynamicLoss.apply
-
+    model_number = 1
     for e in range(2):
       # train loop
       for i, data in tqdm(enumerate(training_data)):
@@ -325,12 +346,10 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
             train_res_recon_error.append(loss)
             train_res_perplexity.append(perplexity)
 
-          if pd.isna(recon_error.item()):
-            nanfiles.append(midi_tensor_dataset.__getname__(i))
-
-          if (i) % 600 == 0:
+          if (i) % 5000 == 0:
             # new save path
-            cur_model_file = get_free_filename('model_'+str(e) + '_' + str(i), model_save_path, suffix='.pt')
+            cur_model_file = get_free_filename('model_'+str(model_number), model_save_path, suffix='.pt')
+            model_number+=1
             torch.save({
                         'epoch': e,
                         'iteration': i,
@@ -342,24 +361,10 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
             logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
             logging.info('\n')
             print(i, 'iterations')
-            print('recon_error:', np.mean(train_res_recon_error[-100:]))
+            print('recon_error:', np.mean(train_res_recon_error[-5000:]))
 
       # VALIDATION LOOP
-      '''model.eval() # change to eval mode
-      for i, vdata in enumerate(validation_data):
-        vdata = vdata.to(device)
-        vq_loss, data_recon, perplexity = model(vdata)
-        if lossfunc=='mse':
-          recon_error = F.mse_loss(data_recon, vdata)
-        elif lossfunc=='l1reg':
-          recon_error = F.mse_loss(data_recon, vdata) + (1.0/data.shape[0])*lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
-        else: # loss function = mae
-          recon_error = F.l1_loss(data_recon, vdata)
-        validation_recon_error.append(recon_error)
-        if (i+1) % 10 == 0:
-          print("Val recon:", recon_error)
-          #logging.info('validation recon_error: %.3f' % np.mean(validation_recon_error[-1]))
-  '''
+
     final_model_file = get_free_filename('model_FINAL', model_save_path, suffix='.pt')
     logging.info("saving model to %s"%final_model_file)
     torch.save(model.state_dict(), final_model_file)
@@ -368,4 +373,4 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
                 'optimizer_state_dict': optimizer.state_dict(),
                 'loss': np.mean(train_res_recon_error[-100:]),
                 }, final_model_file) 
-    return train_res_recon_error, train_res_perplexity, nanfiles
+    return train_res_recon_error, train_res_perplexity, final_model_file

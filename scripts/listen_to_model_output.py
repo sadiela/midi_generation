@@ -39,9 +39,8 @@ def save_graphs(midi_path, save_path):
             print(e)
             print("passed", file)
         
-
 def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False, batchlength=256, num_embed=2048):
-    res_string = "RECON ERRORS!\n"
+    res_string = "MODEL FILE NAME" + model_path + "\nRECON ERRORS!\n"
     file_list = os.listdir(orig_tensor_dir)
 
     model = Model(num_embeddings=num_embed, embedding_dim=128, commitment_cost=0.5)
