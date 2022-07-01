@@ -44,7 +44,7 @@ def preprocess(rawdir, procdir):
     print("START2")
     separate_tracks(rawdir, sep)
     crop_midis(sep, crop)
-    midis_to_tensors(crop, tens, subdiv=32, maxnotelength=16, normalize=False)
+    midis_to_tensors(crop, tens, subdiv=32, maxnotelength=256, normalize=False)
     convert_to_sparse(tens, sparse, del_tensor_dir=True)
     # empty other dirs
 
