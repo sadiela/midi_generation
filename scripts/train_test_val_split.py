@@ -15,7 +15,7 @@ from tqdm import tqdm
 #from midi_utility import *
 
 #full_dir ="/Users/sadiela/Documents/phd/research/music/MIDI_data_survey/datasets/lakh_midi/clean_sep_crop_tensors/"
-train_dir = "/projectnb/textconv/sadiela/midi_generation/data/ttv/train"
+train_dir = "/projectnb/textconv/sadiela/midi_generation/data/ttv/train/"
 test_dir = "/projectnb/textconv/sadiela/midi_generation/data/ttv/test/"
 val_dir = "/projectnb/textconv/sadiela/midi_generation/data//ttv/validate/"
 
