@@ -476,7 +476,7 @@ def midi_to_tensor_2(filepath, subdiv=64, maxnotelength=256): # default maxlengt
         return None
     return np.squeeze(tensor, axis=2)
 
-def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64):
+def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64, pitchlength_cutoff=0.2):
     # Converts midi tensor back into midi file format
     # ASSUMES:
     #   - 1 track
@@ -484,8 +484,7 @@ def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64):
     #   - tempo = 120bpm
     #   - smallest note subdivision = eighth note (0.250 seconds)
     #   - writes everything as piano 
-    # Create new midi object
-    spb = 60/bpm # seconds per beat
+    # Create new midi object spb = 60/bpm # seconds per beat
     spu = 60/(bpm*subdiv)
     new_mid = pretty_midi.PrettyMIDI() # type=0
     # create a track and add it to the midi
@@ -496,13 +495,13 @@ def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64):
         note_start= 0
         current_note_length = 0
         for time in range(tensor.shape[1]):
-            if tensor[pitch,time]==1 and note_on == False:
+            if tensor[pitch,time]>=pitchlength_cutoff and note_on == False:
                 note_on=True
                 note_start = time
                 current_note_length += 1
-            elif tensor[pitch,time]==1 and note_on == True:
+            elif tensor[pitch,time]>=pitchlength_cutoff and note_on == True:
                 current_note_length += 1
-            elif tensor[pitch,time]==0 and note_on == True:
+            elif tensor[pitch,time]<pitchlength_cutoff and note_on == True:
                 # NOTE ENDED
                 new_note = pretty_midi.Note(velocity=100, pitch=(pitch), start=(note_start * spu), end=((note_start+current_note_length)*spu))
                 piano.notes.append(new_note)                
