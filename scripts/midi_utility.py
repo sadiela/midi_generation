@@ -25,7 +25,7 @@ from pathlib import Path
 import pickle
 import matplotlib.pyplot as plt
 import pypianoroll
-from midi2audio import FluidSynth
+#from midi2audio import FluidSynth
 import re
 
 PROJECT_DIRECTORY = Path('..')
@@ -434,12 +434,12 @@ def change_midi_key(old_midi_path, new_midi_path):
     else:
         print("FILE EXISTS:", new_midi_path)
 
-def midi_to_wav(midi_path,wav_path):
+'''def midi_to_wav(midi_path,wav_path):
         print("CONVERTING")
         # using the default sound font in 44100 Hz sample rate
         fs = FluidSynth()
         fs.midi_to_audio(midi_path, wav_path)
-
+'''
 
 def midi_to_tensor_2(filepath, subdiv=64, maxnotelength=256): # default maxlength is 3 minutes 
     # maxnotelength given in BEATS
@@ -556,7 +556,7 @@ if __name__ == "__main__":
     plt.imshow(new_piano_roll[40:-40,:1000], interpolation='none')
     plt.show()'''
 
-    midis_to_tensors_2(sep_crop_dir, tensor_dir, subdiv=64, maxnotelength=256, normalize=False)
+    #midis_to_tensors_2(sep_crop_dir, tensor_dir, subdiv=64, maxnotelength=256, normalize=False)
 
     '''
     all_files = os.listdir(sep_crop_dir)
