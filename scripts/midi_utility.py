@@ -25,7 +25,6 @@ from pathlib import Path
 import pickle
 import matplotlib.pyplot as plt
 import pypianoroll
-from midi2audio import FluidSynth
 import re
 
 PROJECT_DIRECTORY = Path('..')
@@ -107,6 +106,16 @@ def play_x_seconds(midi_filename, x=10, savefile=False):
         print("delete file when done")
         os.remove(temp_filename)
     # delete temp file
+
+# convert a MIDI file to a wav file
+from midi2audio import FluidSynth
+def midi_to_wav(midi_path,wav_path):
+        print("CONVERTING")
+        # using the default sound font in 44100 Hz sample rate
+        fs = FluidSynth()
+        fs.midi_to_audio(midi_path, wav_path)
+
+
 '''
 
 def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
@@ -434,13 +443,7 @@ def change_midi_key(old_midi_path, new_midi_path):
     else:
         print("FILE EXISTS:", new_midi_path)
 
-def midi_to_wav(midi_path,wav_path):
-        print("CONVERTING")
-        # using the default sound font in 44100 Hz sample rate
-        fs = FluidSynth()
-        fs.midi_to_audio(midi_path, wav_path)
-
-
+### CODE FOR NEW MIDI REPRESENTATION ###
 def midi_to_tensor_2(filepath, subdiv=64, maxnotelength=256): # default maxlength is 3 minutes 
     # maxnotelength given in BEATS
     # ASSUMES:
