@@ -107,6 +107,16 @@ def play_x_seconds(midi_filename, x=10, savefile=False):
         print("delete file when done")
         os.remove(temp_filename)
     # delete temp file
+
+# convert a MIDI file to a wav file
+from midi2audio import FluidSynth
+def midi_to_wav(midi_path,wav_path):
+        print("CONVERTING")
+        # using the default sound font in 44100 Hz sample rate
+        fs = FluidSynth()
+        fs.midi_to_audio(midi_path, wav_path)
+
+
 '''
 
 def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
@@ -120,10 +130,6 @@ def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
     # tempo given in bpm
     # assumes 4/4 time 
     # subdivision = =-2 means
-    new_mid = pretty_midi.PrettyMIDI() # type=0
-    # create a track and add it to the midi
-    piano_program = pretty_midi.instrument_name_to_program('Acoustic Grand Piano')
-    piano = pretty_midi.Instrument(program=piano_program)
 
     quarter_note_duration = tempo/60
     notes=[60, 62, 64, 65, 67, 69, 71, 72] #, 73, 74, 75, 76, 77, 78, 79, 80] # 64+7, 64+12]
@@ -360,6 +366,10 @@ def crop_midi(filename, newfilename, cut_beginning=True, maxlength=None):
     except Exception as e: 
         print("Error", e)
         pass
+        new_midi.write(str(newfilename))
+    except Exception as e: 
+        print("Error", e)
+        pass
 
 def sep_and_crop(midi_directory, target_directory):
 # takes a directory filled with midi files, creates new midi files for each individual (NOT DRUM) track
@@ -434,13 +444,8 @@ def change_midi_key(old_midi_path, new_midi_path):
     else:
         print("FILE EXISTS:", new_midi_path)
 
-'''def midi_to_wav(midi_path,wav_path):
-        print("CONVERTING")
-        # using the default sound font in 44100 Hz sample rate
-        fs = FluidSynth()
-        fs.midi_to_audio(midi_path, wav_path)
-'''
 
+### CODE FOR NEW MIDI REPRESENTATION ###
 def midi_to_tensor_2(filepath, subdiv=64, maxnotelength=256): # default maxlength is 3 minutes 
     # maxnotelength given in BEATS
     # ASSUMES:
@@ -476,7 +481,7 @@ def midi_to_tensor_2(filepath, subdiv=64, maxnotelength=256): # default maxlengt
         return None
     return np.squeeze(tensor, axis=2)
 
-def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64):
+def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64, pitchlength_cutoff=0.2):
     # Converts midi tensor back into midi file format
     # ASSUMES:
     #   - 1 track
@@ -484,8 +489,7 @@ def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64):
     #   - tempo = 120bpm
     #   - smallest note subdivision = eighth note (0.250 seconds)
     #   - writes everything as piano 
-    # Create new midi object
-    spb = 60/bpm # seconds per beat
+    # Create new midi object spb = 60/bpm # seconds per beat
     spu = 60/(bpm*subdiv)
     new_mid = pretty_midi.PrettyMIDI() # type=0
     # create a track and add it to the midi
@@ -496,13 +500,13 @@ def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64):
         note_start= 0
         current_note_length = 0
         for time in range(tensor.shape[1]):
-            if tensor[pitch,time]==1 and note_on == False:
+            if tensor[pitch,time]>=pitchlength_cutoff and note_on == False:
                 note_on=True
                 note_start = time
                 current_note_length += 1
-            elif tensor[pitch,time]==1 and note_on == True:
+            elif tensor[pitch,time]>=pitchlength_cutoff and note_on == True:
                 current_note_length += 1
-            elif tensor[pitch,time]==0 and note_on == True:
+            elif tensor[pitch,time]<pitchlength_cutoff and note_on == True:
                 # NOTE ENDED
                 new_note = pretty_midi.Note(velocity=100, pitch=(pitch), start=(note_start * spu), end=((note_start+current_note_length)*spu))
                 piano.notes.append(new_note)                

@@ -58,7 +58,7 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
             # save tensor
             np.save(Path(new_tensor_dir) / str(file.split('.')[0] + '_conv.npy'), cur_tensor)
             # convert to midi and save midi 
-            tensor_to_midi(cur_tensor, Path(new_midi_dir) / str(file.split('.')[0] + '.mid'))
+            tensor_to_midi_2(cur_tensor, Path(new_midi_dir) / str(file.split('.')[0] + '.mid'), pitchlength_cutoff=0.2)
         else:
             print(file, "reconstruction is all 0s")
     with open(Path(new_midi_dir) / 'recon_info.txt', 'w') as outfile:
