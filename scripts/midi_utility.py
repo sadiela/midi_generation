@@ -7,7 +7,6 @@ explore and manipulate midi data as well as preprocessing functions
 # IMPORTS #
 ###########
 import random
-import sys
 import os
 #import pygame # for playing midi
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
@@ -15,12 +14,8 @@ import numpy as np
 import pretty_midi # midi manipulation library
 from tqdm import tqdm
 from gen_utility import * 
-from pathlib import Path
 from scipy import sparse
-import pickle
-import json
 import re
-from glob import glob
 from pathlib import Path
 import pickle
 import matplotlib.pyplot as plt
@@ -28,12 +23,10 @@ import pypianoroll
 #from midi2audio import FluidSynth
 import re
 
-PROJECT_DIRECTORY = Path('..')
-#data_folder = Path("source_data/text_files/")
-
 #####################
 # GLOBAL PARAMETERS #
 #####################
+PROJECT_DIRECTORY = Path('..')
 
 ##############
 # PLAY MUSIC #
