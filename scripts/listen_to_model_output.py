@@ -21,6 +21,7 @@ import pypianoroll
 import yaml
 from pathlib import Path
 import argparse
+import pickle
 
 maxlength = 16*32
 
@@ -39,7 +40,7 @@ def save_graphs(midi_path, save_path):
             print(e)
             print("passed", file)
         
-def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False, batchlength=256, num_embed=2048):
+def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False, batchlength=256, num_embed=1024):
     res_string = "MODEL FILE NAME" + model_path + "\nRECON ERRORS!\n"
     file_list = os.listdir(orig_tensor_dir)
 
@@ -65,7 +66,9 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
         outfile.write(res_string)
 
 def reconstruct_song(orig_tensor_path, model, clip_val=0, norm=False, batchlength=256):
-    data = np.load(orig_tensor_path)
+    with open(orig_tensor_path,'rb') as f: 
+        pickled_tensor = pickle.load(f)
+    data = pickled_tensor.toarray()
     if norm:
         data = data / maxlength
 

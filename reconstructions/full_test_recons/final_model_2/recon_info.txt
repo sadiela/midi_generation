@@ -1,0 +1,10 @@
+RECON ERRORS!
+AnotherGirl_1_cropped.npy recon error: 0.15830950438976288 loss: 0.15841089189052582 zero recon:0.15828704833984375
+AcrosstheUniverse_0_cropped.npy recon error: 0.31745094060897827 loss: 0.3175523281097412 zero recon:0.31744384765625
+Andante,Andante_8_cropped.npy recon error: 0.5638745427131653 loss: 0.5639759302139282 zero recon:0.5638749003410339
+AllYouNeedIsLove_11_cropped.npy recon error: 0.417206734418869 loss: 0.41730812191963196 zero recon:0.4172210693359375
+AndYourBirdCanSing_4_cropped.npy recon error: 0.13376793265342712 loss: 0.13386932015419006 zero recon:0.13370811939239502
+KeepYourHandsOffMyBaby_4_cropped.npy recon error: 0.04257536306977272 loss: 0.04267675057053566 zero recon:0.042457215487957
+AllMyLoving_2_cropped.npy recon error: 0.06616690009832382 loss: 0.06626828759908676 zero recon:0.0662241280078888
+KissesofFire_5_cropped.npy recon error: 0.6681073307991028 loss: 0.6682087182998657 zero recon:0.6683647036552429
+ADayintheLife_5_cropped.npy recon error: 0.010682878084480762 loss: 0.010784266516566277 zero recon:0.010555491782724857
