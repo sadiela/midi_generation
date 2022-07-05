@@ -7,7 +7,7 @@ This file contains the VQ-VAE model class
 from torch.profiler import profile, record_function, ProfilerActivity
 import numpy as np
 from numpy.core.numeric import full
-import pandas as pd
+#import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -72,7 +72,6 @@ class MidiDataset(Dataset):
           cur_tensor = pickled_tensor.toarray()
         else:
           cur_tensor = np.load(self.paths[index]) #, allow_pickle=True)
-
         # convert to torch tensor (vs numpy tensor)
         cur_data = torch.tensor(cur_tensor)
         #cur_data = cur_data[46:-46,:]
