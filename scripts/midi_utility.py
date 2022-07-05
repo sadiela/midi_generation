@@ -100,6 +100,11 @@ def play_x_seconds(midi_filename, x=10, savefile=False):
         os.remove(temp_filename)
     # delete temp file
 
+
+
+
+'''
+
 # convert a MIDI file to a wav file
 from midi2audio import FluidSynth
 def midi_to_wav(midi_path,wav_path):
@@ -107,9 +112,6 @@ def midi_to_wav(midi_path,wav_path):
         # using the default sound font in 44100 Hz sample rate
         fs = FluidSynth()
         fs.midi_to_audio(midi_path, wav_path)
-
-
-'''
 
 def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
     # GENERATE A RANDOM MIDI AND SAVE TO A FILE
@@ -491,6 +493,8 @@ def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64, pitchlength_c
         note_start= 0
         current_note_length = 0
         for time in range(tensor.shape[1]):
+            if tensor[pitch, time] > 0:
+                print(tensor[pitch, time])
             if tensor[pitch,time]>=pitchlength_cutoff and note_on == False:
                 note_on=True
                 note_start = time
@@ -528,9 +532,13 @@ def show_graph(midi_path):
 
 if __name__ == "__main__":
     #orig_midi_dir = Path("/Users/sadiela/Documents/phd/research/music/MIDI_data_survey/datasets/lakh_midi/clean_midi_c_key")
-    sep_crop_dir = Path("/Users/sadiela/Documents/phd/research/music/MIDI_data_survey/datasets/lakh_midi/clean_midi_c_sep_crop")
-    tensor_dir = Path("/Users/sadiela/Documents/phd/research/music/MIDI_data_survey/datasets/lakh_midi/clean_sep_crop_tensors")
+    #sep_crop_dir = Path("/Users/sadiela/Documents/phd/research/music/MIDI_data_survey/datasets/lakh_midi/clean_midi_c_sep_crop")
+    #tensor_dir = Path("/Users/sadiela/Documents/phd/research/music/MIDI_data_survey/datasets/lakh_midi/clean_sep_crop_tensors")
+    mid_path = "/Users/sadiela/Documents/phd/research/music/midi_generation/scripts/AllYouNeedIsLove_11_cropped.mid"
+    wav_path = "/Users/sadiela/Documents/phd/research/music/midi_generation/scripts/AllYouNeedIsLove_11_cropped.wav"
     
+    new_mid = pretty_midi.PrettyMIDI() # type=0
+    print(new_mid.get_end_time())
     #print("Separating tracks and cropping empty starts")
     #sep_and_crop(orig_midi_dir, sep_crop_dir)
 
@@ -551,7 +559,7 @@ if __name__ == "__main__":
     plt.imshow(new_piano_roll[40:-40,:1000], interpolation='none')
     plt.show()'''
 
-    midis_to_tensors_2(sep_crop_dir, tensor_dir, subdiv=64, maxnotelength=256, normalize=False)
+    #midis_to_tensors_2(sep_crop_dir, tensor_dir, subdiv=64, maxnotelength=256, normalize=False)
 
     '''
     all_files = os.listdir(sep_crop_dir)
