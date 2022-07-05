@@ -76,7 +76,7 @@ def train(datapath, modelpath, fstub, loss, lr=1e-3, batchsize=10, batchlength=2
     logging.info("SAVING FILE TO: %s", savefile)
     with open(savefile, 'w') as outfile:
         yaml.dump(results, outfile, default_flow_style=False)
-    return final_model_name
+    return final_model_name, savefile
 
 if __name__ == "__main__":
     prog_start = time.time()
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     print("Chosen hyperparameters:")
     print(hyperparameters)
     
-    final_model_name = train(datadir, modeldir, fstub, loss, lr=lr, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
+    final_model_name, yaml_name = train(datadir, modeldir, fstub, loss, lr=lr, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
     logging.info("All done! TOTAL TIME: %s", str(time.time()-prog_start))
 
 
@@ -157,3 +157,5 @@ if __name__ == "__main__":
     reconstruct_songs(str(tensor_dir), str(recon_res_dir), str(recon_res_dir), final_model_name, clip_val=0, batchlength=batchlength)
     #"Save graphs"
     save_graphs(str(recon_res_dir),str(recon_res_dir))
+
+    show_result_graphs(modeldir, yaml_name, modeldir)
