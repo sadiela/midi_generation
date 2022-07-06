@@ -10,6 +10,7 @@ import random
 import os
 #import pygame # for playing midi
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 import numpy as np
 import pretty_midi # midi manipulation library
 from tqdm import tqdm
@@ -20,7 +21,7 @@ from pathlib import Path
 import pickle
 import matplotlib.pyplot as plt
 import pypianoroll
-#from midi2audio import FluidSynth
+from midi2audio import FluidSynth
 import re
 
 #####################
@@ -101,13 +102,14 @@ def play_x_seconds(midi_filename, x=10, savefile=False):
         os.remove(temp_filename)
     # delete temp file
 
+'''
+
 # convert a MIDI file to a wav file
-from midi2audio import FluidSynth
 def midi_to_wav(midi_path,wav_path):
         print("CONVERTING")
         # using the default sound font in 44100 Hz sample rate
         fs = FluidSynth()
-        fs.midi_to_audio(midi_path, wav_path)'''
+        fs.midi_to_audio(midi_path, wav_path)
 
 def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
     # GENERATE A RANDOM MIDI AND SAVE TO A FILE
@@ -471,7 +473,17 @@ def midi_to_tensor_2(filepath, subdiv=64, maxnotelength=256): # default maxlengt
         return None
     return np.squeeze(tensor, axis=2)
 
-def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64, pitchlength_cutoff=0.2):
+def tensors_to_midis_2(tensor_dir, midi_dir, bpm=120, subdiv=64): 
+    # takes a directory of tensors and converts them to midis
+    file_list = os.listdir(tensor_dir)
+    for file in tqdm(file_list):
+        #cur_tensor = np.load(tensor_dir + '\\' + file)
+        with open(str(tensor_dir / file), 'rb') as f:
+            pickled_tensor = pickle.load(f)
+        cur_tensor = pickled_tensor.toarray()
+        tensor_to_midi_2(cur_tensor, str(midi_dir /  str(file.split('.')[0] + '.mid')), str(midi_dir / str(file.split('.')[0] + '.wav')))
+        
+def tensor_to_midi_2(tensor, desired_filepath, wav_filepath, bpm=120, subdiv=64, pitchlength_cutoff=0.2):
     # Converts midi tensor back into midi file format
     # ASSUMES:
     #   - 1 track
@@ -490,8 +502,8 @@ def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64, pitchlength_c
         note_start= 0
         current_note_length = 0
         for time in range(tensor.shape[1]):
-            if tensor[pitch, time] > 0:
-                print(tensor[pitch, time])
+            #if tensor[pitch, time] > 0:
+            #    print(tensor[pitch, time])
             if tensor[pitch,time]>=pitchlength_cutoff and note_on == False:
                 note_on=True
                 note_start = time
@@ -510,6 +522,8 @@ def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64, pitchlength_c
 
     # save to .mid file 
     new_mid.write(str(desired_filepath))
+
+    midi_to_wav(str(desired_filepath), str(wav_filepath))
 
 def change_keys_and_names(orig_midi_dir, new_midi_dir):
     all_dirs = os.listdir(orig_midi_dir)
