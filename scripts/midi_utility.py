@@ -21,7 +21,7 @@ from pathlib import Path
 import pickle
 import matplotlib.pyplot as plt
 import pypianoroll
-from midi2audio import FluidSynth
+#from midi2audio import FluidSynth
 import re
 
 #####################
@@ -102,7 +102,6 @@ def play_x_seconds(midi_filename, x=10, savefile=False):
         os.remove(temp_filename)
     # delete temp file
 
-'''
 
 # convert a MIDI file to a wav file
 def midi_to_wav(midi_path,wav_path):
@@ -139,7 +138,7 @@ def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
 
     # save to .mid file 
     new_mid.write(filepath)
-
+'''
 
 #### DON'T THINK THIS IS BEING USED ANYMORE...###
 def change_tempo(filepath, newfilepath,  maxlength=720, smallest_subdivision=64, target_tempo=120, previous_tempo=None): # default maxlength is 3 minutes 
