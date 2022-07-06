@@ -25,13 +25,8 @@ from glob import glob
 from pathlib import Path
 import pickle
 import matplotlib.pyplot as plt
-<<<<<<< HEAD
 #import pypianoroll
-#import midi2audio
-=======
-import pypianoroll
-from midi2audio import FluidSynth
->>>>>>> 2954ada983cf77fd9285b3ab188e372c6e3b65e3
+#from midi2audio import FluidSynth
 import re
 
 PROJECT_DIRECTORY = Path('..')
