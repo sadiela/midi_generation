@@ -48,7 +48,7 @@ p= 36 #128'''
 class MidiDataset(Dataset):
     """Midi dataset."""
 
-    def __init__(self, npy_file_dir, l=256, sparse=True, norm=False):
+    def __init__(self, npy_file_dir, l=256, norm=False):
         """
         Args:
             npy_file_dir (string): Path to the npy file directory
@@ -57,7 +57,6 @@ class MidiDataset(Dataset):
         self.l = l
         self.norm = norm 
         self.maxlength = 16*64
-        self.sparse = sparse
         self.paths = [ Path(npy_file_dir) / file for file in file_list] # get entire list of midi tensor file names 
         
         #self.batch_file_paths = set()
@@ -66,13 +65,9 @@ class MidiDataset(Dataset):
         # choose random file path from directory (not already chosen), chunk it 
         #print(str(self.paths[index]))
         # load in tensor
-        if self.sparse:
-          with open(self.paths[index], 'rb') as f:
-            pickled_tensor = pickle.load(f)
-          cur_tensor = pickled_tensor.toarray()
-        else:
-          cur_tensor = np.load(self.paths[index]) #, allow_pickle=True)
-        # convert to torch tensor (vs numpy tensor)
+        with open(self.paths[index], 'rb') as f:
+          pickled_tensor = pickle.load(f)
+        cur_tensor = pickled_tensor.toarray()
         cur_data = torch.tensor(cur_tensor)
         #cur_data = cur_data[46:-46,:]
         p, l_i = cur_data.shape
@@ -253,10 +248,10 @@ class Model(nn.Module):
           x_recon = self._decoder(z)
           return 0, x_recon, 0
 
-def validate_model(model_path, data_path, batchlength= 256, normalize=False, sparse=True, num_embeddings=1024, lossfunc='mse', lam=1):
+def validate_model(model_path, data_path, batchlength= 256, normalize=False, batchsize=5, num_embeddings=1024, lossfunc='mse', lam=1):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # pick device
-    midi_tensor_validation = MidiDataset(data_path, l=batchlength, norm=normalize, sparse=sparse) 
-    validation_data = DataLoader(midi_tensor_validation, collate_fn=collate_fn, batch_size=bs, shuffle=True, num_workers=2)
+    midi_tensor_validation = MidiDataset(data_path, l=batchlength, norm=normalize) 
+    validation_data = DataLoader(midi_tensor_validation, collate_fn=collate_fn, batch_size=batchsize, shuffle=True, num_workers=2)
 
     model = Model(num_embeddings=num_embeddings, embedding_dim=128, commitment_cost=0.5)
     stat_dictionary = torch.load(model_path, map_location=device)
@@ -280,11 +275,11 @@ def validate_model(model_path, data_path, batchlength= 256, normalize=False, spa
         print("Val recon:", recon_error)
         #logging.info('validation recon_error: %.3f' % np.mean(validation_recon_error[-1]))
 
-def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=128, learning_rate=1e-3, lossfunc='mse', bs=10, batchlength=256, normalize=False, quantize=True, sparse=False, lam=1):
+def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=128, learning_rate=1e-3, lossfunc='mse', bs=10, batchlength=256, normalize=False, quantize=True, lam=1):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # pick device
     logging.info("Device: %s" , device)
 
-    midi_tensor_dataset = MidiDataset(Path(datapath) / "train", l=batchlength, norm=normalize, sparse=sparse) # dataset declaration
+    midi_tensor_dataset = MidiDataset(Path(datapath) / "train", l=batchlength, norm=normalize) # dataset declaration
 
     ### Declare model ### 
     model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5, quantize=quantize).to(device) 
@@ -354,10 +349,10 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
                         'iteration': i,
                         'model_state_dict': model.state_dict(),
                         'optimizer_state_dict': optimizer.state_dict(),
-                        'loss': np.mean(train_res_recon_error[-100:]),
+                        'loss': np.mean(train_res_recon_error[-5000:]),
                         }, cur_model_file) # incremental saves
             logging.info('%d iterations' % (i+1))
-            logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
+            logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-5000:]))
             logging.info('\n')
             print(i, 'iterations')
             print('recon_error:', np.mean(train_res_recon_error[-5000:]))
@@ -370,6 +365,6 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     torch.save({
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
-                'loss': np.mean(train_res_recon_error[-100:]),
+                'loss': np.mean(train_res_recon_error[-5000:]),
                 }, final_model_file) 
     return train_res_recon_error, train_res_perplexity, final_model_file
