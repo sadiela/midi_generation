@@ -157,6 +157,4 @@ if __name__ == "__main__":
 
     reconstruct_songs(str(tensor_dir), str(recon_res_dir), str(recon_res_dir), final_model_name, clip_val=0, batchlength=batchlength)
     #"Save graphs"
-    save_graphs(str(recon_res_dir),str(recon_res_dir))
-
-    show_result_graphs(modeldir, yaml_name, modeldir)
+    save_midi_graphs(str(recon_res_dir),str(recon_res_dir))
