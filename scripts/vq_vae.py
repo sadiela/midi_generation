@@ -56,7 +56,7 @@ class MidiDataset(Dataset):
         file_list = os.listdir(npy_file_dir)
         self.l = l
         self.norm = norm 
-        self.maxlength = 16*32
+        self.maxlength = 16*64
         self.sparse = sparse
         self.paths = [ Path(npy_file_dir) / file for file in file_list] # get entire list of midi tensor file names 
         

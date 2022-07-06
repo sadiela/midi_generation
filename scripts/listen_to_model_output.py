@@ -26,38 +26,17 @@ import argparse
 import pickle
 
 maxlength = 16*32
-
-def save_graphs(midi_path, save_path):
-    print('saving pianoroll images')
-    file_list = os.listdir(midi_path)
-    for file in tqdm(file_list):
-        try:
-            recon = pypianoroll.read(Path(midi_path) / file)
-            print(recon.get_length())
-            if recon.get_length() > 64*recon.resolution: # trim only if long
-                recon.trim(0, 64*recon.resolution)
-            recon.plot()
-            plt.title(file)
-            # FIX!
-            plt.savefig(str(Path(save_path) / str(file.split('.')[0] + '.png')))
-        except Exception as e:
-            print(e)
-            print("passed", file)
         
 def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False, batchlength=256, num_embed=1024):
     res_string = "MODEL FILE NAME" + str(model_path) + "\nRECON ERRORS!\n"
     file_list = os.listdir(orig_tensor_dir)
 
-    print("declaring model")
     model = Model(num_embeddings=num_embed, embedding_dim=128, commitment_cost=0.5)
-    print(sum(p.numel() for p in model.parameters()))
-    print("loading saved model")
+    res_string += "number of parameters in initialized model:" + str(sum(p.numel() for p in model.parameters())) + '\n'
     stat_dictionary = torch.load(model_path, map_location=torch.device('cpu'))
     model_params = stat_dictionary["model_state_dict"]
-    print("putting params in model")
-    print(sum(p.numel() for p in model_params.values()))
+    res_string += "number of parameters in state dictionary:" + str(sum(p.numel() for p in model_params.values())) + '\n'
     model.load_state_dict(model_params, )
-    print("setting to eval mode")
     model.eval()
 
     print("listing files")
@@ -75,7 +54,7 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
                 pickle.dump(sparse_arr, outfile)
             # convert to midi and save midi 
             print("entering tensor to midi")
-            tensor_to_midi_2(cur_tensor, Path(new_midi_dir) / str(file.split('.')[0] + '.mid'), Path(new_midi_dir) / str(file.split('.')[0] + '.wav'), pitchlength_cutoff=0.2)
+            tensor_to_midi_2(cur_tensor, Path(new_midi_dir) / str(file.split('.')[0] + '.mid'), pitchlength_cutoff=0.2)
         else:
             print(file, "reconstruction is all 0s")
     with open(Path(new_midi_dir) / 'recon_info.txt', 'w') as outfile:
@@ -123,18 +102,35 @@ def reconstruct_song(orig_tensor_path, model, clip_val=0, norm=False, batchlengt
 
     return unchunked_recon, loss, recon_error, zero_recon
 
-def show_result_graphs(yaml_dir, yaml_name, plot_dir):
-    root_name = yaml_name.split(".")[0]
-    with open(yaml_dir / yaml_name) as file: 
+def save_result_graph(yaml_file, plot_dir):
+    #root_name = yaml_name.split(".")[0]
+    with open(yaml_file) as file: 
         res_dic = yaml.load(file, Loader=yaml.FullLoader)
     plt.plot(res_dic['reconstruction_error'])
-    plt.title("Reconstruction Error" + root_name)
+    plt.title("Reconstruction Error")
     plt.xlabel("Iteration")
     #plt.show()
     print("SAVING")
-    plt.savefig(str(plot_dir / str(root_name+".png")))
+    plt.savefig(str(plot_dir / "recon_error.png"))
 
     plt.clf()
+
+def save_midi_graphs(midi_path, save_path):
+    print('saving pianoroll images')
+    file_list = os.listdir(midi_path)
+    for file in tqdm(file_list):
+        try:
+            recon = pypianoroll.read(Path(midi_path) / file)
+            print(recon.get_length())
+            if recon.get_length() > 64*recon.resolution: # trim only if long
+                recon.trim(0, 64*recon.resolution)
+            recon.plot()
+            plt.title(file)
+            # FIX!
+            plt.savefig(str(Path(save_path) / str(file.split('.')[0] + '.png')))
+        except Exception as e:
+            print(e)
+            print("passed", file)
 
 if __name__ == "__main__":
     # Default paths:
@@ -147,6 +143,10 @@ if __name__ == "__main__":
     parser.add_argument('-r', '--resdir', help='Path to desired result directory', default=results_folder)
     parser.add_argument('-n', '--normalize', dest='norm', action='store_const', const=True, 
                         default=False, help='whether or not to normalize the tensors')
+    parser.add_argument('-c', '--reconstruct', dest='recon', action='store_const', const=True, 
+                        default=False, help='whether or not to perform reconstruction')
+    parser.add_argument('-s', '--savefigs', dest='save', action='store_const', const=True, 
+                        default=False, help='whether or not to save pianoroll images')
     parser.add_argument('-b', '--batchlength', help='Length of midi object', default=256)
     args = vars(parser.parse_args())
 
@@ -154,6 +154,8 @@ if __name__ == "__main__":
     tensor_dir = args['tensordir']
     model_name = args['modeldir']
     resdir = args['resdir']
+    save_figs = args['save']
+    reconstruct = args['recon']
 
     #fstub = args['resname']
     #issparse = args['sparse']
@@ -161,14 +163,16 @@ if __name__ == "__main__":
     batchlength = int(args['batchlength'])
 
     print("Start")
-    '''
-    reconstruct_songs(tensor_dir, resdir, resdir, model_name, clip_val=0, batchlength=batchlength)
+    
+    if reconstruct:
+        reconstruct_songs(tensor_dir, resdir, resdir, model_name, clip_val=0, batchlength=batchlength)
     #"Save graphs"
-    save_graphs(resdir, resdir)'''
+    if save_figs:
+        save_midi_graphs(resdir, resdir)
 
-    model_path = Path('../models/new_rep/model_FINAL-2022-07-01-0.pt')
+    #model_path = Path('../models/new_rep/model_FINAL-2022-07-01-0.pt')
 
-    training_set_tensors = Path('../new_recon_tensors/train_set_tensors')
+    '''training_set_tensors = Path('../new_recon_tensors/train_set_tensors')
     testing_set_tensors = Path('../new_recon_tensors/test_set_tensors')
 
     training_set_midis = Path('../new_recon_tensors/train_set_midis_wavs')
@@ -178,9 +182,8 @@ if __name__ == "__main__":
     testing_recons = Path('../new_recon_tensors/test_recons')
     
     training_recon_midis = Path('../new_recon_tensors/train_recon_midis')
-    testing_recon_midis = Path('../new_recon_tensors/test_recon_midis')
+    testing_recon_midis = Path('../new_recon_tensors/test_recon_midis')'''
 
-    print("Entering Reconstruction")
     #reconstruct_songs(training_set_tensors, training_recons, training_recon_midis, model_path, clip_val=0, norm=False, batchlength=256, num_embed=1024)
 
     #tensors_to_midis_2(training_set_tensors, training_set_midis)
@@ -189,6 +192,4 @@ if __name__ == "__main__":
     #print("TRAINING")
     #save_graphs(training_set_midis, training_set_midis)
     #print("TESTING")
-    save_graphs(training_recon_midis, training_recon_midis)
-
     # python3 listen_to_model_output.py -t "/projectnb/textconv/sadiela/midi_generation/recon_tensors/" -m "/projectnb/textconv/sadiela/midi_generation/models/new_rep/model_FINAL-2022-07-01-0.pt" -r "/projectnb/textconv/sadiela/midi_generation/models/new_rep/final_recons" -b 256

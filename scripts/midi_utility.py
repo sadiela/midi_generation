@@ -25,7 +25,7 @@ from glob import glob
 from pathlib import Path
 import pickle
 import matplotlib.pyplot as plt
-#import pypianoroll
+import pypianoroll
 #from midi2audio import FluidSynth
 import re
 
@@ -75,72 +75,9 @@ key_number_to_name= {
     11:"B",
 }
 
-'''def play_music(midi_filename):
-    pygame.mixer.init(freq, bitsize, channels, buffer)
-    pygame.mixer.music.set_volume(0.8) # optional volume 0 to 1.0
-    # plays an entire midi file
-    try:
-        # use the midi file you just saved
-        #Stream music_file in a blocking manner
-        clock = pygame.time.Clock()
-        pygame.mixer.music.load(midi_filename)
-        pygame.mixer.music.play()
-        while pygame.mixer.music.get_busy():
-            clock.tick(30) # check if playback has finished
-    except KeyboardInterrupt:
-        # if user hits Ctrl/C then exit
-        # (works only in console mode)
-        pygame.mixer.music.fadeout(1000)
-        pygame.mixer.music.stop()
-        raise SystemExit
-
-def play_x_seconds(midi_filename, x=10, savefile=False):
-    # play the first x seconds of a midi
-    # starts at the time where the first notes starts
-    temp_filename = "TEMP_MIDI.MID"
-    # create temporary file and "crop"
-    crop_midi(midi_filename, temp_filename, cut_beginning=True, maxlength=x)
-    play_music(temp_filename)
-    #load midi 
-    if savefile: 
-        print("need to save")
-    else: 
-        print("delete file when done")
-        os.remove(temp_filename)
-    # delete temp file
-
-
-# convert a MIDI file to a wav file
-def midi_to_wav(midi_path,wav_path):
-        print("CONVERTING")
-        # using the default sound font in 44100 Hz sample rate
-        fs = FluidSynth()
-        fs.midi_to_audio(midi_path, wav_path)
-
-
-
-
-def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
-    # GENERATE A RANDOM MIDI AND SAVE TO A FILE
-    # filepath = location to save new file
-    # num_notes = length in notes
-
-    # for now will always write in the key of c, in one octave
-    # notes can range from 16th to whole notes
-    # notes will not play simultaneously
-    # tempo given in bpm
-    # assumes 4/4 time 
-    # subdivision = =-2 means
-        cur_note_length = note_lengths[random.randint(0, len(note_lengths)-1)]
-        new_note = pretty_midi.Note(velocity=100, pitch=(cur_pitch), start=last_endtime, end=(last_endtime+cur_note_length))
-        piano.notes.append(new_note)
-    	last_endtime += cur_note_length
-
-    new_mid.instruments.append(piano)
-
-    # save to .mid file 
-    new_mid.write(filepath)
-'''
+###############################
+# OLD PREPROCESSING FUNCTIONS #
+###############################
 
 #### DON'T THINK THIS IS BEING USED ANYMORE...###
 def change_tempo(filepath, newfilepath,  maxlength=720, smallest_subdivision=64, target_tempo=120, previous_tempo=None): # default maxlength is 3 minutes 
@@ -178,10 +115,6 @@ def change_tempo(filepath, newfilepath,  maxlength=720, smallest_subdivision=64,
     # save to .mid file 
     new_midi.write(newfilepath)
 
-####################################
-# FUNCTIONS FOR DATA PREPROCESSING #
-####################################
-
 def normalize_tensors(orig_tensors, new_dir, subdiv=32, maxnotelength=16):
     maxlength=maxnotelength*subdiv
     file_list = os.listdir(orig_tensors)
@@ -192,113 +125,6 @@ def normalize_tensors(orig_tensors, new_dir, subdiv=32, maxnotelength=16):
             print(cur_tensor.size, np.count_nonzero(cur_tensor)) #, np.count_nonzero(cur_tensor_normed))
         else:
             np.save(new_dir + file.split('.')[0] + '_norm' + '.npy', cur_tensor_normed)
-
-
-def midis_to_tensors(midi_dirpath, tensor_dirpath, subdiv=32, maxnotelength=16, normalize=False):
-    maxlength=maxnotelength*subdiv
-    file_list = os.listdir(midi_dirpath)
-    for file in tqdm(file_list):
-        cur_tensor = midi_to_tensor(midi_dirpath / file, subdiv=subdiv, maxnotelength=maxnotelength)
-        if cur_tensor is not None: 
-            if not normalize: 
-                np.save(tensor_dirpath / str(file.split('.')[0] + '.npy'), cur_tensor)
-            else: 
-                cur_tensor_normed = cur_tensor/maxlength
-                if np.count_nonzero == 0: 
-                    print(cur_tensor.size, np.count_nonzero(cur_tensor)) #, np.count_nonzero(cur_tensor_normed))
-                else:
-                    np.save(tensor_dirpath / str(file.split('.')[0] + '.npy'), cur_tensor_normed)
-        else:
-            "error in conversion to tensor"
-
-def midis_to_tensors_2(midi_dirpath, tensor_dirpath, subdiv=64, maxnotelength=256, normalize=False):
-    maxlength=maxnotelength*subdiv
-    file_list = os.listdir(midi_dirpath)
-    for file in tqdm(file_list):
-        if not os.path.exists(tensor_dirpath / str(file.split('.')[0] + '.p')):
-            cur_tensor = midi_to_tensor_2(midi_dirpath / file, subdiv=subdiv, maxnotelength=maxnotelength)
-            if cur_tensor is not None: 
-                if not normalize: 
-                    sparse_arr = sparse.csr_matrix(cur_tensor) # save sparse!!!
-                    with open(tensor_dirpath / str(file.split('.')[0] + '.p'), 'wb') as outfile:
-                        pickle.dump(sparse_arr, outfile)
-                else: 
-                    cur_tensor_normed = cur_tensor/maxlength
-                    if np.count_nonzero == 0: 
-                        print(cur_tensor.size, np.count_nonzero(cur_tensor)) #, np.count_nonzero(cur_tensor_normed))
-                    else:
-                        np.save(tensor_dirpath / str(file.split('.')[0] + '.npy'), cur_tensor_normed)
-            else:
-                "error in conversion to tensor"
-        #else:
-        #    print("Already converted", file)
-
-def midi_to_tensor(filepath, subdiv=32, maxnotelength=16): # default maxlength is 3 minutes 
-    # maxnotelength given in BEATS
-    # ASSUMES:
-    #   - 1 track
-    #   - constant note velocity (100)
-    #   - smallest note subdivision = 32nd note (0.250 seconds)
-    #   - no tempo change
-    # returns a 128 x maxlength x 1 tensor representing the midi that was input
-    midi_data = pretty_midi.PrettyMIDI(str(filepath))
-    tempo_changes = midi_data.get_tempo_changes() #, midi_data.estimate_tempi())
-    if len(tempo_changes[1]) > 1:
-        print("TEMPO CHANGES!") # might want to skip file in this situation
-    bpm = midi_data.get_tempo_changes()[1][0] #midi_data.estimate_tempo() # in bpm
-    bps = bpm/60
-    length = midi_data.get_end_time() # in seconds
-    tensor_length = (length/60)*bpm*subdiv # # of minutes * beats p minute * beat subdivision
-    #print(bpm, bps, length, int(tensor_length))
-    tensor = np.zeros((128,int(tensor_length),1))
-    if len(midi_data.instruments) > 1:
-        print("TOO MANY TRACKS! EMPTY TENSOR RETURNED")
-    else:
-        try: 
-            for instrument in midi_data.instruments:
-                for note in instrument.notes:
-                    note_start = note.start * bps * subdiv
-                    # max note length? 
-                    note_length = (note.end - note.start) * bps * subdiv
-                    #print(note.start, (note.end-note.start), note_start, note_length, round(note_start), round(note_length))
-                    tensor[note.pitch,int(note_start),0] = int(min(note_length, subdiv*maxnotelength))
-        except Exception as e:
-            print("ERROR!", e)
-            return None
-    return np.squeeze(tensor, axis=2)
-
-
-def tensors_to_midis(tensor_dir, midi_dir, bpm=120, subdiv=32): 
-    # takes a directory of tensors and converts them to midis
-    file_list = os.listdir(tensor_dir)
-    for file in tqdm(file_list):
-        cur_tensor = np.load(tensor_dir + '\\' + file)
-        tensor_to_midi(cur_tensor, midi_dir + '\\' + file.split('.')[0] + '.mid')
-        
-
-def tensor_to_midi(tensor, desired_filepath, bpm=120, subdiv=32):
-    # Converts midi tensor back into midi file format
-    # ASSUMES:
-    #   - 1 track
-    #   - constant note velocity (100)
-    #   - tempo = 120bpm
-    #   - smallest note subdivision = eighth note (0.250 seconds)
-    #   - writes everything as piano 
-    # Create new midi object
-    spb = 60/bpm # seconds per beat
-    new_mid = pretty_midi.PrettyMIDI() # type=0
-    # create a track and add it to the midi
-    piano = pretty_midi.Instrument(program=1)
-    for time in range(tensor.shape[1]):
-        for pitch in range(tensor.shape[0]):
-            if tensor[pitch,time] != 0:
-                # ADD CUTOFF FOR SHORT NOTES? 
-                new_note = pretty_midi.Note(velocity=100, pitch=(pitch), start=(time * (spb/subdiv)), end=((time * (spb/subdiv))+(tensor[pitch,time] * (spb/subdiv))))
-                piano.notes.append(new_note)
-    new_mid.instruments.append(piano)
-
-    # save to .mid file 
-    new_mid.write(str(desired_filepath))
 
 def separate_tracks(midi_directory, target_directory):
     # takes a directory filled with midi files, creates new midi files for each individual (NOT DRUM) track
@@ -359,10 +185,24 @@ def crop_midi(filename, newfilename, cut_beginning=True, maxlength=None):
     except Exception as e: 
         print("Error", e)
         pass
-        new_midi.write(str(newfilename))
-    except Exception as e: 
-        print("Error", e)
-        pass
+
+def convert_to_sparse(tensor_dir, sparse_dir, del_tensor_dir=False):
+    file_list = os.listdir(tensor_dir)
+    for f in tqdm(file_list): 
+        cur_arr = np.load(tensor_dir / f)
+        new_f = f.split('.')[0] + '.p'
+        sparse_arr = sparse.csr_matrix(cur_arr)
+        with open(sparse_dir / new_f, 'wb') as outfile:
+                pickle.dump(sparse_arr, outfile)
+    # Delete tensor_dir to save space
+    if del_tensor_dir: 
+        for f in os.listdir(tensor_dir):
+            os.remove(os.path.join(tensor_dir, f))
+    print("DONE!")
+
+####################################
+# FUNCTIONS FOR DATA PREPROCESSING #
+####################################
 
 def sep_and_crop(midi_directory, target_directory):
 # takes a directory filled with midi files, creates new midi files for each individual (NOT DRUM) track
@@ -391,52 +231,18 @@ def sep_and_crop(midi_directory, target_directory):
             print("ERROR!", e)
             pass
 
-def convert_to_sparse(tensor_dir, sparse_dir, del_tensor_dir=False):
-    file_list = os.listdir(tensor_dir)
-    for f in tqdm(file_list): 
-        cur_arr = np.load(tensor_dir / f)
-        new_f = f.split('.')[0] + '.p'
-        sparse_arr = sparse.csr_matrix(cur_arr)
-        with open(sparse_dir / new_f, 'wb') as outfile:
-                pickle.dump(sparse_arr, outfile)
-    # Delete tensor_dir to save space
-    if del_tensor_dir: 
-        for f in os.listdir(tensor_dir):
-            os.remove(os.path.join(tensor_dir, f))
-    print("DONE!")
-
-
-def change_midi_key(old_midi_path, new_midi_path):
-    if not Path(new_midi_path).is_file():    
-        try: 
-            open_midi = pretty_midi.PrettyMIDI(old_midi_path)
-            total_velocity = sum(sum(open_midi.get_chroma())) # collapses pianoroll accross octaves
-
-            semitone_velocities = np.array([sum(semitone)/total_velocity for semitone in open_midi.get_chroma()]) # assuming C is 0?
-
-            ind = np.argpartition(semitone_velocities, -7)[-7:]
-
-            key=0
-            for i in range(12):
-                if set(keys_to_notes[i]) == set(ind):
-                    #print("KEY:", key_number_to_name[i], i)
-                    key = i
-                    break
-
-            # shift piece into the key of c
-            if key != 0:
-                for i, instrument in enumerate(open_midi.instruments): 
-                        if not instrument.is_drum:
-                            for note in instrument.notes:
-                                note.pitch -= key
-
-            # check if file exists
-            open_midi.write(new_midi_path)
-        except Exception as e:
-            print("ERROR!", e, str(old_midi_path))
-    else:
-        print("FILE EXISTS:", new_midi_path)
-
+def midis_to_tensors_2(midi_dirpath, tensor_dirpath, subdiv=64, maxnotelength=256, normalize=False):
+    maxlength=maxnotelength*subdiv
+    file_list = os.listdir(midi_dirpath)
+    for file in tqdm(file_list):
+        if not os.path.exists(tensor_dirpath / str(file.split('.')[0] + '.p')):
+            cur_tensor = midi_to_tensor_2(midi_dirpath / file, subdiv=subdiv, maxnotelength=maxnotelength)
+            if cur_tensor is not None: 
+                sparse_arr = sparse.csr_matrix(cur_tensor) # save sparse!!!
+                with open(tensor_dirpath / str(file.split('.')[0] + '.p'), 'wb') as outfile:
+                    pickle.dump(sparse_arr, outfile)
+            else:
+                "error in conversion to tensor"
 
 ### CODE FOR NEW MIDI REPRESENTATION ###
 def midi_to_tensor_2(filepath, subdiv=64, maxnotelength=256): # default maxlength is 3 minutes 
@@ -461,14 +267,13 @@ def midi_to_tensor_2(filepath, subdiv=64, maxnotelength=256): # default maxlengt
         if len(midi_data.instruments) > 1:
             print("TOO MANY TRACKS! EMPTY TENSOR RETURNED")
         else:
-
-                for instrument in midi_data.instruments:
-                    for note in instrument.notes:
-                        note_start = note.start * bps * subdiv
-                        note_end = note.end * bps * subdiv
-                        note_length = note_end - note_start
-                        #print(note_start, note_end, note_length)
-                        tensor[note.pitch, int(note_start):int(note_start+note_length-1),0]=1
+            for instrument in midi_data.instruments:
+                for note in instrument.notes:
+                    note_start = note.start * bps * subdiv
+                    note_end = note.end * bps * subdiv
+                    note_length = note_end - note_start
+                    #print(note_start, note_end, note_length)
+                    tensor[note.pitch, int(note_start):int(note_start+note_length-1),0]=1
     except Exception as e:
         print("ERROR!", e)
         return None
@@ -484,7 +289,7 @@ def tensors_to_midis_2(tensor_dir, midi_dir, bpm=120, subdiv=64):
         cur_tensor = pickled_tensor.toarray()
         tensor_to_midi_2(cur_tensor, str(midi_dir /  str(file.split('.')[0] + '.mid')), str(midi_dir / str(file.split('.')[0] + '.wav')))
         
-def tensor_to_midi_2(tensor, desired_filepath, wav_filepath, bpm=120, subdiv=64, pitchlength_cutoff=0.2):
+def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64, pitchlength_cutoff=0.2):
     # Converts midi tensor back into midi file format
     # ASSUMES:
     #   - 1 track
@@ -524,8 +329,6 @@ def tensor_to_midi_2(tensor, desired_filepath, wav_filepath, bpm=120, subdiv=64,
     # save to .mid file 
     new_mid.write(str(desired_filepath))
 
-    #midi_to_wav(str(desired_filepath), str(wav_filepath))
-
 def change_keys_and_names(orig_midi_dir, new_midi_dir):
     all_dirs = os.listdir(orig_midi_dir)
     for d in tqdm(all_dirs): 
@@ -533,6 +336,37 @@ def change_keys_and_names(orig_midi_dir, new_midi_dir):
         for f in files: 
             new_midi_name = re.sub(r'[^\w\s]', '', d + '__' + f[:-4]).replace(" ", "_") + ".mid"
             change_midi_key(str(orig_midi_dir / d / f), str(new_midi_dir / new_midi_name))
+
+def change_midi_key(old_midi_path, new_midi_path):
+    if not Path(new_midi_path).is_file():    
+        try: 
+            open_midi = pretty_midi.PrettyMIDI(old_midi_path)
+            total_velocity = sum(sum(open_midi.get_chroma())) # collapses pianoroll accross octaves
+
+            semitone_velocities = np.array([sum(semitone)/total_velocity for semitone in open_midi.get_chroma()]) # assuming C is 0?
+
+            ind = np.argpartition(semitone_velocities, -7)[-7:]
+
+            key=0
+            for i in range(12):
+                if set(keys_to_notes[i]) == set(ind):
+                    #print("KEY:", key_number_to_name[i], i)
+                    key = i
+                    break
+
+            # shift piece into the key of c
+            if key != 0:
+                for i, instrument in enumerate(open_midi.instruments): 
+                        if not instrument.is_drum:
+                            for note in instrument.notes:
+                                note.pitch -= key
+
+            # check if file exists
+            open_midi.write(new_midi_path)
+        except Exception as e:
+            print("ERROR!", e, str(old_midi_path))
+    else:
+        print("FILE EXISTS:", new_midi_path)
 
 def show_graph(midi_path):
     recon = pypianoroll.read(midi_path)

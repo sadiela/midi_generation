@@ -28,28 +28,21 @@ def preprocess(rawdir, procdir):
     
     # create new directories
     try: 
-        os.mkdir(procdir / 'separated') # Do I need another / after to make clear its a directory? probably not 
         os.mkdir(procdir / 'cropped')
-        os.mkdir(procdir / 'tensor')
         os.mkdir(procdir / 'sparse')
     except FileExistsError:
         print("Already done!")
         pass
 
-    sep = procdir / 'separated'
     crop = procdir / 'cropped'
-    tens = procdir / 'tensor'
     sparse = procdir / 'sparse'
    
     print("START2")
-    separate_tracks(rawdir, sep)
-    crop_midis(sep, crop)
-    midis_to_tensors(crop, tens, subdiv=32, maxnotelength=256, normalize=False)
-    convert_to_sparse(tens, sparse, del_tensor_dir=True)
+    #separate_tracks(rawdir, sep)
+    #crop_midis(sep, crop)
+    sep_and_crop(rawdir, crop)
+    midis_to_tensors_2(crop, sparse, subdiv=32, maxnotelength=256, normalize=False)
     # empty other dirs
-
-    for f in os.listdir(sep):
-            os.remove(os.path.join(sep, f))
 
     for f in os.listdir(crop):
             os.remove(os.path.join(crop, f))

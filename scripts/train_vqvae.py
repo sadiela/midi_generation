@@ -76,6 +76,7 @@ def train(datapath, modelpath, fstub, loss, lr=1e-3, batchsize=10, batchlength=2
     logging.info("SAVING FILE TO: %s", savefile)
     with open(savefile, 'w') as outfile:
         yaml.dump(results, outfile, default_flow_style=False)
+    save_result_graph(savefile, model_path)
     return final_model_name, savefile
 
 if __name__ == "__main__":
