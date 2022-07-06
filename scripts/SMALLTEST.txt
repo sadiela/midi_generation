@@ -1,0 +1,1518 @@
+START
+file exists
+file exists
+file exists
+file exists
+file exists
+file exists
+file exists
+no file
+Chosen hyperparameters:
+Loss function: mse
+Data directory: ../data/small_test 
+Model directory: ../models 
+Output directory: ../results
+File stub: small_test
+Sparse: True 
+Normalize: False 
+Quantize: True
+Batch size:%s
+Batch length:%s
+ 10 256
+Embedding dimension: 128 
+Number of embeddings: 1024
+Lambda: 1
+Learning Rate: 0.001
+DEVICE: cuda
+no file
+0it [00:00, ?it/s]1it [00:03,  3.10s/it]2it [00:04,  2.22s/it]3it [00:06,  1.92s/it]4it [00:07,  1.58s/it]5it [00:08,  1.46s/it]6it [00:09,  1.30s/it]7it [00:11,  1.43s/it]8it [00:12,  1.37s/it]9it [00:14,  1.44s/it]10it [00:16,  1.61s/it]11it [00:17,  1.52s/it]12it [00:19,  1.59s/it]13it [00:20,  1.47s/it]14it [00:21,  1.36s/it]15it [00:22,  1.34s/it]16it [00:24,  1.31s/it]17it [00:25,  1.22s/it]18it [00:26,  1.33s/it]19it [00:28,  1.37s/it]20it [00:29,  1.30s/it]21it [00:30,  1.30s/it]22it [00:31,  1.23s/it]23it [00:33,  1.46s/it]24it [00:35,  1.48s/it]25it [00:36,  1.46s/it]26it [00:38,  1.56s/it]27it [00:39,  1.49s/it]28it [00:40,  1.36s/it]29it [00:42,  1.47s/it]30it [00:44,  1.52s/it]31it [00:45,  1.51s/it]32it [00:46,  1.49s/it]33it [00:48,  1.59s/it]34it [00:50,  1.53s/it]35it [00:51,  1.49s/it]36it [00:52,  1.23s/it]37it [00:53,  1.28s/it]38it [00:55,  1.43s/it]39it [00:56,  1.30s/it]40it [00:57,  1.28s/it]41it [00:59,  1.32s/it]42it [01:00,  1.45s/it]43it [01:02,  1.56s/it]44it [01:04,  1.58s/it]45it [01:05,  1.47s/it]46it [01:06,  1.45s/it]47it [01:07,  1.30s/it]48it [01:09,  1.32s/it]49it [01:10,  1.34s/it]50it [01:11,  1.30s/it]51it [01:13,  1.38s/it]52it [01:14,  1.33s/it]53it [01:15,  1.30s/it]54it [01:17,  1.31s/it]55it [01:18,  1.41s/it]56it [01:20,  1.45s/it]57it [01:22,  1.53s/it]58it [01:23,  1.46s/it]59it [01:24,  1.45s/it]60it [01:26,  1.45s/it]61it [01:27,  1.36s/it]62it [01:28,  1.20s/it]63it [01:30,  1.42s/it]64it [01:31,  1.46s/it]65it [01:32,  1.35s/it]66it [01:34,  1.50s/it]67it [01:36,  1.53s/it]68it [01:37,  1.37s/it]69it [01:38,  1.43s/it]70it [01:39,  1.36s/it]71it [01:41,  1.42s/it]72it [01:42,  1.36s/it]73it [01:44,  1.54s/it]74it [01:45,  1.40s/it]75it [01:47,  1.44s/it]76it [01:48,  1.47s/it]77it [01:50,  1.41s/it]78it [01:51,  1.34s/it]79it [01:52,  1.44s/it]80it [01:54,  1.53s/it]81it [01:56,  1.51s/it]82it [01:57,  1.52s/it]83it [01:58,  1.42s/it]84it [02:00,  1.44s/it]85it [02:01,  1.39s/it]86it [02:03,  1.51s/it]87it [02:05,  1.58s/it]88it [02:06,  1.63s/it]89it [02:08,  1.55s/it]90it [02:09,  1.53s/it]91it [02:11,  1.67s/it]92it [02:13,  1.59s/it]93it [02:14,  1.61s/it]94it [02:16,  1.62s/it]95it [02:18,  1.68s/it]96it [02:19,  1.60s/it]97it [02:21,  1.56s/it]98it [02:22,  1.60s/it]99it [02:24,  1.64s/it]100it [02:25,  1.51s/it]101it [02:27,  1.45s/it]102it [02:28,  1.34s/it]103it [02:29,  1.29s/it]104it [02:30,  1.28s/it]105it [02:31,  1.26s/it]106it [02:33,  1.39s/it]107it [02:34,  1.33s/it]108it [02:36,  1.35s/it]109it [02:37,  1.34s/it]110it [02:38,  1.26s/it]111it [02:40,  1.45s/it]112it [02:42,  1.54s/it]113it [02:43,  1.61s/it]114it [02:45,  1.57s/it]115it [02:46,  1.49s/it]116it [02:48,  1.45s/it]117it [02:49,  1.37s/it]118it [02:50,  1.24s/it]119it [02:51,  1.31s/it]120it [02:53,  1.33s/it]121it [02:54,  1.33s/it]122it [02:55,  1.27s/it]123it [02:57,  1.39s/it]124it [02:58,  1.36s/it]125it [02:59,  1.31s/it]126it [03:01,  1.35s/it]127it [03:02,  1.44s/it]128it [03:04,  1.42s/it]129it [03:05,  1.43s/it]130it [03:07,  1.46s/it]131it [03:08,  1.37s/it]132it [03:10,  1.50s/it]133it [03:11,  1.47s/it]134it [03:12,  1.38s/it]135it [03:14,  1.50s/it]136it [03:16,  1.56s/it]137it [03:17,  1.51s/it]138it [03:19,  1.61s/it]139it [03:21,  1.71s/it]140it [03:22,  1.70s/it]141it [03:23,  1.44s/it]142it [03:25,  1.42s/it]143it [03:26,  1.46s/it]144it [03:28,  1.54s/it]145it [03:29,  1.52s/it]146it [03:31,  1.50s/it]147it [03:32,  1.44s/it]148it [03:33,  1.36s/it]149it [03:35,  1.41s/it]150it [03:37,  1.48s/it]151it [03:38,  1.50s/it]152it [03:40,  1.63s/it]153it [03:41,  1.46s/it]154it [03:43,  1.56s/it]155it [03:44,  1.52s/it]156it [03:46,  1.53s/it]157it [03:47,  1.46s/it]158it [03:48,  1.39s/it]159it [03:50,  1.37s/it]160it [03:51,  1.40s/it]161it [03:53,  1.40s/it]162it [03:54,  1.44s/it]163it [03:56,  1.51s/it]164it [03:58,  1.63s/it]165it [03:59,  1.50s/it]166it [04:00,  1.37s/it]167it [04:02,  1.48s/it]168it [04:03,  1.42s/it]169it [04:04,  1.39s/it]170it [04:06,  1.39s/it]171it [04:07,  1.33s/it]172it [04:08,  1.42s/it]173it [04:10,  1.39s/it]174it [04:11,  1.48s/it]175it [04:13,  1.37s/it]176it [04:14,  1.50s/it]177it [04:16,  1.49s/it]178it [04:17,  1.52s/it]179it [04:19,  1.55s/it]180it [04:20,  1.48s/it]181it [04:22,  1.55s/it]182it [04:23,  1.44s/it]183it [04:25,  1.47s/it]184it [04:26,  1.41s/it]185it [04:28,  1.41s/it]186it [04:29,  1.36s/it]187it [04:30,  1.33s/it]188it [04:31,  1.36s/it]189it [04:33,  1.36s/it]190it [04:34,  1.38s/it]191it [04:36,  1.36s/it]192it [04:37,  1.32s/it]193it [04:38,  1.42s/it]194it [04:40,  1.43s/it]195it [04:41,  1.46s/it]196it [04:43,  1.48s/it]197it [04:45,  1.57s/it]198it [04:46,  1.56s/it]199it [04:47,  1.42s/it]200it [04:49,  1.46s/it]201it [04:51,  1.62s/it]202it [04:52,  1.60s/it]203it [04:54,  1.61s/it]204it [04:55,  1.51s/it]205it [04:57,  1.48s/it]206it [04:58,  1.48s/it]207it [05:00,  1.51s/it]208it [05:01,  1.54s/it]209it [05:03,  1.60s/it]210it [05:05,  1.58s/it]211it [05:06,  1.41s/it]212it [05:07,  1.36s/it]213it [05:08,  1.28s/it]214it [05:10,  1.34s/it]215it [05:11,  1.51s/it]216it [05:13,  1.52s/it]217it [05:14,  1.49s/it]218it [05:16,  1.52s/it]219it [05:17,  1.44s/it]220it [05:19,  1.42s/it]221it [05:20,  1.43s/it]222it [05:22,  1.52s/it]223it [05:23,  1.49s/it]224it [05:24,  1.43s/it]225it [05:26,  1.37s/it]226it [05:27,  1.38s/it]227it [05:29,  1.45s/it]228it [05:30,  1.48s/it]229it [05:31,  1.28s/it]230it [05:32,  1.20s/it]231it [05:33,  1.24s/it]232it [05:35,  1.32s/it]233it [05:36,  1.32s/it]234it [05:37,  1.23s/it]235it [05:39,  1.31s/it]236it [05:41,  1.45s/it]237it [05:42,  1.41s/it]238it [05:43,  1.46s/it]239it [05:45,  1.57s/it]240it [05:46,  1.44s/it]241it [05:48,  1.51s/it]242it [05:49,  1.42s/it]243it [05:51,  1.56s/it]244it [05:53,  1.58s/it]245it [05:55,  1.65s/it]246it [05:56,  1.66s/it]247it [05:58,  1.52s/it]248it [05:59,  1.59s/it]249it [06:01,  1.53s/it]250it [06:03,  1.63s/it]251it [06:04,  1.58s/it]252it [06:05,  1.47s/it]253it [06:07,  1.54s/it]254it [06:08,  1.52s/it]255it [06:10,  1.46s/it]256it [06:11,  1.54s/it]257it [06:12,  1.37s/it]258it [06:14,  1.30s/it]259it [06:15,  1.27s/it]260it [06:16,  1.29s/it]261it [06:18,  1.35s/it]262it [06:19,  1.45s/it]263it [06:20,  1.34s/it]264it [06:22,  1.40s/it]265it [06:23,  1.40s/it]266it [06:25,  1.45s/it]267it [06:26,  1.41s/it]268it [06:28,  1.38s/it]269it [06:29,  1.46s/it]270it [06:31,  1.44s/it]271it [06:32,  1.37s/it]272it [06:33,  1.29s/it]273it [06:34,  1.23s/it]274it [06:36,  1.34s/it]275it [06:37,  1.26s/it]276it [06:38,  1.20s/it]277it [06:39,  1.30s/it]278it [06:41,  1.32s/it]279it [06:42,  1.24s/it]280it [06:43,  1.23s/it]281it [06:44,  1.35s/it]282it [06:46,  1.31s/it]283it [06:47,  1.34s/it]284it [06:49,  1.40s/it]285it [06:50,  1.34s/it]286it [06:51,  1.44s/it]287it [06:53,  1.58s/it]288it [06:55,  1.50s/it]289it [06:56,  1.53s/it]290it [06:58,  1.46s/it]291it [06:59,  1.48s/it]292it [07:00,  1.42s/it]293it [07:02,  1.47s/it]294it [07:03,  1.42s/it]295it [07:05,  1.44s/it]296it [07:06,  1.33s/it]297it [07:08,  1.48s/it]298it [07:09,  1.40s/it]299it [07:10,  1.34s/it]300it [07:12,  1.43s/it]301it [07:13,  1.36s/it]302it [07:14,  1.24s/it]303it [07:15,  1.21s/it]304it [07:17,  1.29s/it]305it [07:18,  1.41s/it]306it [07:20,  1.56s/it]307it [07:22,  1.53s/it]308it [07:23,  1.45s/it]309it [07:24,  1.39s/it]310it [07:25,  1.35s/it]311it [07:27,  1.33s/it]312it [07:28,  1.41s/it]313it [07:30,  1.49s/it]314it [07:31,  1.39s/it]315it [07:33,  1.51s/it]316it [07:34,  1.52s/it]317it [07:36,  1.52s/it]318it [07:37,  1.44s/it]319it [07:38,  1.31s/it]320it [07:39,  1.24s/it]321it [07:40,  1.19s/it]322it [07:42,  1.34s/it]323it [07:43,  1.37s/it]324it [07:45,  1.37s/it]325it [07:46,  1.41s/it]326it [07:48,  1.50s/it]327it [07:50,  1.53s/it]328it [07:51,  1.50s/it]329it [07:53,  1.59s/it]330it [07:54,  1.48s/it]331it [07:56,  1.50s/it]332it [07:57,  1.52s/it]333it [07:59,  1.58s/it]334it [08:00,  1.41s/it]335it [08:02,  1.48s/it]336it [08:03,  1.38s/it]337it [08:04,  1.44s/it]338it [08:06,  1.45s/it]339it [08:08,  1.56s/it]340it [08:09,  1.46s/it]341it [08:10,  1.49s/it]342it [08:12,  1.45s/it]343it [08:13,  1.36s/it]344it [08:14,  1.30s/it]345it [08:16,  1.36s/it]346it [08:17,  1.38s/it]347it [08:18,  1.35s/it]348it [08:20,  1.33s/it]349it [08:21,  1.32s/it]350it [08:22,  1.31s/it]351it [08:24,  1.39s/it]352it [08:25,  1.41s/it]353it [08:27,  1.39s/it]354it [08:28,  1.50s/it]355it [08:30,  1.44s/it]356it [08:31,  1.45s/it]357it [08:33,  1.52s/it]358it [08:34,  1.35s/it]359it [08:35,  1.44s/it]360it [08:37,  1.42s/it]361it [08:38,  1.49s/it]362it [08:40,  1.44s/it]363it [08:41,  1.44s/it]364it [08:42,  1.39s/it]365it [08:44,  1.45s/it]366it [08:46,  1.51s/it]367it [08:46,  1.22s/it]367it [08:46,  1.44s/it]TRAIN: torch.Size([347, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([347, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([347, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([347, 155, 128])
+TRAIN: torch.Size([469, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([469, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([469, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([469, 155, 128])
+TRAIN: torch.Size([454, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([454, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([454, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([454, 155, 128])
+TRAIN: torch.Size([311, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([311, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([311, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([311, 155, 128])
+TRAIN: torch.Size([363, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([363, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([363, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([363, 155, 128])
+TRAIN: torch.Size([292, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([292, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([292, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([292, 155, 128])
+TRAIN: torch.Size([495, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([495, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([495, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([495, 155, 128])
+TRAIN: torch.Size([359, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([359, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([359, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([359, 155, 128])
+TRAIN: torch.Size([466, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([466, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([466, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([466, 155, 128])
+TRAIN: torch.Size([586, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([586, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([586, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([586, 155, 128])
+TRAIN: torch.Size([375, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([375, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([375, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([375, 155, 128])
+TRAIN: torch.Size([513, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([513, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([513, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([513, 155, 128])
+TRAIN: torch.Size([352, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([352, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([352, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([352, 155, 128])
+TRAIN: torch.Size([326, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([326, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([326, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([326, 155, 128])
+TRAIN: torch.Size([376, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([376, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([376, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([376, 155, 128])
+TRAIN: torch.Size([360, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([360, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([360, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([360, 155, 128])
+TRAIN: torch.Size([297, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([297, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([297, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([297, 155, 128])
+TRAIN: torch.Size([461, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([461, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([461, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([461, 155, 128])
+TRAIN: torch.Size([422, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([422, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([422, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([422, 155, 128])
+TRAIN: torch.Size([333, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([333, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([333, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([333, 155, 128])
+TRAIN: torch.Size([380, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([380, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([380, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([380, 155, 128])
+TRAIN: torch.Size([309, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([309, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([309, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([309, 155, 128])
+TRAIN: torch.Size([586, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([586, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([586, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([586, 155, 128])
+TRAIN: torch.Size([448, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([448, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([448, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([448, 155, 128])
+TRAIN: torch.Size([406, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([406, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([406, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([406, 155, 128])
+TRAIN: torch.Size([522, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([522, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([522, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([522, 155, 128])
+TRAIN: torch.Size([386, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([386, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([386, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([386, 155, 128])
+TRAIN: torch.Size([313, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([313, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([313, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([313, 155, 128])
+TRAIN: torch.Size([496, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([496, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([496, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([496, 155, 128])
+TRAIN: torch.Size([477, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([477, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([477, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([477, 155, 128])
+TRAIN: torch.Size([431, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([431, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([431, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([431, 155, 128])
+TRAIN: torch.Size([414, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([414, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([414, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([414, 155, 128])
+TRAIN: torch.Size([534, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([534, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([534, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([534, 155, 128])
+TRAIN: torch.Size([398, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([398, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([398, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([398, 155, 128])
+TRAIN: torch.Size([404, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([404, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([404, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([404, 155, 128])
+TRAIN: torch.Size([181, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([181, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([181, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([181, 155, 128])
+TRAIN: torch.Size([405, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([405, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([405, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([405, 155, 128])
+TRAIN: torch.Size([520, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([520, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([520, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([520, 155, 128])
+TRAIN: torch.Size([282, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([282, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([282, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([282, 155, 128])
+TRAIN: torch.Size([368, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([368, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([368, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([368, 155, 128])
+TRAIN: torch.Size([403, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([403, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([403, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([403, 155, 128])
+TRAIN: torch.Size([512, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([512, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([512, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([512, 155, 128])
+TRAIN: torch.Size([528, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([528, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([528, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([528, 155, 128])
+TRAIN: torch.Size([477, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([477, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([477, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([477, 155, 128])
+TRAIN: torch.Size([350, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([350, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([350, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([350, 155, 128])
+TRAIN: torch.Size([406, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([406, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([406, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([406, 155, 128])
+TRAIN: torch.Size([278, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([278, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([278, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([278, 155, 128])
+TRAIN: torch.Size([396, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([396, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([396, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([396, 155, 128])
+TRAIN: torch.Size([393, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([393, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([393, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([393, 155, 128])
+TRAIN: torch.Size([358, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([358, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([358, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([358, 155, 128])
+TRAIN: torch.Size([447, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([447, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([447, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([447, 155, 128])
+TRAIN: torch.Size([359, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([359, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([359, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([359, 155, 128])
+TRAIN: torch.Size([357, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([357, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([357, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([357, 155, 128])
+TRAIN: torch.Size([392, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([392, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([392, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([392, 155, 128])
+TRAIN: torch.Size([472, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([472, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([472, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([472, 155, 128])
+TRAIN: torch.Size([454, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([454, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([454, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([454, 155, 128])
+TRAIN: torch.Size([493, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([493, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([493, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([493, 155, 128])
+TRAIN: torch.Size([387, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([387, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([387, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([387, 155, 128])
+TRAIN: torch.Size([404, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([404, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([404, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([404, 155, 128])
+TRAIN: torch.Size([424, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([424, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([424, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([424, 155, 128])
+TRAIN: torch.Size([332, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([332, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([332, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([332, 155, 128])
+TRAIN: torch.Size([241, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([241, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([241, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([241, 155, 128])
+TRAIN: torch.Size([565, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([565, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([565, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([565, 155, 128])
+TRAIN: torch.Size([451, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([451, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([451, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([451, 155, 128])
+TRAIN: torch.Size([316, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([316, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([316, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([316, 155, 128])
+TRAIN: torch.Size([539, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([539, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([539, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([539, 155, 128])
+TRAIN: torch.Size([458, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([458, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([458, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([458, 155, 128])
+TRAIN: torch.Size([297, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([297, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([297, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([297, 155, 128])
+TRAIN: torch.Size([446, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([446, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([446, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([446, 155, 128])
+TRAIN: torch.Size([348, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([348, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([348, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([348, 155, 128])
+TRAIN: torch.Size([456, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([456, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([456, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([456, 155, 128])
+TRAIN: torch.Size([359, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([359, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([359, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([359, 155, 128])
+TRAIN: torch.Size([566, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([566, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([566, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([566, 155, 128])
+TRAIN: torch.Size([319, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([319, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([319, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([319, 155, 128])
+TRAIN: torch.Size([437, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([437, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([437, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([437, 155, 128])
+TRAIN: torch.Size([445, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([445, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([445, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([445, 155, 128])
+TRAIN: torch.Size([367, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([367, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([367, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([367, 155, 128])
+TRAIN: torch.Size([351, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([351, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([351, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([351, 155, 128])
+TRAIN: torch.Size([481, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([481, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([481, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([481, 155, 128])
+TRAIN: torch.Size([505, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([505, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([505, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([505, 155, 128])
+TRAIN: torch.Size([420, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([420, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([420, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([420, 155, 128])
+TRAIN: torch.Size([449, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([449, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([449, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([449, 155, 128])
+TRAIN: torch.Size([341, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([341, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([341, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([341, 155, 128])
+TRAIN: torch.Size([433, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([433, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([433, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([433, 155, 128])
+TRAIN: torch.Size([370, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([370, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([370, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([370, 155, 128])
+TRAIN: torch.Size([527, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([527, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([527, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([527, 155, 128])
+TRAIN: torch.Size([504, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([504, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([504, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([504, 155, 128])
+TRAIN: torch.Size([514, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([514, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([514, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([514, 155, 128])
+TRAIN: torch.Size([391, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([391, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([391, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([391, 155, 128])
+TRAIN: torch.Size([434, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([434, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([434, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([434, 155, 128])
+TRAIN: torch.Size([578, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([578, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([578, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([578, 155, 128])
+TRAIN: torch.Size([412, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([412, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([412, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([412, 155, 128])
+TRAIN: torch.Size([478, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([478, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([478, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([478, 155, 128])
+TRAIN: torch.Size([473, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([473, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([473, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([473, 155, 128])
+TRAIN: torch.Size([525, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([525, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([525, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([525, 155, 128])
+TRAIN: torch.Size([411, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([411, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([411, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([411, 155, 128])
+TRAIN: torch.Size([423, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([423, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([423, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([423, 155, 128])
+TRAIN: torch.Size([488, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([488, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([488, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([488, 155, 128])
+TRAIN: torch.Size([500, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([500, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([500, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([500, 155, 128])
+TRAIN: torch.Size([353, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([353, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([353, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([353, 155, 128])
+TRAIN: torch.Size([383, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([383, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([383, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([383, 155, 128])
+TRAIN: torch.Size([320, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([320, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([320, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([320, 155, 128])
+TRAIN: torch.Size([335, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([335, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([335, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([335, 155, 128])
+TRAIN: torch.Size([375, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([375, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([375, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([375, 155, 128])
+TRAIN: torch.Size([355, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([355, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([355, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([355, 155, 128])
+TRAIN: torch.Size([491, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([491, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([491, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([491, 155, 128])
+TRAIN: torch.Size([348, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([348, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([348, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([348, 155, 128])
+TRAIN: torch.Size([403, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([403, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([403, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([403, 155, 128])
+TRAIN: torch.Size([381, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([381, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([381, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([381, 155, 128])
+TRAIN: torch.Size([314, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([314, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([314, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([314, 155, 128])
+TRAIN: torch.Size([550, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([550, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([550, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([550, 155, 128])
+TRAIN: torch.Size([514, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([514, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([514, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([514, 155, 128])
+TRAIN: torch.Size([511, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([511, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([511, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([511, 155, 128])
+TRAIN: torch.Size([436, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([436, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([436, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([436, 155, 128])
+TRAIN: torch.Size([379, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([379, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([379, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([379, 155, 128])
+TRAIN: torch.Size([394, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([394, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([394, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([394, 155, 128])
+TRAIN: torch.Size([344, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([344, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([344, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([344, 155, 128])
+TRAIN: torch.Size([271, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([271, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([271, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([271, 155, 128])
+TRAIN: torch.Size([423, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([423, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([423, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([423, 155, 128])
+TRAIN: torch.Size([404, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([404, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([404, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([404, 155, 128])
+TRAIN: torch.Size([381, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([381, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([381, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([381, 155, 128])
+TRAIN: torch.Size([336, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([336, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([336, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([336, 155, 128])
+TRAIN: torch.Size([483, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([483, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([483, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([483, 155, 128])
+TRAIN: torch.Size([380, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([380, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([380, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([380, 155, 128])
+TRAIN: torch.Size([345, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([345, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([345, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([345, 155, 128])
+TRAIN: torch.Size([420, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([420, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([420, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([420, 155, 128])
+TRAIN: torch.Size([477, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([477, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([477, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([477, 155, 128])
+TRAIN: torch.Size([400, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([400, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([400, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([400, 155, 128])
+TRAIN: torch.Size([418, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([418, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([418, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([418, 155, 128])
+TRAIN: torch.Size([440, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([440, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([440, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([440, 155, 128])
+TRAIN: torch.Size([338, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([338, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([338, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([338, 155, 128])
+TRAIN: torch.Size([527, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([527, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([527, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([527, 155, 128])
+TRAIN: torch.Size([403, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([403, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([403, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([403, 155, 128])
+TRAIN: torch.Size([342, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([342, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([342, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([342, 155, 128])
+TRAIN: torch.Size([519, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([519, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([519, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([519, 155, 128])
+TRAIN: torch.Size([495, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([495, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([495, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([495, 155, 128])
+TRAIN: torch.Size([401, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([401, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([401, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([401, 155, 128])
+TRAIN: torch.Size([536, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([536, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([536, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([536, 155, 128])
+TRAIN: torch.Size([568, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([568, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([568, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([568, 155, 128])
+TRAIN: torch.Size([491, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([491, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([491, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([491, 155, 128])
+TRAIN: torch.Size([237, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([237, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([237, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([237, 155, 128])
+TRAIN: torch.Size([399, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([399, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([399, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([399, 155, 128])
+TRAIN: torch.Size([445, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([445, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([445, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([445, 155, 128])
+TRAIN: torch.Size([512, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([512, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([512, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([512, 155, 128])
+TRAIN: torch.Size([417, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([417, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([417, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([417, 155, 128])
+TRAIN: torch.Size([419, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([419, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([419, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([419, 155, 128])
+TRAIN: torch.Size([386, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([386, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([386, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([386, 155, 128])
+TRAIN: torch.Size([339, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([339, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([339, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([339, 155, 128])
+TRAIN: torch.Size([442, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([442, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([442, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([442, 155, 128])
+TRAIN: torch.Size([477, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([477, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([477, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([477, 155, 128])
+TRAIN: torch.Size([452, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([452, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([452, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([452, 155, 128])
+TRAIN: torch.Size([564, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([564, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([564, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([564, 155, 128])
+TRAIN: torch.Size([300, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([300, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([300, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([300, 155, 128])
+TRAIN: torch.Size([524, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([524, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([524, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([524, 155, 128])
+TRAIN: torch.Size([415, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([415, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([415, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([415, 155, 128])
+TRAIN: torch.Size([445, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([445, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([445, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([445, 155, 128])
+TRAIN: torch.Size([384, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([384, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([384, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([384, 155, 128])
+TRAIN: torch.Size([355, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([355, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([355, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([355, 155, 128])
+TRAIN: torch.Size([389, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([389, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([389, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([389, 155, 128])
+TRAIN: torch.Size([425, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([425, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([425, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([425, 155, 128])
+TRAIN: torch.Size([395, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([395, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([395, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([395, 155, 128])
+TRAIN: torch.Size([449, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([449, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([449, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([449, 155, 128])
+TRAIN: torch.Size([480, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([480, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([480, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([480, 155, 128])
+TRAIN: torch.Size([561, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([561, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([561, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([561, 155, 128])
+TRAIN: torch.Size([349, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([349, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([349, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([349, 155, 128])
+TRAIN: torch.Size([307, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([307, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([307, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([307, 155, 128])
+TRAIN: torch.Size([509, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([509, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([509, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([509, 155, 128])
+TRAIN: torch.Size([371, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([371, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([371, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([371, 155, 128])
+TRAIN: torch.Size([390, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([390, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([390, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([390, 155, 128])
+TRAIN: torch.Size([395, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([395, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([395, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([395, 155, 128])
+TRAIN: torch.Size([342, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([342, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([342, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([342, 155, 128])
+TRAIN: torch.Size([475, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([475, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([475, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([475, 155, 128])
+TRAIN: torch.Size([386, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([386, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([386, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([386, 155, 128])
+TRAIN: torch.Size([490, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([490, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([490, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([490, 155, 128])
+TRAIN: torch.Size([321, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([321, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([321, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([321, 155, 128])
+TRAIN: torch.Size([533, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([533, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([533, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([533, 155, 128])
+TRAIN: torch.Size([418, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([418, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([418, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([418, 155, 128])
+TRAIN: torch.Size([467, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([467, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([467, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([467, 155, 128])
+TRAIN: torch.Size([464, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([464, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([464, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([464, 155, 128])
+TRAIN: torch.Size([390, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([390, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([390, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([390, 155, 128])
+TRAIN: torch.Size([493, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([493, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([493, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([493, 155, 128])
+TRAIN: torch.Size([348, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([348, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([348, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([348, 155, 128])
+TRAIN: torch.Size([441, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([441, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([441, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([441, 155, 128])
+TRAIN: torch.Size([379, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([379, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([379, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([379, 155, 128])
+TRAIN: torch.Size([406, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([406, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([406, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([406, 155, 128])
+TRAIN: torch.Size([366, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([366, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([366, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([366, 155, 128])
+TRAIN: torch.Size([365, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([365, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([365, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([365, 155, 128])
+TRAIN: torch.Size([409, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([409, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([409, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([409, 155, 128])
+TRAIN: torch.Size([396, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([396, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([396, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([396, 155, 128])
+TRAIN: torch.Size([415, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([415, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([415, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([415, 155, 128])
+TRAIN: torch.Size([374, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([374, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([374, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([374, 155, 128])
+TRAIN: torch.Size([367, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([367, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([367, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([367, 155, 128])
+TRAIN: torch.Size([478, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([478, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([478, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([478, 155, 128])
+TRAIN: torch.Size([417, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([417, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([417, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([417, 155, 128])
+TRAIN: torch.Size([443, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([443, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([443, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([443, 155, 128])
+TRAIN: torch.Size([442, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([442, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([442, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([442, 155, 128])
+TRAIN: torch.Size([513, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([513, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([513, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([513, 155, 128])
+TRAIN: torch.Size([452, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([452, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([452, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([452, 155, 128])
+TRAIN: torch.Size([315, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([315, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([315, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([315, 155, 128])
+TRAIN: torch.Size([443, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([443, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([443, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([443, 155, 128])
+TRAIN: torch.Size([580, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([580, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([580, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([580, 155, 128])
+TRAIN: torch.Size([457, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([457, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([457, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([457, 155, 128])
+TRAIN: torch.Size([469, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([469, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([469, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([469, 155, 128])
+TRAIN: torch.Size([371, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([371, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([371, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([371, 155, 128])
+TRAIN: torch.Size([403, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([403, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([403, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([403, 155, 128])
+TRAIN: torch.Size([430, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([430, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([430, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([430, 155, 128])
+TRAIN: torch.Size([454, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([454, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([454, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([454, 155, 128])
+TRAIN: torch.Size([466, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([466, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([466, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([466, 155, 128])
+TRAIN: torch.Size([506, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([506, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([506, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([506, 155, 128])
+TRAIN: torch.Size([445, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([445, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([445, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([445, 155, 128])
+TRAIN: torch.Size([296, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([296, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([296, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([296, 155, 128])
+TRAIN: torch.Size([362, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([362, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([362, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([362, 155, 128])
+TRAIN: torch.Size([318, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([318, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([318, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([318, 155, 128])
+TRAIN: torch.Size([433, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([433, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([433, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([433, 155, 128])
+TRAIN: torch.Size([554, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([554, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([554, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([554, 155, 128])
+TRAIN: torch.Size([452, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([452, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([452, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([452, 155, 128])
+TRAIN: torch.Size([404, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([404, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([404, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([404, 155, 128])
+TRAIN: torch.Size([462, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([462, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([462, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([462, 155, 128])
+TRAIN: torch.Size([360, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([360, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([360, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([360, 155, 128])
+TRAIN: torch.Size([404, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([404, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([404, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([404, 155, 128])
+TRAIN: torch.Size([412, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([412, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([412, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([412, 155, 128])
+TRAIN: torch.Size([503, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([503, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([503, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([503, 155, 128])
+TRAIN: torch.Size([409, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([409, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([409, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([409, 155, 128])
+TRAIN: torch.Size([377, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([377, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([377, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([377, 155, 128])
+TRAIN: torch.Size([358, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([358, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([358, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([358, 155, 128])
+TRAIN: torch.Size([403, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([403, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([403, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([403, 155, 128])
+TRAIN: torch.Size([470, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([470, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([470, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([470, 155, 128])
+TRAIN: torch.Size([449, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([449, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([449, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([449, 155, 128])
+TRAIN: torch.Size([234, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([234, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([234, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([234, 155, 128])
+TRAIN: torch.Size([298, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([298, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([298, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([298, 155, 128])
+TRAIN: torch.Size([387, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([387, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([387, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([387, 155, 128])
+TRAIN: torch.Size([434, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([434, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([434, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([434, 155, 128])
+TRAIN: torch.Size([382, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([382, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([382, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([382, 155, 128])
+TRAIN: torch.Size([298, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([298, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([298, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([298, 155, 128])
+TRAIN: torch.Size([438, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([438, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([438, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([438, 155, 128])
+TRAIN: torch.Size([517, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([517, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([517, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([517, 155, 128])
+TRAIN: torch.Size([382, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([382, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([382, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([382, 155, 128])
+TRAIN: torch.Size([458, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([458, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([458, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([458, 155, 128])
+TRAIN: torch.Size([529, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([529, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([529, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([529, 155, 128])
+TRAIN: torch.Size([336, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([336, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([336, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([336, 155, 128])
+TRAIN: torch.Size([484, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([484, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([484, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([484, 155, 128])
+TRAIN: torch.Size([355, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([355, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([355, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([355, 155, 128])
+TRAIN: torch.Size([553, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([553, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([553, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([553, 155, 128])
+TRAIN: torch.Size([475, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([475, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([475, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([475, 155, 128])
+TRAIN: torch.Size([518, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([518, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([518, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([518, 155, 128])
+TRAIN: torch.Size([493, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([493, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([493, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([493, 155, 128])
+TRAIN: torch.Size([350, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([350, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([350, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([350, 155, 128])
+TRAIN: torch.Size([511, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([511, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([511, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([511, 155, 128])
+TRAIN: torch.Size([400, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([400, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([400, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([400, 155, 128])
+TRAIN: torch.Size([547, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([547, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([547, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([547, 155, 128])
+TRAIN: torch.Size([422, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([422, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([422, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([422, 155, 128])
+TRAIN: torch.Size([357, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([357, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([357, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([357, 155, 128])
+TRAIN: torch.Size([491, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([491, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([491, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([491, 155, 128])
+TRAIN: torch.Size([430, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([430, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([430, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([430, 155, 128])
+TRAIN: torch.Size([384, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([384, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([384, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([384, 155, 128])
+TRAIN: torch.Size([506, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([506, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([506, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([506, 155, 128])
+TRAIN: torch.Size([279, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([279, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([279, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([279, 155, 128])
+TRAIN: torch.Size([334, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([334, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([334, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([334, 155, 128])
+TRAIN: torch.Size([346, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([346, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([346, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([346, 155, 128])
+TRAIN: torch.Size([390, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([390, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([390, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([390, 155, 128])
+TRAIN: torch.Size([432, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([432, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([432, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([432, 155, 128])
+TRAIN: torch.Size([490, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([490, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([490, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([490, 155, 128])
+TRAIN: torch.Size([318, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([318, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([318, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([318, 155, 128])
+TRAIN: torch.Size([448, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([448, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([448, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([448, 155, 128])
+TRAIN: torch.Size([400, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([400, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([400, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([400, 155, 128])
+TRAIN: torch.Size([457, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([457, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([457, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([457, 155, 128])
+TRAIN: torch.Size([380, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([380, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([380, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([380, 155, 128])
+TRAIN: torch.Size([390, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([390, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([390, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([390, 155, 128])
+TRAIN: torch.Size([476, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([476, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([476, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([476, 155, 128])
+TRAIN: torch.Size([401, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([401, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([401, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([401, 155, 128])
+TRAIN: torch.Size([346, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([346, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([346, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([346, 155, 128])
+TRAIN: torch.Size([324, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([324, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([324, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([324, 155, 128])
+TRAIN: torch.Size([317, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([317, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([317, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([317, 155, 128])
+TRAIN: torch.Size([467, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([467, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([467, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([467, 155, 128])
+TRAIN: torch.Size([304, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([304, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([304, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([304, 155, 128])
+TRAIN: torch.Size([317, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([317, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([317, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([317, 155, 128])
+TRAIN: torch.Size([439, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([439, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([439, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([439, 155, 128])
+TRAIN: torch.Size([396, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([396, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([396, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([396, 155, 128])
+TRAIN: torch.Size([299, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([299, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([299, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([299, 155, 128])
+TRAIN: torch.Size([355, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([355, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([355, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([355, 155, 128])
+TRAIN: torch.Size([473, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([473, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([473, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([473, 155, 128])
+TRAIN: torch.Size([360, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([360, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([360, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([360, 155, 128])
+TRAIN: torch.Size([401, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([401, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([401, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([401, 155, 128])
+TRAIN: torch.Size([447, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([447, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([447, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([447, 155, 128])
+TRAIN: torch.Size([344, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([344, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([344, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([344, 155, 128])
+TRAIN: torch.Size([487, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([487, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([487, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([487, 155, 128])
+TRAIN: torch.Size([561, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([561, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([561, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([561, 155, 128])
+TRAIN: torch.Size([385, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([385, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([385, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([385, 155, 128])
+TRAIN: torch.Size([461, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([461, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([461, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([461, 155, 128])
+TRAIN: torch.Size([386, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([386, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([386, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([386, 155, 128])
+TRAIN: torch.Size([439, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([439, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([439, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([439, 155, 128])
+TRAIN: torch.Size([378, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([378, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([378, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([378, 155, 128])
+TRAIN: torch.Size([451, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([451, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([451, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([451, 155, 128])
+TRAIN: torch.Size([391, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([391, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([391, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([391, 155, 128])
+TRAIN: torch.Size([419, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([419, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([419, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([419, 155, 128])
+TRAIN: torch.Size([320, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([320, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([320, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([320, 155, 128])
+TRAIN: torch.Size([535, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([535, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([535, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([535, 155, 128])
+TRAIN: torch.Size([358, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([358, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([358, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([358, 155, 128])
+TRAIN: torch.Size([348, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([348, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([348, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([348, 155, 128])
+TRAIN: torch.Size([475, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([475, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([475, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([475, 155, 128])
+TRAIN: torch.Size([341, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([341, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([341, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([341, 155, 128])
+TRAIN: torch.Size([281, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([281, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([281, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([281, 155, 128])
+TRAIN: torch.Size([330, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([330, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([330, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([330, 155, 128])
+TRAIN: torch.Size([427, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([427, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([427, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([427, 155, 128])
+TRAIN: torch.Size([486, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([486, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([486, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([486, 155, 128])
+TRAIN: torch.Size([563, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([563, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([563, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([563, 155, 128])
+TRAIN: torch.Size([420, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([420, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([420, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([420, 155, 128])
+TRAIN: torch.Size([375, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([375, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([375, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([375, 155, 128])
+TRAIN: torch.Size([364, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([364, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([364, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([364, 155, 128])
+TRAIN: torch.Size([369, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([369, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([369, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([369, 155, 128])
+TRAIN: torch.Size([371, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([371, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([371, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([371, 155, 128])
+TRAIN: torch.Size([462, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([462, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([462, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([462, 155, 128])
+TRAIN: torch.Size([483, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([483, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([483, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([483, 155, 128])
+TRAIN: torch.Size([344, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([344, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([344, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([344, 155, 128])
+TRAIN: torch.Size([521, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([521, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([521, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([521, 155, 128])
+TRAIN: torch.Size([447, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([447, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([447, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([447, 155, 128])
+TRAIN: torch.Size([436, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([436, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([436, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([436, 155, 128])
+TRAIN: torch.Size([368, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([368, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([368, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([368, 155, 128])
+TRAIN: torch.Size([293, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([293, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([293, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([293, 155, 128])
+TRAIN: torch.Size([311, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([311, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([311, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([311, 155, 128])
+TRAIN: torch.Size([314, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([314, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([314, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([314, 155, 128])
+TRAIN: torch.Size([492, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([492, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([492, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([492, 155, 128])
+TRAIN: torch.Size([407, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([407, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([407, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([407, 155, 128])
+TRAIN: torch.Size([404, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([404, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([404, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([404, 155, 128])
+TRAIN: torch.Size([430, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([430, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([430, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([430, 155, 128])
+TRAIN: torch.Size([495, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([495, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([495, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([495, 155, 128])
+TRAIN: torch.Size([464, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([464, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([464, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([464, 155, 128])
+TRAIN: torch.Size([414, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([414, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([414, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([414, 155, 128])
+TRAIN: torch.Size([518, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([518, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([518, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([518, 155, 128])
+TRAIN: torch.Size([360, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([360, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([360, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([360, 155, 128])
+TRAIN: torch.Size([446, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([446, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([446, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([446, 155, 128])
+TRAIN: torch.Size([459, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([459, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([459, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([459, 155, 128])
+TRAIN: torch.Size([501, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([501, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([501, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([501, 155, 128])
+TRAIN: torch.Size([293, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([293, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([293, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([293, 155, 128])
+TRAIN: torch.Size([475, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([475, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([475, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([475, 155, 128])
+TRAIN: torch.Size([336, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([336, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([336, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([336, 155, 128])
+TRAIN: torch.Size([456, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([456, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([456, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([456, 155, 128])
+TRAIN: torch.Size([425, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([425, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([425, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([425, 155, 128])
+TRAIN: torch.Size([527, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([527, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([527, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([527, 155, 128])
+TRAIN: torch.Size([362, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([362, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([362, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([362, 155, 128])
+TRAIN: torch.Size([447, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([447, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([447, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([447, 155, 128])
+TRAIN: torch.Size([395, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([395, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([395, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([395, 155, 128])
+TRAIN: torch.Size([329, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([329, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([329, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([329, 155, 128])
+TRAIN: torch.Size([342, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([342, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([342, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([342, 155, 128])
+TRAIN: torch.Size([433, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([433, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([433, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([433, 155, 128])
+TRAIN: torch.Size([417, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([417, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([417, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([417, 155, 128])
+TRAIN: torch.Size([368, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([368, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([368, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([368, 155, 128])
+TRAIN: torch.Size([373, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([373, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([373, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([373, 155, 128])
+TRAIN: torch.Size([385, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([385, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([385, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([385, 155, 128])
+TRAIN: torch.Size([374, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([374, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([374, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([374, 155, 128])
+TRAIN: torch.Size([460, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([460, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([460, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([460, 155, 128])
+TRAIN: torch.Size([417, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([417, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([417, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([417, 155, 128])
+TRAIN: torch.Size([390, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([390, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([390, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([390, 155, 128])
+TRAIN: torch.Size([513, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([513, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([513, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([513, 155, 128])
+TRAIN: torch.Size([382, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([382, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([382, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([382, 155, 128])
+TRAIN: torch.Size([427, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([427, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([427, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([427, 155, 128])
+TRAIN: torch.Size([482, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([482, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([482, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([482, 155, 128])
+TRAIN: torch.Size([279, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([279, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([279, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([279, 155, 128])
+TRAIN: torch.Size([479, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([479, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([479, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([479, 155, 128])
+TRAIN: torch.Size([393, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([393, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([393, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([393, 155, 128])
+TRAIN: torch.Size([483, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([483, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([483, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([483, 155, 128])
+TRAIN: torch.Size([385, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([385, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([385, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([385, 155, 128])
+TRAIN: torch.Size([411, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([411, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([411, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([411, 155, 128])
+TRAIN: torch.Size([374, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([374, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([374, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([374, 155, 128])
+TRAIN: torch.Size([462, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([462, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([462, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([462, 155, 128])
+TRAIN: torch.Size([485, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([485, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([485, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([485, 155, 128])
+TRAIN: torch.Size([152, 1, 128, 256])
+ORIGINAL INPUT SHAPE: torch.Size([152, 1, 128, 155])
+INPUT SHAPE SQUEEZED: torch.Size([152, 128, 155])
+INPUT SHAPE PERMUTED: torch.Size([152, 155, 128])
+
+Traceback (most recent call last):
+  File "train_vqvae.py", line 153, in <module>
+    train(datadir, outdir, modeldir, fstub, loss, lr=lr, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
+  File "train_vqvae.py", line 65, in train
+    recon_error, perplex, nan_recon_files = train_model(datapath, model_file, 
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/vq_vae.py", line 344, in train_model
+    vq_loss, data_recon, perplexity = model(vdata)
+  File "/projectnb/textconv/sadiela/.conda/envs/py3/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/vq_vae.py", line 246, in forward
+    z = self._encoder(x)
+  File "/projectnb/textconv/sadiela/.conda/envs/py3/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/vq_vae.py", line 196, in forward
+    x = self._conv_1(inputs)
+  File "/projectnb/textconv/sadiela/.conda/envs/py3/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/projectnb/textconv/sadiela/.conda/envs/py3/lib/python3.8/site-packages/torch/nn/modules/conv.py", line 446, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "/projectnb/textconv/sadiela/.conda/envs/py3/lib/python3.8/site-packages/torch/nn/modules/conv.py", line 442, in _conv_forward
+    return F.conv2d(input, weight, bias, self.stride,
+RuntimeError: Input type (torch.FloatTensor) and weight type (torch.cuda.FloatTensor) should be the same or input should be a MKLDNN tensor and weight is a dense tensor

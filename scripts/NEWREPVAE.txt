@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "train_vqvae.py", line 1, in <module>
+    from midi_utility import PROJECT_DIRECTORY
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/midi_utility.py", line 110, in <module>
+    from midi2audio import FluidSynth
+ModuleNotFoundError: No module named 'midi2audio'

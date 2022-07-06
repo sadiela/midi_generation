@@ -20,6 +20,7 @@ from pathlib import Path
 import pickle
 import matplotlib.pyplot as plt
 import pypianoroll
+#from midi2audio import FluidSynth
 import re
 
 #####################
@@ -119,10 +120,6 @@ def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
     # tempo given in bpm
     # assumes 4/4 time 
     # subdivision = =-2 means
-    new_mid = pretty_midi.PrettyMIDI() # type=0
-    # create a track and add it to the midi
-    piano_program = pretty_midi.instrument_name_to_program('Acoustic Grand Piano')
-    piano = pretty_midi.Instrument(program=piano_program)
 
     quarter_note_duration = tempo/60
     notes=[60, 62, 64, 65, 67, 69, 71, 72] #, 73, 74, 75, 76, 77, 78, 79, 80] # 64+7, 64+12]
@@ -359,6 +356,10 @@ def crop_midi(filename, newfilename, cut_beginning=True, maxlength=None):
     except Exception as e: 
         print("Error", e)
         pass
+        new_midi.write(str(newfilename))
+    except Exception as e: 
+        print("Error", e)
+        pass
 
 def sep_and_crop(midi_directory, target_directory):
 # takes a directory filled with midi files, creates new midi files for each individual (NOT DRUM) track
@@ -432,6 +433,7 @@ def change_midi_key(old_midi_path, new_midi_path):
             print("ERROR!", e, str(old_midi_path))
     else:
         print("FILE EXISTS:", new_midi_path)
+
 
 ### CODE FOR NEW MIDI REPRESENTATION ###
 def midi_to_tensor_2(filepath, subdiv=64, maxnotelength=256): # default maxlength is 3 minutes 

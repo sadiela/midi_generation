@@ -1,0 +1,23 @@
+#!/bin/bash -l
+
+# Set project
+#$ -P textconv
+#$ -o NEWREPVAE.txt
+#$ -m ea
+#$ -j y
+#$ -V
+# Request 4 cpus
+
+#$ -pe omp 4
+
+# Request 2 gpus
+#$ -l gpus=3
+
+# Spec min gpu compute compatibility
+#$ -l gpu_c=6
+
+
+module load miniconda
+conda activate py3
+
+python3 train_vqvae.py -m '../models/new_rep_vae' -r 'new_rep_test_vae' -d "../data/ttv" -s -q
