@@ -11,6 +11,8 @@ sys.path.append("..")
 ###########
 import sys
 import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -31,7 +33,9 @@ def save_graphs(midi_path, save_path):
     for file in tqdm(file_list):
         try:
             recon = pypianoroll.read(Path(midi_path) / file)
-            recon.trim(0, 64*recon.resolution)
+            print(recon.get_length())
+            if recon.get_length() > 64*recon.resolution: # trim only if long
+                recon.trim(0, 64*recon.resolution)
             recon.plot()
             plt.title(file)
             # FIX!
@@ -41,15 +45,22 @@ def save_graphs(midi_path, save_path):
             print("passed", file)
         
 def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False, batchlength=256, num_embed=1024):
-    res_string = "MODEL FILE NAME" + model_path + "\nRECON ERRORS!\n"
+    #res_string = "MODEL FILE NAME" + str(model_path) + "\nRECON ERRORS!\n"
     file_list = os.listdir(orig_tensor_dir)
 
+    print("declaring model")
     model = Model(num_embeddings=num_embed, embedding_dim=128, commitment_cost=0.5)
+    print(sum(p.numel() for p in model.parameters()))
+    print("loading saved model")
     stat_dictionary = torch.load(model_path, map_location=torch.device('cpu'))
     model_params = stat_dictionary["model_state_dict"]
-    model.load_state_dict(model_params)
+    print("putting params in model")
+    print(sum(p.numel() for p in model_params.values()))
+    model.load_state_dict(model_params, )
+    print("setting to eval mode")
     model.eval()
 
+    print("listing files")
     for file in file_list:
         print(file) # perform reconstruction
         cur_tensor, loss, recon_err, zero_recon = reconstruct_song(Path(orig_tensor_dir) / file, model, clip_val=clip_val, norm=norm, batchlength=batchlength)
@@ -59,8 +70,11 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
             input("Continue")
             res_string += str(file) + ' recon error: ' + str(recon_err.item()) + ' loss: ' + str(loss.item()) + ' zero recon:' + str(zero_recon.item()) + '\n'
             # save tensor
-            np.save(Path(new_tensor_dir) / str(file.split('.')[0] + '_conv.npy'), cur_tensor)
+            sparse_arr = sparse.csr_matrix(cur_tensor) # save sparse!!!
+            with open(str(Path(new_tensor_dir) / str(file.split('.')[0] + '_conv.p')), 'wb') as outfile:
+                pickle.dump(sparse_arr, outfile)
             # convert to midi and save midi 
+            print("entering tensor to midi")
             tensor_to_midi_2(cur_tensor, Path(new_midi_dir) / str(file.split('.')[0] + '.mid'), pitchlength_cutoff=0.2)
         else:
             print(file, "reconstruction is all 0s")
@@ -96,8 +110,8 @@ def reconstruct_song(orig_tensor_path, model, clip_val=0, norm=False, batchlengt
 
     #print("recon data shape:", data_recon.shape)
     #print(data_recon)
-    #for i in range(data_recon.shape[0]):
-    #    print(torch.max(data_recon[i,:,:,:]).item())
+    for i in range(data_recon.shape[0]):
+        print(torch.max(data_recon[i,:,:,:]).item())
     print('Loss:', loss.item(), '\Perplexity:', perplexity.item())
 
     unchunked_recon = data_recon.view(p, n_2).detach().numpy()
@@ -147,8 +161,34 @@ if __name__ == "__main__":
     batchlength = int(args['batchlength'])
 
     print("Start")
+    '''
     reconstruct_songs(tensor_dir, resdir, resdir, model_name, clip_val=0, batchlength=batchlength)
     #"Save graphs"
-    save_graphs(resdir, resdir)
+    save_graphs(resdir, resdir)'''
+
+    model_path = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/models/model_FINAL-2022-07-01-0.pt')
+
+    training_set_tensors = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/new_recon_tensors/train_set_tensors')
+    testing_set_tensors = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/new_recon_tensors/test_set_tensors')
+
+    training_set_midis = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/new_recon_tensors/train_set_midis_wavs')
+    testing_set_midis = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/new_recon_tensors/test_set_midis_wavs')
+
+    training_recons = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/new_recon_tensors/train_recons')
+    testing_recons = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/new_recon_tensors/test_recons')
+    
+    training_recon_midis = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/new_recon_tensors/train_recon_midis')
+    testing_recon_midis = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/new_recon_tensors/test_recon_midis')
+
+    print("Entering Reconstruction")
+    reconstruct_songs(training_set_tensors, training_recons, training_recon_midis, model_path, clip_val=0, norm=False, batchlength=256, num_embed=1024)
+
+    #tensors_to_midis_2(training_set_tensors, training_set_midis)
+    
+    #tensors_to_midis_2(testing_set_tensors, testing_set_midis)
+    #print("TRAINING")
+    #save_graphs(training_set_midis, training_set_midis)
+    #print("TESTING")
+    #save_graphs(testing_set_midis, testing_set_midis)
 
     # python3 listen_to_model_output.py -t "/projectnb/textconv/sadiela/midi_generation/recon_tensors/" -m "/projectnb/textconv/sadiela/midi_generation/models/new_rep/model_FINAL-2022-07-01-0.pt" -r "/projectnb/textconv/sadiela/midi_generation/models/new_rep/final_recons" -b 256
