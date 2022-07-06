@@ -181,7 +181,7 @@ if __name__ == "__main__":
     testing_recon_midis = Path('../new_recon_tensors/test_recon_midis')
 
     print("Entering Reconstruction")
-    reconstruct_songs(training_set_tensors, training_recons, training_recon_midis, model_path, clip_val=0, norm=False, batchlength=256, num_embed=1024)
+    #reconstruct_songs(training_set_tensors, training_recons, training_recon_midis, model_path, clip_val=0, norm=False, batchlength=256, num_embed=1024)
 
     #tensors_to_midis_2(training_set_tensors, training_set_midis)
     
@@ -189,6 +189,6 @@ if __name__ == "__main__":
     #print("TRAINING")
     #save_graphs(training_set_midis, training_set_midis)
     #print("TESTING")
-    #save_graphs(testing_set_midis, testing_set_midis)
+    save_graphs(training_recon_midis, training_recon_midis)
 
     # python3 listen_to_model_output.py -t "/projectnb/textconv/sadiela/midi_generation/recon_tensors/" -m "/projectnb/textconv/sadiela/midi_generation/models/new_rep/model_FINAL-2022-07-01-0.pt" -r "/projectnb/textconv/sadiela/midi_generation/models/new_rep/final_recons" -b 256
