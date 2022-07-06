@@ -168,17 +168,17 @@ if __name__ == "__main__":
 
     model_path = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/models/model_FINAL-2022-07-01-0.pt')
 
-    training_set_tensors = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/new_recon_tensors/train_set_tensors')
-    testing_set_tensors = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/new_recon_tensors/test_set_tensors')
+    training_set_tensors = Path('../new_recon_tensors/train_set_tensors')
+    testing_set_tensors = Path('../new_recon_tensors/test_set_tensors')
 
-    training_set_midis = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/new_recon_tensors/train_set_midis_wavs')
-    testing_set_midis = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/new_recon_tensors/test_set_midis_wavs')
+    training_set_midis = Path('../new_recon_tensors/train_set_midis_wavs')
+    testing_set_midis = Path('..new_recon_tensors/test_set_midis_wavs')
 
-    training_recons = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/new_recon_tensors/train_recons')
-    testing_recons = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/new_recon_tensors/test_recons')
+    training_recons = Path('../new_recon_tensors/train_recons')
+    testing_recons = Path('../new_recon_tensors/test_recons')
     
-    training_recon_midis = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/new_recon_tensors/train_recon_midis')
-    testing_recon_midis = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/new_recon_tensors/test_recon_midis')
+    training_recon_midis = Path('../new_recon_tensors/train_recon_midis')
+    testing_recon_midis = Path('../new_recon_tensors/test_recon_midis')
 
     print("Entering Reconstruction")
     reconstruct_songs(training_set_tensors, training_recons, training_recon_midis, model_path, clip_val=0, norm=False, batchlength=256, num_embed=1024)
