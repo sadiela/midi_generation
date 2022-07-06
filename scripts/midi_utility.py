@@ -100,18 +100,13 @@ def play_x_seconds(midi_filename, x=10, savefile=False):
         os.remove(temp_filename)
     # delete temp file
 
-
-
-
-'''
-
 # convert a MIDI file to a wav file
 from midi2audio import FluidSynth
 def midi_to_wav(midi_path,wav_path):
         print("CONVERTING")
         # using the default sound font in 44100 Hz sample rate
         fs = FluidSynth()
-        fs.midi_to_audio(midi_path, wav_path)
+        fs.midi_to_audio(midi_path, wav_path)'''
 
 def generate_random_midi(filepath, num_notes=10, subdivision=-4, tempo=120):
     # GENERATE A RANDOM MIDI AND SAVE TO A FILE
