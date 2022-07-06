@@ -45,7 +45,7 @@ def save_graphs(midi_path, save_path):
             print("passed", file)
         
 def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False, batchlength=256, num_embed=1024):
-    #res_string = "MODEL FILE NAME" + str(model_path) + "\nRECON ERRORS!\n"
+    res_string = "MODEL FILE NAME" + str(model_path) + "\nRECON ERRORS!\n"
     file_list = os.listdir(orig_tensor_dir)
 
     print("declaring model")
@@ -67,7 +67,7 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
         # record info IF RECONSTRUCTION NOT ALL 0s
         if (cur_tensor > 0).sum() > 0: 
             print(cur_tensor[:,:10])
-            input("Continue")
+            #input("Continue")
             res_string += str(file) + ' recon error: ' + str(recon_err.item()) + ' loss: ' + str(loss.item()) + ' zero recon:' + str(zero_recon.item()) + '\n'
             # save tensor
             sparse_arr = sparse.csr_matrix(cur_tensor) # save sparse!!!
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     #"Save graphs"
     save_graphs(resdir, resdir)'''
 
-    model_path = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/models/model_FINAL-2022-07-01-0.pt')
+    model_path = Path('../models/new_rep/model_FINAL-2022-07-01-0.pt')
 
     training_set_tensors = Path('../new_recon_tensors/train_set_tensors')
     testing_set_tensors = Path('../new_recon_tensors/test_set_tensors')
