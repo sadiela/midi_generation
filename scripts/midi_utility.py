@@ -524,7 +524,7 @@ def tensor_to_midi_2(tensor, desired_filepath, wav_filepath, bpm=120, subdiv=64,
     # save to .mid file 
     new_mid.write(str(desired_filepath))
 
-    midi_to_wav(str(desired_filepath), str(wav_filepath))
+    #midi_to_wav(str(desired_filepath), str(wav_filepath))
 
 def change_keys_and_names(orig_midi_dir, new_midi_dir):
     all_dirs = os.listdir(orig_midi_dir)
