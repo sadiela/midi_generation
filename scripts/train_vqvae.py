@@ -147,7 +147,7 @@ if __name__ == "__main__":
 
 
     # path 
-    tensor_dir = Path('..') / 'recon_tensors'
+    tensor_dir = Path('..') / 'new_recon_tensors'/ 'train_set_tensors'
     recon_res_dir = Path(modeldir) / 'final_recons'
     try: 
         recon_res_dir.mkdir()

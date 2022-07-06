@@ -4,3 +4,69 @@ Traceback (most recent call last):
   File "/projectnb2/textconv/sadiela/midi_generation/scripts/midi_utility.py", line 110, in <module>
     from midi2audio import FluidSynth
 ModuleNotFoundError: No module named 'midi2audio'
+Traceback (most recent call last):
+  File "train_vqvae.py", line 1, in <module>
+    from midi_utility import PROJECT_DIRECTORY
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/midi_utility.py", line 138
+    new_mid.instruments.append(piano)
+                                    ^
+IndentationError: unindent does not match any outer indentation level
+START
+no file
+Chosen hyperparameters:
+
+Data directory../data/ttv
+Model/output directory../models/new_rep_vae
+File stub:new_rep_test_vae
+Sparse:True
+Normalize:False
+Quantize:False
+Batch size:5
+Batch length:256
+Embedding dimension:128
+Number of embeddings:1024
+Learning rate:0.001
+Lambda:1
+DEVICE: cuda
+0it [00:00, ?it/s]0it [00:02, ?it/s]
+no file
+Traceback (most recent call last):
+  File "train_vqvae.py", line 145, in <module>
+    final_model_name, yaml_name = train(datadir, modeldir, fstub, loss, lr=lr, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
+  File "train_vqvae.py", line 65, in train
+    recon_error, perplex, final_model_name = train_model(datapath, modelpath, 
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/vq_vae.py", line 357, in train_model
+    'loss': np.mean(train_res_recon_error[-100:]),
+  File "<__array_function__ internals>", line 5, in mean
+  File "/projectnb/textconv/sadiela/.conda/envs/py3/lib/python3.8/site-packages/numpy/core/fromnumeric.py", line 3372, in mean
+    return _methods._mean(a, axis=axis, dtype=dtype,
+  File "/projectnb/textconv/sadiela/.conda/envs/py3/lib/python3.8/site-packages/numpy/core/_methods.py", line 170, in _mean
+    ret = ret.dtype.type(ret / rcount)
+AttributeError: 'torch.dtype' object has no attribute 'type'
+START
+file exists
+no file
+Chosen hyperparameters:
+
+Data directory../data/ttv
+Model/output directory../models/new_rep_vae
+File stub:new_rep_test_vae
+Sparse:True
+Normalize:False
+Quantize:False
+Batch size:5
+Batch length:256
+Embedding dimension:128
+Number of embeddings:1024
+Learning rate:0.001
+Lambda:1
+DEVICE: cuda
+0it [00:00, ?it/s]0it [00:01, ?it/s]
+Traceback (most recent call last):
+  File "train_vqvae.py", line 145, in <module>
+    final_model_name, yaml_name = train(datadir, modeldir, fstub, loss, lr=lr, batchsize=batchsize, batchlength=batchlength, normalize=normalize, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
+  File "train_vqvae.py", line 65, in train
+    recon_error, perplex, final_model_name = train_model(datapath, modelpath, 
+  File "/projectnb2/textconv/sadiela/midi_generation/scripts/vq_vae.py", line 346, in train_model
+    train_res_perplexity.append(perplexity.item())
+AttributeError: 'int' object has no attribute 'item'
