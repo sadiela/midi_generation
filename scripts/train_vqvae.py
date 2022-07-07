@@ -282,7 +282,7 @@ if __name__ == "__main__":
 
     logging.basicConfig(filename=logfile, level=numeric_level)
 
-    hyperparameters = '\nData directory' + datadir + '\nModel/output directory' + modeldir + '\nFile stub:' + fstub
+    hyperparameters = '\nData directory' + str(datadir) + '\nModel/output directory' + str(modeldir) + '\nFile stub:' + fstub
     hyperparameters += '\nSparse:' + str(sparse) + '\nQuantize:' + str(quantize)
     hyperparameters += '\nBatch size:' + str(batchsize) + '\nBatch length:' + str(batchlength)
     hyperparameters +=  '\nEmbedding dimension:' + str(embeddim) + '\nNumber of embeddings:' + str(numembed)

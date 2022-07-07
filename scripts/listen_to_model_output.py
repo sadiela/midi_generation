@@ -13,7 +13,6 @@ import sys
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
-import numpy as np
 import torch
 import torch.nn.functional as F
 from midi_utility import *
