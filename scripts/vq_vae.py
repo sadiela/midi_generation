@@ -4,107 +4,15 @@ This file contains the VQ-VAE model class
 ###########
 # Imports #
 ###########
-from torch.profiler import profile, record_function, ProfilerActivity
-import numpy as np
-from numpy.core.numeric import full
-#import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torch.utils.data import Dataset, DataLoader
-import random 
-import os
-from tqdm import tqdm
-import pickle
 import logging
-from gen_utility import *
-#from dp_loss import *
-from dp_loss.speedy_sparse_dp_loss import *
-from dp_loss.shared_functions import *
-from pathlib import Path
-#from midi_utility import * 
-
 
 # is reconstruction error going down? 
 # Run w/ more data
 # Increase # of embedding vectors? 
-
-##############################
-# MODEL/OPTIMIZER PARAMETERS #
-##############################
-'''
-num_hiddens = 128
-num_residual_hiddens = 16
-num_residual_layers = 2
-l = 512 #1024 # batch length
-p= 36 #128
-p= 36 #128'''
-#decay=0.99? WHAT DOES THIS DOO???
-
-###############################
-# CUSTOM DATALOADER/COLLATION #
-###############################
-class MidiDataset(Dataset):
-    """Midi dataset."""
-
-    def __init__(self, npy_file_dir, l=256, norm=False):
-        """
-        Args:
-            npy_file_dir (string): Path to the npy file directory
-        """
-        file_list = os.listdir(npy_file_dir)
-        self.l = l
-        self.norm = norm 
-        self.maxlength = 16*64
-        self.paths = [ Path(npy_file_dir) / file for file in file_list] # get entire list of midi tensor file names 
-        
-        #self.batch_file_paths = set()
-
-    def __getitem__(self, index):
-        # choose random file path from directory (not already chosen), chunk it 
-        #print(str(self.paths[index]))
-        # load in tensor
-        with open(self.paths[index], 'rb') as f:
-          pickled_tensor = pickle.load(f)
-        cur_tensor = pickled_tensor.toarray()
-        cur_data = torch.tensor(cur_tensor)
-        #cur_data = cur_data[46:-46,:]
-        p, l_i = cur_data.shape
-        
-        # normalize if specified
-        if self.norm:
-          cur_data = cur_data / self.maxlength 
-        
-        # make sure divisible by l
-        # CHUNK! 
-        #print("DATA SHAPE:", cur_data.shape)
-        if l_i // self.l == 0: 
-          padded = torch.zeros((p, self.l))
-          padded[:,0:l_i] = cur_data
-          l_i=self.l
-        else: 
-          padded = cur_data[:,:(cur_data.shape[1]-(cur_data.shape[1]%self.l))]
-        padded = padded.float()
-        cur_chunked = torch.reshape(padded, (l_i//self.l, 1, p, self.l)) 
-        
-        return cur_chunked # 3d tensor: l_i\\l x p x l
-
-    def __getname__(self, index):
-        return self.paths[index]
-
-    def __len__(self):
-        return len(self.paths)
-
-def collate_fn(data, collate_shuffle=True):
-  # data is a list of tensors
-  # concatenate and shuffle all list items
-  full_list = torch.cat(data, 0)
-  if collate_shuffle:
-    idx = torch.randperm(full_list.shape[0])
-    return  full_list[idx].view(full_list.size())
-  else:
-    return full_list
 
 ###########################
 # MODEL CLASS DEFINITIONS #
@@ -186,6 +94,7 @@ class Encoder(nn.Module):
                                  out_channels=1,
                                  kernel_size=(1,8))
         self.pool = nn.MaxPool2d((1, 2))
+
   def forward(self, inputs):
           x = self._conv_1(inputs)
           x = F.relu(x)
@@ -209,7 +118,9 @@ class Decoder(nn.Module):
                                  out_channels=1,
                                  kernel_size=(1,32))
         self.pool = nn.MaxPool2d((1, 2))
+
   def forward(self, inputs):
+          print("DECODER INPUT SHAPE:", inputs.shape)
           x = self._conv_trans_1(inputs)
 
           x = F.relu(x)
@@ -219,151 +130,19 @@ class Decoder(nn.Module):
           x = self._conv_trans_3(x)
           return x
 
-class Model(nn.Module):
-    def __init__(self, num_embeddings, embedding_dim, commitment_cost, quantize=True, decay=0):
-        super(Model, self).__init__()
+class VQVAE_Model(nn.Module):
+    def __init__(self, num_embeddings, embedding_dim, commitment_cost, decay=0):
+        super(VQVAE_Model, self).__init__()
         
         self._encoder = Encoder(1)
         self._vq_vae = MIDIVectorQuantizer(num_embeddings, embedding_dim,
                                            commitment_cost)
         self._decoder = Decoder(embedding_dim)
-        self.quantize = quantize
 
     def forward(self, x):
       #print("INPUT DIMENSION", x.shape)
-      #input('Continue...')
-      if not self.quantize:
-        z = self._encoder(x)
-        x_recon = self._decoder(z)
-        return 0, x_recon, 0
-      else: 
-        z = self._encoder(x)
-        if self.quantize: 
-          loss, quantized, perplexity, _ = self._vq_vae(z)
-          x_recon = self._decoder(quantized)
+      z = self._encoder(x)
+      loss, quantized, perplexity, _ = self._vq_vae(z)
+      x_recon = self._decoder(quantized)
 
-          return loss, x_recon, perplexity
-        else:
-          x_recon = self._decoder(z)
-          return 0, x_recon, 0
-
-def validate_model(model_path, data_path, batchlength= 256, normalize=False, batchsize=5, num_embeddings=1024, lossfunc='mse', lam=1):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # pick device
-    midi_tensor_validation = MidiDataset(data_path, l=batchlength, norm=normalize) 
-    validation_data = DataLoader(midi_tensor_validation, collate_fn=collate_fn, batch_size=batchsize, shuffle=True, num_workers=2)
-
-    model = Model(num_embeddings=num_embeddings, embedding_dim=128, commitment_cost=0.5)
-    stat_dictionary = torch.load(model_path, map_location=device)
-    model_params = stat_dictionary["model_state_dict"]
-    model.load_state_dict(model_params)
-    model.eval()
-
-    validation_recon_error = []
-
-    for i, vdata in enumerate(validation_data):
-      vdata = vdata.to(device)
-      vq_loss, data_recon, perplexity = model(vdata)
-      if lossfunc=='mse':
-        recon_error = F.mse_loss(data_recon, vdata)
-      elif lossfunc=='l1reg':
-        recon_error = F.mse_loss(data_recon, vdata) + (1.0/vdata.shape[0])*lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
-      else: # loss function = mae
-        recon_error = F.l1_loss(data_recon, vdata)
-      validation_recon_error.append(recon_error)
-      if (i+1) % 10 == 0:
-        print("Val recon:", recon_error)
-        #logging.info('validation recon_error: %.3f' % np.mean(validation_recon_error[-1]))
-
-def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=128, learning_rate=1e-3, lossfunc='mse', bs=10, batchlength=256, normalize=False, quantize=True, lam=1):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # pick device
-    logging.info("Device: %s" , device)
-
-    midi_tensor_dataset = MidiDataset(Path(datapath) / "train", l=batchlength, norm=normalize) # dataset declaration
-
-    ### Declare model ### 
-    model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5, quantize=quantize).to(device) 
-
-    ### Declare optimizer ###
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate, amsgrad=False) # optimizer declaration
-
-    model.float()
-    model.train() # training mode
-    train_res_recon_error = []
-    train_res_perplexity = []
-    total_loss = []
-
-    training_data = DataLoader(midi_tensor_dataset, collate_fn=collate_fn, batch_size=bs, shuffle=True, num_workers=2)
-    # Let # of tensors = n
-    # each tensor is pxl_i, where l_i is the length of the nth tensor
-    # when we chunk the data, it becomes (l_i//l = s_i) x 1 x p x l 
-    # so we want a big (sum(s_i)) x 1 x p x l tensor. 
-    # Then we want to shuffle along axis=0 so two adjacent pxl guys aren't 
-    # necessarily from the same song
-
-    max_tensor_size= 0 
-    #dynamic_loss = SpeedySparseDynamicLoss.apply
-    model_number = 1
-    for e in range(2):
-      # train loop
-      for i, data in tqdm(enumerate(training_data)):
-          #name = midi_tensor_dataset.__getname__(i)
-          # s x p x 1 x l
-          data = data.to(device)
-          cursize = torch.numel(data)
-          if cursize > max_tensor_size:
-            max_tensor_size = cursize
-            logging.info("NEW MAX BATCH SIZE: %d", max_tensor_size)
-
-          #print('TRAIN:', data.shape)
-
-          vq_loss, data_recon, perplexity = model(data)
-          if lossfunc=='mse':
-            recon_error = F.mse_loss(data_recon, data) #/ data_variance
-          #elif lossfunc=='dyn':
-          #  recon_error = dynamic_loss(data_recon, data, device) #X_hat, then X!!!
-          elif lossfunc=='l1reg':
-            recon_error = F.mse_loss(data_recon, data) + (1.0/data.shape[0])*lam*torch.norm(data_recon, p=1) # +  ADD L1 norm
-          else: # loss function = mae
-            recon_error = F.l1_loss(data_recon, data)
-          loss = recon_error + vq_loss # will be 0 if no quantization
-          loss.backward()
-          torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
-          optimizer.step()
-          
-          ### RECORD LOSSES ###
-          total_loss.append(loss.item())
-          if quantize:
-            train_res_recon_error.append(recon_error.item())
-            train_res_perplexity.append(perplexity.item())
-          else:
-            train_res_recon_error.append(loss.item())
-            train_res_perplexity.append(0)
-
-          if (i) % 5000 == 0:
-            # new save path
-            cur_model_file = get_free_filename('model_'+str(model_number), model_save_path, suffix='.pt')
-            model_number+=1
-            torch.save({
-                        'epoch': e,
-                        'iteration': i,
-                        'model_state_dict': model.state_dict(),
-                        'optimizer_state_dict': optimizer.state_dict(),
-                        'loss': np.mean(train_res_recon_error[-5000:]),
-                        }, cur_model_file) # incremental saves
-            logging.info('%d iterations' % (i+1))
-            logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-5000:]))
-            logging.info('\n')
-            print(i, 'iterations')
-            print('recon_error:', np.mean(train_res_recon_error[-5000:]))
-
-      # VALIDATION LOOP
-
-    final_model_file = get_free_filename('model_FINAL', model_save_path, suffix='.pt')
-    logging.info("saving model to %s"%final_model_file)
-    torch.save(model.state_dict(), final_model_file)
-    torch.save({
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'loss': np.mean(train_res_recon_error[-5000:]),
-                }, final_model_file) 
-    return train_res_recon_error, train_res_perplexity, final_model_file
+      return loss, x_recon, perplexity
