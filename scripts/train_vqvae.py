@@ -126,7 +126,7 @@ def validate_model(model, data_path, batchlength= 256, batchsize=5, num_embeddin
     model.train()
 
 
-def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=128, learning_rate=1e-3, lossfunc='mse', bs=10, batchlength=256, normalize=False, quantize=True, lam=1):
+def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=128, learning_rate=1e-3, lossfunc='mse', batchsize=10, batchlength=256, normalize=False, quantize=True, lam=1):
     print("DEVICE:", DEVICE)
     ### Declare model ###
     #model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
@@ -149,7 +149,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     train_res_perplexity = []
     total_loss = []
 
-    training_data = DataLoader(midi_tensor_dataset, collate_fn=collate_fn, batch_size=bs, shuffle=True, num_workers=2)
+    training_data = DataLoader(midi_tensor_dataset, collate_fn=collate_fn, batch_size=batchsize, shuffle=True, num_workers=2)
     # Let # of tensors = n
     # each tensor is pxl_i, where l_i is the length of the nth tensor
     # when we chunk the data, it becomes (l_i//l = s_i) x 1 x p x l 
@@ -320,6 +320,6 @@ if __name__ == "__main__":
         os.mkdir(recon_res_dir)
 
     # reconstruct midis
-    reconstruct_songs(str(tensor_dir), str(recon_res_dir), str(recon_res_dir), final_model_name, clip_val=0, batchlength=batchlength)
+    reconstruct_songs(str(tensor_dir), str(recon_res_dir), str(recon_res_dir), final_model_name, clip_val=0, batchlength=batchlength, quantize=quantize, embedding_dim=embeddim)
     # Save pianorolls
     save_midi_graphs(str(recon_res_dir),str(recon_res_dir))

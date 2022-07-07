@@ -17,6 +17,7 @@ import torch
 import torch.nn.functional as F
 from midi_utility import *
 from vq_vae import * 
+from vae import *
 import matplotlib.pyplot as plt
 import pypianoroll
 import yaml
@@ -26,11 +27,15 @@ import pickle
 
 maxlength = 16*32
         
-def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False, batchlength=256, num_embed=1024):
+def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False, batchlength=256, num_embed=1024, quantize=False, embedding_dim=128):
     res_string = "MODEL FILE NAME" + str(model_path) + "\nRECON ERRORS!\n"
     file_list = os.listdir(orig_tensor_dir)
 
-    model = Model(num_embeddings=num_embed, embedding_dim=128, commitment_cost=0.5)
+    if quantize:
+        model = VQVAE_Model(num_embeddings=num_embed, embedding_dim=embedding_dim, commitment_cost=0.5)
+    else: 
+        model = VAE_Model(in_channels=1, hidden_dim=128*155, latent_dim=embedding_dim)
+
     res_string += "number of parameters in initialized model:" + str(sum(p.numel() for p in model.parameters())) + '\n'
     stat_dictionary = torch.load(model_path, map_location=torch.device('cpu'))
     model_params = stat_dictionary["model_state_dict"]

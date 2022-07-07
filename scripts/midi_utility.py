@@ -154,12 +154,11 @@ def sep_and_crop(midi_directory, target_directory):
             print("ERROR!", e)
             pass
 
-def midis_to_tensors_2(midi_dirpath, tensor_dirpath, subdiv=64, maxnotelength=256, normalize=False):
-    maxlength=maxnotelength*subdiv
+def midis_to_tensors_2(midi_dirpath, tensor_dirpath, subdiv=64):
     file_list = os.listdir(midi_dirpath)
     for file in tqdm(file_list):
         if not os.path.exists(tensor_dirpath / str(file.split('.')[0] + '.p')):
-            cur_tensor = midi_to_tensor_2(midi_dirpath / file, subdiv=subdiv, maxnotelength=maxnotelength)
+            cur_tensor = midi_to_tensor_2(midi_dirpath / file, subdiv=subdiv)
             if cur_tensor is not None: 
                 sparse_arr = sparse.csr_matrix(cur_tensor) # save sparse!!!
                 with open(tensor_dirpath / str(file.split('.')[0] + '.p'), 'wb') as outfile:
@@ -168,7 +167,7 @@ def midis_to_tensors_2(midi_dirpath, tensor_dirpath, subdiv=64, maxnotelength=25
                 "error in conversion to tensor"
 
 ### CODE FOR NEW MIDI REPRESENTATION ###
-def midi_to_tensor_2(filepath, subdiv=64, maxnotelength=256): # default maxlength is 3 minutes 
+def midi_to_tensor_2(filepath, subdiv=64): # default maxlength is 3 minutes 
     # maxnotelength given in BEATS
     # ASSUMES:
     #   - 1 track
@@ -210,7 +209,7 @@ def tensors_to_midis_2(tensor_dir, midi_dir, bpm=120, subdiv=64):
         with open(str(tensor_dir / file), 'rb') as f:
             pickled_tensor = pickle.load(f)
         cur_tensor = pickled_tensor.toarray()
-        tensor_to_midi_2(cur_tensor, str(midi_dir /  str(file.split('.')[0] + '.mid')), str(midi_dir / str(file.split('.')[0] + '.wav')))
+        tensor_to_midi_2(cur_tensor, str(midi_dir /  str(file.split('.')[0] + '.mid')), str(midi_dir / str(file.split('.')[0] + '.wav')), bpm=bpm, subdiv=subdiv)
         
 def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64, pitchlength_cutoff=0.2):
     # Converts midi tensor back into midi file format
