@@ -75,57 +75,6 @@ key_number_to_name= {
     11:"B",
 }
 
-###############################
-# OLD PREPROCESSING FUNCTIONS #
-###############################
-
-#### DON'T THINK THIS IS BEING USED ANYMORE...###
-def change_tempo(filepath, newfilepath,  maxlength=720, smallest_subdivision=64, target_tempo=120, previous_tempo=None): # default maxlength is 3 minutes 
-    # changes tempo of midi file
-    
-    # get old midi 
-    midi = pretty_midi.PrettyMIDI(filepath)
-    # old tempo
-    if not previous_tempo: 
-        previous_tempo = midi.estimate_tempo()
-    beat_length = 60/previous_tempo # in seconds secs/beat
-    target_beat_length = 60/target_tempo # in seconds secs/beat
-    
-    # create new midi and instrument 
-    new_midi = pretty_midi.PrettyMIDI() # type=0
-    piano_program = pretty_midi.instrument_name_to_program('Acoustic Grand Piano')
-    piano = pretty_midi.Instrument(program=piano_program)
-    
-    # convert notes to proper tempo
-    if len(midi.instruments) > 1:
-        print("TOO MANY TRACKS! EMPTY TENSOR RETURNED")
-    else:
-        for instrument in midi.instruments:
-            for note in instrument.notes:
-
-                note_length = note.end - note.start 
-                number_of_beats = note_length/beat_length
-
-                new_start_time = note.start
-
-                new_note = pretty_midi.Note(velocity=100, pitch=note.pitch, start=note.start*(target_tempo/60)*(target_beat_length), end=(note.start+number_of_beats*target_beat_length))
-                piano.notes.append(new_note)
-    new_midi.instruments.append(piano)
-
-    # save to .mid file 
-    new_midi.write(newfilepath)
-
-def normalize_tensors(orig_tensors, new_dir, subdiv=32, maxnotelength=16):
-    maxlength=maxnotelength*subdiv
-    file_list = os.listdir(orig_tensors)
-    for file in tqdm(file_list):
-        cur_tensor = np.load(orig_tensors + file)
-        cur_tensor_normed = cur_tensor/maxlength
-        if np.count_nonzero == 0: 
-            print(cur_tensor.size, np.count_nonzero(cur_tensor)) #, np.count_nonzero(cur_tensor_normed))
-        else:
-            np.save(new_dir + file.split('.')[0] + '_norm' + '.npy', cur_tensor_normed)
-
 def separate_tracks(midi_directory, target_directory):
     # takes a directory filled with midi files, creates new midi files for each individual (NOT DRUM) track
     # in the original files, so each output midi has a single track
@@ -151,18 +100,6 @@ def separate_tracks(midi_directory, target_directory):
             print("ERROR!", e)
             pass
 
-# Crop all midis in a directory 
-def crop_midis(dirname, new_dirname, cut_beginning=True, maxlength=None, remove_special=True): 
-    file_list = os.listdir(dirname)
-    for file in tqdm(file_list):
-        old_name = dirname / file
-        if remove_special: 
-            new_name = new_dirname / re.sub(r'[^A-Za-z0-9_. ]', r'', file) #remove_special_chars(file) # + file.split('.')[0] + '_cropped.mid'
-        else:
-            new_name = new_dirname / file
-        #if not os.path.exists(new_name):
-        crop_midi(old_name, new_name, cut_beginning=cut_beginning, maxlength=maxlength)
-
 def crop_midi(filename, newfilename, cut_beginning=True, maxlength=None):
     # cut out empty space at beginning of midi file
     # maxlength given in seconds
@@ -185,20 +122,6 @@ def crop_midi(filename, newfilename, cut_beginning=True, maxlength=None):
     except Exception as e: 
         print("Error", e)
         pass
-
-def convert_to_sparse(tensor_dir, sparse_dir, del_tensor_dir=False):
-    file_list = os.listdir(tensor_dir)
-    for f in tqdm(file_list): 
-        cur_arr = np.load(tensor_dir / f)
-        new_f = f.split('.')[0] + '.p'
-        sparse_arr = sparse.csr_matrix(cur_arr)
-        with open(sparse_dir / new_f, 'wb') as outfile:
-                pickle.dump(sparse_arr, outfile)
-    # Delete tensor_dir to save space
-    if del_tensor_dir: 
-        for f in os.listdir(tensor_dir):
-            os.remove(os.path.join(tensor_dir, f))
-    print("DONE!")
 
 ####################################
 # FUNCTIONS FOR DATA PREPROCESSING #
@@ -337,7 +260,7 @@ def change_keys_and_names(orig_midi_dir, new_midi_dir):
             new_midi_name = re.sub(r'[^\w\s]', '', d + '__' + f[:-4]).replace(" ", "_") + ".mid"
             change_midi_key(str(orig_midi_dir / d / f), str(new_midi_dir / new_midi_name))
 
-def change_midi_key(old_midi_path, new_midi_path):
+def change_midi_key(old_midi_path, new_midi_path, desired_key=0):
     if not Path(new_midi_path).is_file():    
         try: 
             open_midi = pretty_midi.PrettyMIDI(old_midi_path)
@@ -354,12 +277,12 @@ def change_midi_key(old_midi_path, new_midi_path):
                     key = i
                     break
 
-            # shift piece into the key of c
-            if key != 0:
+            # shift piece into the key of c (if desired_key = 0)
+            if key != desired_key:
                 for i, instrument in enumerate(open_midi.instruments): 
                         if not instrument.is_drum:
                             for note in instrument.notes:
-                                note.pitch -= key
+                                note.pitch -= (key - desired_key)
 
             # check if file exists
             open_midi.write(new_midi_path)

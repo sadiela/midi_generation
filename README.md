@@ -28,6 +28,16 @@ You can set up your virtual environment and download all of these dependencies w
 This model is fairly large. It is desirable to train on a machine with GPUs for reasonable running time.
 
 ### Usage:
+#### `midi_utility.py`
+
+This file contains most of the core functions for manipulating MIDI data.
+
+##### Functons that work with MIDI input
+
+
+##### Functions that work with tensor input
+
+
 `midi_preprocessing.py`
 Preprocessing steps. Starting with a directory of midi files, executes the following:
 

@@ -9,7 +9,7 @@ import argparse
 import time
 from pathlib import Path
 import logging
-from listen_to_model_output import *
+from reconstruct_from_model import *
 
 
 '''
@@ -297,7 +297,7 @@ if __name__ == "__main__":
     #####################
     #### Train model ####
     #####################
-    recon_error, perplex, final_model_name = train_model(datadir, modeldir, fstub, loss, lr=lr, batchsize=batchsize, batchlength=batchlength, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
+    recon_error, perplex, final_model_name = train_model(datadir, modeldir, fstub, loss, learning_rate=lr, batchsize=batchsize, batchlength=batchlength, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
     logging.info("All done training! TOTAL TIME: %s", str(time.time()-prog_start))
 
     # save losses to file and plot graph!
