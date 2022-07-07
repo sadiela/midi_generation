@@ -179,6 +179,8 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
             #  recon_error = dynamic_loss(x_hat, x, device) #X_hat, then X!!!
             elif lossfunc=='l1reg':
                 recon_error = F.mse_loss(x_hat, x) + (1.0/x.shape[0])*lam*torch.norm(x_hat, p=1) # +  ADD L1 norm
+            elif lossfunc=='bce':
+                recon_error = nn.functional.binary_cross_entropy(x_hat, x, reduction='mean')
             else: # loss function = mae
                 recon_error = F.l1_loss(x_hat, x)
             loss = recon_error + vq_loss # will be 0 if no quantization
@@ -292,7 +294,9 @@ if __name__ == "__main__":
     print("Chosen hyperparameters:")
     print(hyperparameters)
 
-    # Train model!
+    #####################
+    #### Train model ####
+    #####################
     recon_error, perplex, final_model_name = train_model(datadir, modeldir, fstub, loss, lr=lr, batchsize=batchsize, batchlength=batchlength, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
     logging.info("All done training! TOTAL TIME: %s", str(time.time()-prog_start))
 
@@ -307,14 +311,13 @@ if __name__ == "__main__":
     except Exception as e: 
         print(e)
 
-
-    # Reconstruct tensors! # 
+    ########################
+    # Reconstruct tensors! #
+    ######################## 
     tensor_dir = Path('..') / 'new_recon_tensors'/ 'train_set_tensors'
     recon_res_dir = Path(modeldir) / 'final_recons'
-    try: 
-        recon_res_dir.mkdir()
-    except OSError as error: 
-        print(error)  
+    if not os.path.isdir(recon_res_dir):
+        os.mkdir(recon_res_dir)
 
     # reconstruct midis
     reconstruct_songs(str(tensor_dir), str(recon_res_dir), str(recon_res_dir), final_model_name, clip_val=0, batchlength=batchlength)
