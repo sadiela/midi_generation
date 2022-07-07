@@ -53,25 +53,31 @@ Separates midis into individual tracks (for now)
 * Crops empty beginnings from separated midis
 * Converts midis to tensor representations
 * Stores tensors in sparse format to save memory
-* To run: provide the following command line arguments:
+* Splits into 80/10/10 train/test/validate directories
+
+To run: provide the following command line arguments:
     * -r: raw data directory
-    * -p: directory where you want the processed data
+    * -p: directory where you want the processed data to be stored
+
+**(would be nice to add key change code to this pipeline!)**
 
 `python midi_preprocessing -r RAW_DATA_DIR -p PROCESSED_DATA_DIR`
 
-`train_vqvae.py`
-To train the VQ-VAE model:
+### `train_vqvae.py`
+To train the VAE/VQ-VAE model:
 
 * Clone repository to your local machine
 * Navigate to /scripts directory
 * Run python test_vqvae.py with the following (optional) arguments:(
     * -d: path to data directory (midi tensors)
-    * -m: path where you want model saved
-    * -o: path to desired results directory
+    * -m: path where you want model/results saved
     * -r: result and model filestub
-    * -n: whether or not to normalize the tensors (default is not to normalize)
+    * -q: VAE or VQ-VAE (defaults to VQ-VAE)
     * -b: number of songs in a batch
-    * -l: specify loss function (default is MSE, using flag switches to MAE)
+    * -a: Length of a batch (want to change to 384 once subdiv is 96)
+    * -u: Number of embeddings (for VQ-VAE)
+    * -e: Embedding dimension
+    * -l: specify loss function (default is MSE, VAE always uses BCEloss)
     * -v: increase logging verbosity
     * -q: whether or not to quantize representations
 
@@ -80,5 +86,6 @@ To train the VQ-VAE model:
 This file contains various functions for analyzing trained model results. You can do the following:
 
 * `reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path)`: reconstruct a directory of midi tensors using the VQ-VAE model; save as tensors and midis
+* `reconstruct_song(orig_tensor_path, model)`: subroutine of `reconstruct_songs`; returns a reconstruction and loss for a provided tensor.
 * `save_midi_graphs(midi_path, save_path)`: save pianoroll images of midis
 * `save_result_graph(yaml_file, plot_dir)`: show reconstruction error and perplexity graphs over model training

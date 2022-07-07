@@ -67,8 +67,8 @@ def preprocess(rawdir, procdir):
     
     # create new directories
     try: 
-        os.mkdir(procdir / 'cropped')
-        os.mkdir(procdir / 'sparse')
+        os.mkdir(procdir / 'cropped') # midis 
+        os.mkdir(procdir / 'sparse') # tensors
     except FileExistsError:
         print("Already done!")
         pass
@@ -76,7 +76,6 @@ def preprocess(rawdir, procdir):
     crop = procdir / 'cropped'
     sparse = procdir / 'sparse'
    
-    print("START2")
     #separate_tracks(rawdir, sep)
     #crop_midis(sep, crop)
     sep_and_crop(rawdir, crop)

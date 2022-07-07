@@ -251,8 +251,6 @@ if __name__ == "__main__":
     #parser.add_argument('-n', '--nfolds', help='number of folds to use in cross validation', default=1) # make default 1?
     parser.add_argument('-v', '--verbosity', dest='loglevel', action='store_const', const='DEBUG',
                         default='INFO',help='specify level of detail for log file')
-    parser.add_argument('-s', '--sparse', dest='sparse', action='store_const', const=True, 
-                        default=False, help='whether or not to tensors are sparse')
     parser.add_argument('-k', '--lambda', help='L1 Hyperparam', default='1')
     args = vars(parser.parse_args())
 
@@ -263,7 +261,6 @@ if __name__ == "__main__":
     datadir = args['datadir']
     modelsubdir = args['modeldir']
     fstub = args['resname']
-    sparse = args['sparse']
     quantize = args['quant']
     batchsize = int(args['batchsize'])
     batchlength = int(args['batchlength'])
@@ -283,7 +280,7 @@ if __name__ == "__main__":
     logging.basicConfig(filename=logfile, level=numeric_level)
 
     hyperparameters = '\nData directory' + str(datadir) + '\nModel/output directory' + str(modeldir) + '\nFile stub:' + fstub
-    hyperparameters += '\nSparse:' + str(sparse) + '\nQuantize:' + str(quantize)
+    hyperparameters += '\nQuantize:' + str(quantize)
     hyperparameters += '\nBatch size:' + str(batchsize) + '\nBatch length:' + str(batchlength)
     hyperparameters +=  '\nEmbedding dimension:' + str(embeddim) + '\nNumber of embeddings:' + str(numembed)
     hyperparameters += '\nLearning rate:' + str(lr) + '\nLambda:' + str(lam)
@@ -297,7 +294,7 @@ if __name__ == "__main__":
     #####################
     #### Train model ####
     #####################
-    recon_error, perplex, final_model_name = train_model(datadir, modeldir, fstub, loss, learning_rate=lr, batchsize=batchsize, batchlength=batchlength, quantize=quantize, sparse=sparse, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
+    recon_error, perplex, final_model_name = train_model(datadir, modeldir, fstub, loss, learning_rate=lr, batchsize=batchsize, batchlength=batchlength, quantize=quantize, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
     logging.info("All done training! TOTAL TIME: %s", str(time.time()-prog_start))
 
     # save losses to file and plot graph!

@@ -211,7 +211,7 @@ def tensors_to_midis_2(tensor_dir, midi_dir, bpm=120, subdiv=64):
         cur_tensor = pickled_tensor.toarray()
         tensor_to_midi_2(cur_tensor, str(midi_dir /  str(file.split('.')[0] + '.mid')), str(midi_dir / str(file.split('.')[0] + '.wav')), bpm=bpm, subdiv=subdiv)
         
-def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64, pitchlength_cutoff=0.2):
+def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64):
     # Converts midi tensor back into midi file format
     # ASSUMES:
     #   - 1 track
@@ -232,13 +232,13 @@ def tensor_to_midi_2(tensor, desired_filepath, bpm=120, subdiv=64, pitchlength_c
         for time in range(tensor.shape[1]):
             #if tensor[pitch, time] > 0:
             #    print(tensor[pitch, time])
-            if tensor[pitch,time]>=pitchlength_cutoff and note_on == False:
+            if tensor[pitch,time]==1 and note_on == False:
                 note_on=True
                 note_start = time
                 current_note_length += 1
-            elif tensor[pitch,time]>=pitchlength_cutoff and note_on == True:
+            elif tensor[pitch,time]==1 and note_on == True:
                 current_note_length += 1
-            elif tensor[pitch,time]<pitchlength_cutoff and note_on == True:
+            elif tensor[pitch,time] != 1 and note_on == True:
                 # NOTE ENDED
                 new_note = pretty_midi.Note(velocity=100, pitch=(pitch), start=(note_start * spu), end=((note_start+current_note_length)*spu))
                 piano.notes.append(new_note)                

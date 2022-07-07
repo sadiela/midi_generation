@@ -43,7 +43,6 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
     model.load_state_dict(model_params, )
     model.eval()
 
-    print("listing files")
     for file in file_list:
         print(file) # perform reconstruction
         cur_tensor, loss, recon_err, zero_recon = reconstruct_song(Path(orig_tensor_dir) / file, model, clip_val=clip_val, norm=norm, batchlength=batchlength)
@@ -58,13 +57,13 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
                 pickle.dump(sparse_arr, outfile)
             # convert to midi and save midi 
             print("entering tensor to midi")
-            tensor_to_midi_2(cur_tensor, Path(new_midi_dir) / str(file.split('.')[0] + '.mid'), pitchlength_cutoff=0.2)
+            tensor_to_midi_2(cur_tensor, Path(new_midi_dir) / str(file.split('.')[0] + '.mid'))
         else:
             print(file, "reconstruction is all 0s")
     with open(Path(new_midi_dir) / 'recon_info.txt', 'w') as outfile:
         outfile.write(res_string)
 
-def reconstruct_song(orig_tensor_path, model, clip_val=0, norm=False, batchlength=256):
+def reconstruct_song(orig_tensor_path, model, clip_val=0.5, norm=False, batchlength=256, ):
     with open(orig_tensor_path,'rb') as f: 
         pickled_tensor = pickle.load(f)
     data = pickled_tensor.toarray()
@@ -99,7 +98,10 @@ def reconstruct_song(orig_tensor_path, model, clip_val=0, norm=False, batchlengt
 
     unchunked_recon = data_recon.view(p, n_2).detach().numpy()
     # Turn all negative values to 0 
-    unchunked_recon = unchunked_recon.clip(min=clip_val) # min note length that should count
+    #unchunked_recon = unchunked_recon.clip(min=clip_val) # min note length that should count
+    print(unchunked_recon)
+    unchunked_recon[unchunked_recon < clip_val] = 0
+    unchunked_recon[unchunked_recon >= clip_val] = 1
 
     if norm: # unnormalize!
         unchunked_recon = unchunked_recon * maxlength
