@@ -56,8 +56,8 @@ Separates midis into individual tracks (for now)
 * Splits into 80/10/10 train/test/validate directories
 
 To run: provide the following command line arguments:
-    * -r: raw data directory
-    * -p: directory where you want the processed data to be stored
+* -r: raw data directory
+* -p: directory where you want the processed data to be stored
 
 **(would be nice to add key change code to this pipeline!)**
 
