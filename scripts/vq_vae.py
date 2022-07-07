@@ -146,7 +146,6 @@ class MIDIVectorQuantizer(nn.Module):
                     + torch.sum(self._embedding.weight**2, dim=1)
                     - 2 * torch.matmul(flat_input, self._embedding.weight.t()))
     logging.debug("DISTANCES: %s %s", str(distances), str(distances.shape))
-    logging.debug("DISTANCES: %s %s", str(distances), str(distances.shape))
 
     # Encoding
     encoding_indices = torch.argmin(distances, dim=1).unsqueeze(1)
