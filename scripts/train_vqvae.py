@@ -195,10 +195,10 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
           total_loss.append(loss.item())
           if quantize:
             train_res_recon_error.append(recon_error.item())
-            train_res_perplexity.append(perplexity.item())
+            #train_res_perplexity.append(perplexity.item())
           else:
             train_res_recon_error.append(loss.item())
-            train_res_perplexity.append(0)
+            #train_res_perplexity.append(0)
 
           if (i) % 5000 == 0:
             # new save path
