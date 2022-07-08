@@ -56,8 +56,8 @@ Separates midis into individual tracks (for now)
 * Splits into 80/10/10 train/test/validate directories
 
 To run: provide the following command line arguments:
-    * -r: raw data directory
-    * -p: directory where you want the processed data to be stored
+* -r: raw data directory
+* -p: directory where you want the processed data to be stored
 
 **(would be nice to add key change code to this pipeline!)**
 
@@ -68,7 +68,7 @@ To train the VAE/VQ-VAE model:
 
 * Clone repository to your local machine
 * Navigate to /scripts directory
-* Run python test_vqvae.py with the following (optional) arguments:(
+* Run python test_vqvae.py with the following arguments:
     * -d: path to data directory (midi tensors)
     * -m: path where you want model/results saved
     * -r: result and model filestub
@@ -79,7 +79,6 @@ To train the VAE/VQ-VAE model:
     * -e: Embedding dimension
     * -l: specify loss function (default is MSE, VAE always uses BCEloss)
     * -v: increase logging verbosity
-    * -q: whether or not to quantize representations
 
 ### `reconstruct_from_model.py`
 
@@ -88,4 +87,4 @@ This file contains various functions for analyzing trained model results. You ca
 * `reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path)`: reconstruct a directory of midi tensors using the VQ-VAE model; save as tensors and midis
 * `reconstruct_song(orig_tensor_path, model)`: subroutine of `reconstruct_songs`; returns a reconstruction and loss for a provided tensor.
 * `save_midi_graphs(midi_path, save_path)`: save pianoroll images of midis
-* `save_result_graph(yaml_file, plot_dir)`: show reconstruction error and perplexity graphs over model training
+* `save_result_graph(yaml_file, plot_dir)`: save reconstruction error and perplexity graphs over model training
