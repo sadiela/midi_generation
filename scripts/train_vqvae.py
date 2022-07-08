@@ -132,7 +132,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     #model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
     logging.info("Models will be saved in the directory: %s", model_save_path)
 
-    midi_tensor_dataset = MidiDataset(Path(datapath) / "train", l=batchlength, norm=normalize) # dataset declaration
+    midi_tensor_dataset = MidiDataset(Path(datapath) / "train", l=batchlength) # dataset declaration
 
     ### Declare model ### 
     if quantize:
@@ -294,7 +294,8 @@ if __name__ == "__main__":
     #####################
     #### Train model ####
     #####################
-    recon_error, perplex, final_model_name = train_model(datadir, modeldir, fstub, loss, learning_rate=lr, batchsize=batchsize, batchlength=batchlength, quantize=quantize, num_embeddings=numembed, embedding_dim=embeddim, lam=lam)
+
+    recon_error, perplex, final_model_name = train_model(datadir, modeldir, num_embeddings=numembed, embedding_dim=embeddim, lossfunc=loss, learning_rate=lr, batchsize=batchsize, batchlength=batchlength, quantize=quantize, lam=lam)
     logging.info("All done training! TOTAL TIME: %s", str(time.time()-prog_start))
 
     # save losses to file and plot graph!

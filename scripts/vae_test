@@ -20,4 +20,4 @@
 module load miniconda
 conda activate py3
 
-python3 train_vqvae.py -m 'new_rep_vae' -r 'new_rep_vae' -s -q 
+python3 train_vqvae.py -m 'new_rep_vae' -r 'new_rep_vae' -q 
