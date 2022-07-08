@@ -136,7 +136,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
 
     ### Declare model ### 
     if quantize:
-        model = VQVAE_Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5, quantize=quantize).to(DEVICE) 
+        model = VQVAE_Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5).to(DEVICE) 
     else: 
         model = VAE_Model(in_channels=1, hidden_dim=PITCH_DIM*155, latent_dim=embedding_dim).to(DEVICE)
 
@@ -161,7 +161,6 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     for e in range(2):
       # train loop
       for i, x in tqdm(enumerate(training_data)):
-          print(i)
           #name = midi_tensor_xset.__getname__(i)
           optimizer.zero_grad() # yes? 
           # s x p x 1 x l
@@ -189,7 +188,6 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
             x_hat, mean, log_var = model(x, DEVICE)
             loss = bce_loss(x_hat, x, mean, log_var)
 
-          print("backward")
           loss.backward()
           torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
           optimizer.step()
