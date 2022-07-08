@@ -161,6 +161,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     for e in range(2):
       # train loop
       for i, x in tqdm(enumerate(training_data)):
+          print(i)
           #name = midi_tensor_xset.__getname__(i)
           optimizer.zero_grad() # yes? 
           # s x p x 1 x l
@@ -185,10 +186,10 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
                 recon_error = F.l1_loss(x_hat, x)
             loss = recon_error + vq_loss # will be 0 if no quantization
           else:
-            x_hat, mean, log_var = model(x)
+            x_hat, mean, log_var = model(x, DEVICE)
             loss = bce_loss(x_hat, x, mean, log_var)
 
-
+          print("backward")
           loss.backward()
           torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
           optimizer.step()
