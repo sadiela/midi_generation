@@ -27,7 +27,7 @@ import pickle
 
 maxlength = 16*32
         
-def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False, batchlength=256, num_embed=1024, quantize=False, embedding_dim=128):
+def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, device, clip_val=0, norm=False, batchlength=256, num_embed=1024, quantize=False, embedding_dim=128):
     res_string = "MODEL FILE NAME" + str(model_path) + "\nRECON ERRORS!\n"
     file_list = os.listdir(orig_tensor_dir)
 
@@ -45,7 +45,7 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
 
     for file in file_list:
         print(file) # perform reconstruction
-        cur_tensor, loss, recon_err, zero_recon = reconstruct_song(Path(orig_tensor_dir) / file, model, clip_val=clip_val, norm=norm, batchlength=batchlength)
+        cur_tensor, loss, recon_err, zero_recon = reconstruct_song(Path(orig_tensor_dir) / file, model, device, clip_val=clip_val, norm=norm, batchlength=batchlength)
         # record info IF RECONSTRUCTION NOT ALL 0s
         if (cur_tensor > 0).sum() > 0: 
             print(cur_tensor[:,:10])
@@ -63,7 +63,7 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
     with open(Path(new_midi_dir) / 'recon_info.txt', 'w') as outfile:
         outfile.write(res_string)
 
-def reconstruct_song(orig_tensor_path, model, clip_val=0.5, norm=False, batchlength=256, ):
+def reconstruct_song(orig_tensor_path, model, device, clip_val=0.5, norm=False, batchlength=256, ):
     with open(orig_tensor_path,'rb') as f: 
         pickled_tensor = pickle.load(f)
     data = pickled_tensor.toarray()
@@ -76,6 +76,8 @@ def reconstruct_song(orig_tensor_path, model, clip_val=0.5, norm=False, batchlen
 
     l = batchlength #1024 # batch length
 
+    data = data.to(device)
+
     data = data[:,:(data.shape[1]-(data.shape[1]%l))]
     p, n_2 = data.shape
     #print("Cropped data shape:", data.shape)
@@ -85,7 +87,7 @@ def reconstruct_song(orig_tensor_path, model, clip_val=0.5, norm=False, batchlen
     #print("chunked data shape", chunked_data.shape)
     #print(data)
     
-    vq_loss, data_recon, perplexity = model(chunked_data)
+    vq_loss, data_recon, perplexity = model(chunked_data, device)
     recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
     zero_recon = F.mse_loss(torch.zeros(n//l, 1, p, l), chunked_data)
     loss = recon_error + vq_loss

@@ -317,6 +317,6 @@ if __name__ == "__main__":
         os.mkdir(recon_res_dir)
 
     # reconstruct midis
-    reconstruct_songs(str(tensor_dir), str(recon_res_dir), str(recon_res_dir), final_model_name, clip_val=0, batchlength=batchlength, quantize=quantize, embedding_dim=embeddim)
+    reconstruct_songs(str(tensor_dir), str(recon_res_dir), str(recon_res_dir), final_model_name, device=DEVICE, clip_val=0, batchlength=batchlength, quantize=quantize, embedding_dim=embeddim)
     # Save pianorolls
     save_midi_graphs(str(recon_res_dir),str(recon_res_dir))
