@@ -73,8 +73,8 @@ def reconstruct_song(orig_tensor_path, model, device, clip_val=0.5, norm=False, 
     with open(orig_tensor_path,'rb') as f: 
         pickled_tensor = pickle.load(f)
     data = pickled_tensor.toarray()
-    if norm:
-        data = data / maxlength
+
+    data = torch.tensor(data)
 
     # Test on a song
     #print(data.shape)
