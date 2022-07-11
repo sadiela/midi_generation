@@ -89,36 +89,41 @@ def reconstruct_song(orig_tensor_path, model, device, clip_val=0.5, norm=False, 
     #print("Cropped data shape:", data.shape)
     data = torch.tensor(data).float()
 
-    chunked_data = data.view((n//l, 1, p, l))
+    x = data.view((n//l, 1, p, l))
     #print("chunked data shape", chunked_data.shape)
     #print(data)
     
     if quantize: 
-        x_hat, mean, log_var = model(chunked_data)
-        loss = bce_loss(x_hat, chunked_data, mean, log_var)
-    else: 
-        vq_loss, data_recon = model(chunked_data, device)
-        recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
-        zero_recon = F.mse_loss(torch.zeros(n//l, 1, p, l), chunked_data)
+        vq_loss, x_hat = model(x)
+        recon_error = F.mse_loss(x_hat, x) #/ data_variance
+        zero_loss = F.mse_loss(torch.zeros(n//l, 1, p, l), x) + vq_loss
         loss = recon_error + vq_loss
+    else: 
+        x_hat, mean, log_var = model(x, device)
+        loss = bce_loss(x_hat, x, mean, log_var)
+        zero_loss = (torch.zeros(n//l, 1, p, l), x)
 
     #print("recon data shape:", data_recon.shape)
     #print(data_recon)
-    for i in range(data_recon.shape[0]):
-        print(torch.max(data_recon[i,:,:,:]).item())
+    for i in range(x_hat.shape[0]):
+        print(torch.max(x_hat[i,:,:,:]).item())
     print('Loss:', loss.item())#, '\Perplexity:', perplexity.item())
 
-    unchunked_recon = data_recon.view(p, n_2).detach().numpy()
+    unchunked_recon = x_hat.view(p, n_2)
+    print(torch.sum(unchunked_recon), torch.sum(data))
+
+    unchunked_recon = unchunked_recon.detach().numpy()
     # Turn all negative values to 0 
     #unchunked_recon = unchunked_recon.clip(min=clip_val) # min note length that should count
     print(unchunked_recon)
     unchunked_recon[unchunked_recon < clip_val] = 0
     unchunked_recon[unchunked_recon >= clip_val] = 1
+    print(torch.sum(unchunked_recon), torch.sum(data))
 
     if norm: # unnormalize!
         unchunked_recon = unchunked_recon * maxlength
 
-    return unchunked_recon, loss, recon_error, zero_recon
+    return unchunked_recon, loss, recon_error, zero_loss
 
 def save_result_graph(yaml_file, plot_dir):
     #root_name = yaml_name.split(".")[0]
