@@ -56,7 +56,7 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
         if (cur_tensor > 0).sum() > 0: 
             print(cur_tensor[:,:10])
             #input("Continue")
-            res_string += str(file) + ' loss: ' + str(loss.item()) + ' zero lodd:' + str(zero_loss.item()) + '\n'
+            res_string += str(file) + ' loss: ' + str(loss.item()) + ' zero loss:' + str(zero_loss.item()) + '\n'
             # save tensor
             sparse_arr = sparse.csr_matrix(cur_tensor) # save sparse!!!
             with open(str(Path(new_tensor_dir) / str(file.split('.')[0] + '_conv.p')), 'wb') as outfile:
@@ -101,7 +101,7 @@ def reconstruct_song(orig_tensor_path, model, device, clip_val=0.5, norm=False, 
     else: 
         x_hat, mean, log_var = model(x, device)
         loss = bce_loss(x_hat, x, mean, log_var)
-        zero_loss = (torch.zeros(n//l, 1, p, l), x)
+        zero_loss = bce_loss(torch.zeros(n//l, 1, p, l), x)
 
     #print("recon data shape:", data_recon.shape)
     #print(data_recon)
