@@ -90,7 +90,7 @@ def reconstruct_song(orig_tensor_path, model, device, clip_val=0.5, norm=False, 
     data = torch.tensor(data).float()
 
     x = data.view((n//l, 1, p, l))
-    #print("chunked data shape", chunked_data.shape)
+    print("chunked data shape", x.shape)
     #print(data)
     
     if quantize: 
@@ -109,10 +109,7 @@ def reconstruct_song(orig_tensor_path, model, device, clip_val=0.5, norm=False, 
         print(torch.max(x_hat[i,:,:,:]).item())
     print('Loss:', loss.item())#, '\Perplexity:', perplexity.item())
 
-    unchunked_recon = x_hat.view(p, n_2)
-    print(torch.sum(unchunked_recon), torch.sum(data))
-
-    unchunked_recon = unchunked_recon.detach().numpy()
+    unchunked_recon = x_hat.view(p, n_2).detach().numpy()
     # Turn all negative values to 0 
     #unchunked_recon = unchunked_recon.clip(min=clip_val) # min note length that should count
     print(unchunked_recon)
@@ -122,6 +119,8 @@ def reconstruct_song(orig_tensor_path, model, device, clip_val=0.5, norm=False, 
 
     if norm: # unnormalize!
         unchunked_recon = unchunked_recon * maxlength
+
+    print(np.sum(unchunked_recon), np.sum(data.numpy()))
 
     return unchunked_recon, loss, recon_error, zero_loss
 
