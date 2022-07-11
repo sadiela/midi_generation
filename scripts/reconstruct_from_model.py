@@ -121,7 +121,7 @@ def reconstruct_song(orig_tensor_path, model, device, clip_val=0.5, norm=False, 
 
     print(np.sum(unchunked_recon), np.sum(data.numpy()))
 
-    return unchunked_recon, loss, recon_error, zero_loss
+    return unchunked_recon, loss, zero_loss
 
 def save_result_graph(yaml_file, plot_dir):
     #root_name = yaml_name.split(".")[0]
