@@ -51,12 +51,12 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
 
     for file in file_list:
         print(file) # perform reconstruction
-        cur_tensor, loss, zero_loss = reconstruct_song(Path(orig_tensor_dir) / file, model, device, clip_val=clip_val, norm=norm, batchlength=batchlength, quantize=quantize)
+        cur_tensor, loss = reconstruct_song(Path(orig_tensor_dir) / file, model, device, clip_val=clip_val, norm=norm, batchlength=batchlength, quantize=quantize)
         # record info IF RECONSTRUCTION NOT ALL 0s
         if (cur_tensor > 0).sum() > 0: 
             print(cur_tensor[:,:10])
             #input("Continue")
-            res_string += str(file) + ' loss: ' + str(loss.item()) + ' zero loss:' + str(zero_loss.item()) + '\n'
+            res_string += str(file) + ' loss: ' + str(loss.item()) # + ' zero loss:' + str(zero_loss.item()) + '\n'
             # save tensor
             sparse_arr = sparse.csr_matrix(cur_tensor) # save sparse!!!
             with open(str(Path(new_tensor_dir) / str(file.split('.')[0] + '_conv.p')), 'wb') as outfile:
@@ -96,12 +96,12 @@ def reconstruct_song(orig_tensor_path, model, device, clip_val=0.5, norm=False, 
     if quantize: 
         vq_loss, x_hat = model(x)
         recon_error = F.mse_loss(x_hat, x) #/ data_variance
-        zero_loss = F.mse_loss(torch.zeros(n//l, 1, p, l), x) + vq_loss
+        #zero_loss = F.mse_loss(torch.zeros(n//l, 1, p, l), x) + vq_loss
         loss = recon_error + vq_loss
     else: 
         x_hat, mean, log_var = model(x, device)
         loss = bce_loss(x_hat, x, mean, log_var)
-        zero_loss = bce_loss(torch.zeros(n//l, 1, p, l), x)
+        #zero_loss = bce_loss(torch.zeros(n//l, 1, p, l), x)
 
     #print("recon data shape:", data_recon.shape)
     #print(data_recon)
@@ -121,7 +121,7 @@ def reconstruct_song(orig_tensor_path, model, device, clip_val=0.5, norm=False, 
 
     print(np.sum(unchunked_recon), np.sum(data.numpy()))
 
-    return unchunked_recon, loss, zero_loss
+    return unchunked_recon, loss #, zero_loss
 
 def save_result_graph(yaml_file, plot_dir):
     #root_name = yaml_name.split(".")[0]
