@@ -304,7 +304,7 @@ if __name__ == "__main__":
     try: 
         with open(savefile, 'w') as outfile:
             yaml.dump(results, outfile, default_flow_style=False)
-        save_result_graph(savefile, model_path)
+        save_result_graph(savefile, modeldir)
     except Exception as e: 
         print(e)
 

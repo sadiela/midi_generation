@@ -152,6 +152,17 @@ def save_midi_graphs(midi_path, save_path):
 
 if __name__ == "__main__":
     # Default paths:
+    tensor_dir = '/projectnb/textconv/sadiela/midi_generation/new_recon_tensors/train_recons/'
+    recon_res_dir = '/projectnb/textconv/sadiela/midi_generation/models/new_rep_vae_overhaul/final_recons/'
+    final_model_name = '/projectnb/textconv/sadiela/midi_generation/models/new_rep_vae_overhaul/model_FINAL-2022-07-09-0.pt'
+    batchlength= 256
+    quantize= False
+    embeddim = 128
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # pick device
+    reconstruct_songs(str(tensor_dir), str(recon_res_dir), str(recon_res_dir), final_model_name, device=device, clip_val=0, batchlength=batchlength, quantize=quantize, embedding_dim=embeddim)
+    # Save pianorolls
+    save_midi_graphs(str(recon_res_dir),str(recon_res_dir))
+    '''
     original_tensors = PROJECT_DIRECTORY / "recon_tensors"
     model_path = PROJECT_DIRECTORY / "models"
     results_folder = PROJECT_DIRECTORY / "results"
@@ -189,7 +200,7 @@ if __name__ == "__main__":
         save_midi_graphs(resdir, resdir)
 
     #model_path = Path('../models/new_rep/model_FINAL-2022-07-01-0.pt')
-
+    '''
     '''training_set_tensors = Path('../new_recon_tensors/train_set_tensors')
     testing_set_tensors = Path('../new_recon_tensors/test_set_tensors')
 
