@@ -94,10 +94,10 @@ def reconstruct_song(orig_tensor_path, model, device, clip_val=0.5, norm=False, 
     #print(data)
     
     if quantize: 
-        x_hat, mean, log_var = model(chunked_data, device)
+        x_hat, mean, log_var = model(chunked_data)
         loss = bce_loss(x_hat, chunked_data, mean, log_var)
     else: 
-        vq_loss, data_recon, perplexity = model(chunked_data)
+        vq_loss, data_recon = model(chunked_data, device)
         recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
         zero_recon = F.mse_loss(torch.zeros(n//l, 1, p, l), chunked_data)
         loss = recon_error + vq_loss
