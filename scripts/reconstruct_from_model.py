@@ -115,7 +115,6 @@ def reconstruct_song(orig_tensor_path, model, device, clip_val=0.5, norm=False, 
     print(unchunked_recon)
     unchunked_recon[unchunked_recon < clip_val] = 0
     unchunked_recon[unchunked_recon >= clip_val] = 1
-    print(torch.sum(unchunked_recon), torch.sum(data))
 
     if norm: # unnormalize!
         unchunked_recon = unchunked_recon * maxlength
