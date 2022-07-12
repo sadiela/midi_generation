@@ -24,16 +24,13 @@ import yaml
 from pathlib import Path
 import argparse
 import pickle
+from loss_functions import *
 
 maxlength = 16*32
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu") # pick device
 
-def bce_loss(x_hat, x, mean, log_var):
-    reproduction_loss = nn.functional.binary_cross_entropy(x_hat, x, reduction='mean')
-    kld = - 0.5 * torch.sum(1 + log_var - mean.pow(2) - log_var.exp())
 
-    return reproduction_loss + kld
-        
-def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, device, clip_val=0, norm=False, batchlength=256, num_embed=1024, quantize=False, embedding_dim=128):
+def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False, batchlength=256, num_embed=1024, quantize=False, embedding_dim=128):
     res_string = "MODEL FILE NAME" + str(model_path) + "\nRECON ERRORS!\n"
     file_list = os.listdir(orig_tensor_dir)
 
@@ -43,7 +40,7 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
         model = VAE_Model(in_channels=1, hidden_dim=128*155, latent_dim=embedding_dim)
 
     res_string += "number of parameters in initialized model:" + str(sum(p.numel() for p in model.parameters())) + '\n'
-    stat_dictionary = torch.load(model_path, map_location=torch.device('cpu'))
+    stat_dictionary = torch.load(model_path, map_location=torch.device(DEVICE))
     model_params = stat_dictionary["model_state_dict"]
     res_string += "number of parameters in state dictionary:" + str(sum(p.numel() for p in model_params.values())) + '\n'
     model.load_state_dict(model_params)
@@ -51,7 +48,7 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
 
     for file in file_list:
         print(file) # perform reconstruction
-        cur_tensor, loss, recon_err, zero_recon = reconstruct_song(Path(orig_tensor_dir) / file, model, device, clip_val=clip_val, norm=norm, batchlength=batchlength, quantize=quantize)
+        cur_tensor, loss, recon_err, zero_recon = reconstruct_song(Path(orig_tensor_dir) / file, model, clip_val=clip_val, norm=norm, batchlength=batchlength, quantize=quantize)
         # record info IF RECONSTRUCTION NOT ALL 0s
         if (cur_tensor > 0).sum() > 0: 
             print(cur_tensor[:,:10])
@@ -69,7 +66,7 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
     with open(Path(new_midi_dir) / 'recon_info.txt', 'w') as outfile:
         outfile.write(res_string)
 
-def reconstruct_song(orig_tensor_path, model, device, clip_val=0.5, norm=False, batchlength=256, quantize=False):
+def reconstruct_song(orig_tensor_path, model, clip_val=0.5, norm=False, batchlength=256, quantize=False):
     with open(orig_tensor_path,'rb') as f: 
         pickled_tensor = pickle.load(f)
     data = pickled_tensor.toarray()
@@ -82,7 +79,7 @@ def reconstruct_song(orig_tensor_path, model, device, clip_val=0.5, norm=False, 
 
     l = batchlength #1024 # batch length
 
-    data = data.to(device)
+    data = data.to(DEVICE)
 
     data = data[:,:(data.shape[1]-(data.shape[1]%l))]
     p, n_2 = data.shape
@@ -94,7 +91,7 @@ def reconstruct_song(orig_tensor_path, model, device, clip_val=0.5, norm=False, 
     #print(data)
     
     if quantize: 
-        x_hat, mean, log_var = model(chunked_data, device)
+        x_hat, mean, log_var = model(chunked_data)
         loss = bce_loss(x_hat, chunked_data, mean, log_var)
     else: 
         vq_loss, data_recon, perplexity = model(chunked_data)

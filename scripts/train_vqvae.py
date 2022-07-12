@@ -95,12 +95,6 @@ def collate_fn(data, collate_shuffle=True):
   else:
     return full_list
 
-def bce_loss(x_hat, x, mean, log_var):
-    reproduction_loss = nn.functional.binary_cross_entropy(x_hat, x, reduction='mean')
-    kld = - 0.5 * torch.sum(1 + log_var - mean.pow(2) - log_var.exp())
-
-    return reproduction_loss + kld
-
 def validate_model(model, data_path, batchlength= 256, batchsize=5, num_embeddings=1024, lossfunc='mse', lam=1):
     midi_tensor_validation = MidiDataset(data_path, l=batchlength) 
     validation_data = DataLoader(midi_tensor_validation, collate_fn=collate_fn, batch_size=batchsize, shuffle=True, num_workers=2)
@@ -116,6 +110,8 @@ def validate_model(model, data_path, batchlength= 256, batchsize=5, num_embeddin
         recon_error = F.mse_loss(x_hat, v_x)
       elif lossfunc=='l1reg':
         recon_error = F.mse_loss(x_hat, v_x) + (1.0/v_x.shape[0])*lam*torch.norm(x_hat, p=1) # +  ADD L1 norm
+      elif lossfunc=='bce':
+        recon_error==bce_loss(x_hat, v_x)
       else: # loss function = mae
         recon_error = F.l1_loss(x_hat, v_x)
       validation_recon_error.append(recon_error)
@@ -185,7 +181,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
                 recon_error = F.l1_loss(x_hat, x)
             loss = recon_error + vq_loss # will be 0 if no quantization
           else:
-            x_hat, mean, log_var = model(x, DEVICE)
+            x_hat, mean, log_var = model(x)
             loss = bce_loss(x_hat, x, mean, log_var)
 
           loss.backward()

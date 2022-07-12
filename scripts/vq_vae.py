@@ -10,6 +10,8 @@ import torch.nn.functional as F
 import torch.optim as optim
 import logging
 
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu") # pick device
+
 # is reconstruction error going down? 
 # Run w/ more data
 # Increase # of embedding vectors? 

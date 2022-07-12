@@ -10,6 +10,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 import logging
 
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu") # pick device
+
+
 # is reconstruction error going down? 
 # Run w/ more data
 # Increase # of embedding vectors? 
@@ -96,13 +99,13 @@ class VAE_Model(nn.Module):
     self.Encoder = VAE_Encoder(in_channels, hidden_dim, latent_dim)
     self.Decoder = VAE_Decoder(in_channels, hidden_dim, latent_dim) 
 
-  def reparameterization(self, mean, var, device):
-    epsilon = torch.randn_like(var).to(device)
+  def reparameterization(self, mean, var):
+    epsilon = torch.randn_like(var).to(DEVICE)
     z = mean + var * epsilon
     return z
   
-  def forward(self, x, device):
+  def forward(self, x):
     mean, log_var = self.Encoder(x)
-    z = self.reparameterization(mean, torch.exp(0.5 * log_var), device)
+    z = self.reparameterization(mean, torch.exp(0.5 * log_var))
     x_hat = self.Decoder(z)
     return x_hat, mean, log_var
