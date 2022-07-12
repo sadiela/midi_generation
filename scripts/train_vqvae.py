@@ -241,8 +241,8 @@ if __name__ == "__main__":
 
     # run a single label experiment by default, if --multi flag is added, run a multilabel experiment!
     parser.add_argument('-l','--lossfunc', help='loss function to use', default='mse')
-    parser.add_argument('-q', '--quantize', dest='quant', action='store_const', const=False,
-                        default=True, help="True=VQVAE, false=VAE")
+    parser.add_argument('-q', '--quantize', dest='quant', action='store_const', const=True,
+                        default=False, help="True=VQVAE, false=VAE")
     #parser.add_argument('-n', '--nfolds', help='number of folds to use in cross validation', default=1) # make default 1?
     parser.add_argument('-v', '--verbosity', dest='loglevel', action='store_const', const='DEBUG',
                         default='INFO',help='specify level of detail for log file')
@@ -300,7 +300,7 @@ if __name__ == "__main__":
     try: 
         with open(savefile, 'w') as outfile:
             yaml.dump(results, outfile, default_flow_style=False)
-        save_result_graph(savefile, model_path)
+        save_result_graph(savefile, modeldir)
     except Exception as e: 
         print(e)
 
@@ -316,3 +316,5 @@ if __name__ == "__main__":
     reconstruct_songs(str(tensor_dir), str(recon_res_dir), str(recon_res_dir), final_model_name, device=DEVICE, clip_val=0, batchlength=batchlength, quantize=quantize, embedding_dim=embeddim)
     # Save pianorolls
     save_midi_graphs(str(recon_res_dir),str(recon_res_dir))
+
+    # python3 train_vqvae.py -d '../mini_data' -m '../models/mini_test_models' -r "tiny_test" 

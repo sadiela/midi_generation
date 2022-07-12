@@ -48,12 +48,12 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
 
     for file in file_list:
         print(file) # perform reconstruction
-        cur_tensor, loss, recon_err, zero_recon = reconstruct_song(Path(orig_tensor_dir) / file, model, clip_val=clip_val, norm=norm, batchlength=batchlength, quantize=quantize)
+        cur_tensor, loss = reconstruct_song(Path(orig_tensor_dir) / file, model, clip_val=clip_val, norm=norm, batchlength=batchlength, quantize=quantize)
         # record info IF RECONSTRUCTION NOT ALL 0s
         if (cur_tensor > 0).sum() > 0: 
             print(cur_tensor[:,:10])
             #input("Continue")
-            res_string += str(file) + ' recon error: ' + str(recon_err.item()) + ' loss: ' + str(loss.item()) + ' zero recon:' + str(zero_recon.item()) + '\n'
+            res_string += str(file) + ' loss: ' + str(loss.item()) # + ' zero loss:' + str(zero_loss.item()) + '\n'
             # save tensor
             sparse_arr = sparse.csr_matrix(cur_tensor) # save sparse!!!
             with open(str(Path(new_tensor_dir) / str(file.split('.')[0] + '_conv.p')), 'wb') as outfile:
@@ -70,8 +70,8 @@ def reconstruct_song(orig_tensor_path, model, clip_val=0.5, norm=False, batchlen
     with open(orig_tensor_path,'rb') as f: 
         pickled_tensor = pickle.load(f)
     data = pickled_tensor.toarray()
-    if norm:
-        data = data / maxlength
+
+    data = torch.tensor(data)
 
     # Test on a song
     #print(data.shape)
@@ -86,36 +86,36 @@ def reconstruct_song(orig_tensor_path, model, clip_val=0.5, norm=False, batchlen
     #print("Cropped data shape:", data.shape)
     data = torch.tensor(data).float()
 
-    chunked_data = data.view((n//l, 1, p, l))
-    #print("chunked data shape", chunked_data.shape)
+    x = data.view((n//l, 1, p, l))
+    print("chunked data shape", x.shape)
     #print(data)
     
     if quantize: 
-        x_hat, mean, log_var = model(chunked_data)
-        loss = bce_loss(x_hat, chunked_data, mean, log_var)
-    else: 
-        vq_loss, data_recon, perplexity = model(chunked_data)
-        recon_error = F.mse_loss(data_recon, chunked_data) #/ data_variance
-        zero_recon = F.mse_loss(torch.zeros(n//l, 1, p, l), chunked_data)
+        vq_loss, x_hat = model(x)
+        recon_error = F.mse_loss(x_hat, x) #/ data_variance
+        #zero_loss = F.mse_loss(torch.zeros(n//l, 1, p, l), x) + vq_loss
         loss = recon_error + vq_loss
+    else: 
+        x_hat, mean, log_var = model(x)
+        loss = bce_loss(x_hat, x, mean, log_var)
+        #zero_loss = bce_loss(torch.zeros(n//l, 1, p, l), x)
 
     #print("recon data shape:", data_recon.shape)
     #print(data_recon)
-    for i in range(data_recon.shape[0]):
-        print(torch.max(data_recon[i,:,:,:]).item())
+    for i in range(x_hat.shape[0]):
+        print(torch.max(x_hat[i,:,:,:]).item())
     print('Loss:', loss.item())#, '\Perplexity:', perplexity.item())
 
-    unchunked_recon = data_recon.view(p, n_2).detach().numpy()
+    unchunked_recon = x_hat.view(p, n_2).detach().numpy()
     # Turn all negative values to 0 
     #unchunked_recon = unchunked_recon.clip(min=clip_val) # min note length that should count
     print(unchunked_recon)
     unchunked_recon[unchunked_recon < clip_val] = 0
     unchunked_recon[unchunked_recon >= clip_val] = 1
 
-    if norm: # unnormalize!
-        unchunked_recon = unchunked_recon * maxlength
+    print(np.sum(unchunked_recon), np.sum(data.numpy()))
 
-    return unchunked_recon, loss, recon_error, zero_recon
+    return unchunked_recon, loss #, zero_loss
 
 def save_result_graph(yaml_file, plot_dir):
     #root_name = yaml_name.split(".")[0]
@@ -149,6 +149,17 @@ def save_midi_graphs(midi_path, save_path):
 
 if __name__ == "__main__":
     # Default paths:
+    tensor_dir = '/projectnb/textconv/sadiela/midi_generation/new_recon_tensors/train_recons/'
+    recon_res_dir = '/projectnb/textconv/sadiela/midi_generation/models/new_rep_vae_overhaul/final_recons/'
+    final_model_name = '/projectnb/textconv/sadiela/midi_generation/models/new_rep_vae_overhaul/model_FINAL-2022-07-09-0.pt'
+    batchlength= 256
+    quantize= False
+    embeddim = 128
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # pick device
+    reconstruct_songs(str(tensor_dir), str(recon_res_dir), str(recon_res_dir), final_model_name, device=device, clip_val=0, batchlength=batchlength, quantize=quantize, embedding_dim=embeddim)
+    # Save pianorolls
+    save_midi_graphs(str(recon_res_dir),str(recon_res_dir))
+    '''
     original_tensors = PROJECT_DIRECTORY / "recon_tensors"
     model_path = PROJECT_DIRECTORY / "models"
     results_folder = PROJECT_DIRECTORY / "results"
@@ -186,7 +197,7 @@ if __name__ == "__main__":
         save_midi_graphs(resdir, resdir)
 
     #model_path = Path('../models/new_rep/model_FINAL-2022-07-01-0.pt')
-
+    '''
     '''training_set_tensors = Path('../new_recon_tensors/train_set_tensors')
     testing_set_tensors = Path('../new_recon_tensors/test_set_tensors')
 
