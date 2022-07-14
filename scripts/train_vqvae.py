@@ -33,10 +33,10 @@ PITCH_DIM = 128
 # DEFAULT FILEPATHS #
 #####################
 #data_folder = Path("source_data/text_files/")
-datpath = PROJECT_DIRECTORY  / 'data' / 'ttv'  # '..\\midi_data\\full_dataset_midis_normalized\\'
-desktopdatpath = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'midi_tensors_2'
-modpath = PROJECT_DIRECTORY / 'models'
-respath = PROJECT_DIRECTORY / 'models'
+datadir = PROJECT_DIRECTORY  / 'data' / 'ttv'  # '..\\midi_data\\full_dataset_midis_normalized\\'
+desktopdatdir = PROJECT_DIRECTORY / 'midi_data' / 'new_data' / 'midi_tensors_2'
+modelupperdir = PROJECT_DIRECTORY / 'models'
+resdir = PROJECT_DIRECTORY / 'models'
 #logpath = PROJECT_DIRECTORY / 'scripts' / 'log_files'
 #/usr3/graduate/sadiela/midi_generation/models/' #model_10_25_2.pt'
 
@@ -114,7 +114,6 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     logging.info("Models will be saved in the directory: %s", model_save_path)
 
     midi_tensor_dataset = MidiDataset(Path(datapath) / "train", l=batchlength) # dataset declaration
-    print("GRABBED DATA")
 
     ### Declare model ### 
     if quantize:
@@ -133,7 +132,6 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     train_res_total_loss = []
 
     training_data = DataLoader(midi_tensor_dataset, collate_fn=collate_fn, batch_size=batchsize, shuffle=True, num_workers=2)
-    print("SET UP DATA LOADER")
     # Let # of tensors = n
     # each tensor is pxl_i, where l_i is the length of the nth tensor
     # when we chunk the data, it becomes (l_i//l = s_i) x 1 x p x l 
@@ -155,27 +153,19 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
             max_tensor_size = cursize
             logging.info("NEW MAX BATCH SIZE: %d", max_tensor_size)
 
-        
-          print("Choosing loss:", lossfunc, quantize)
-          #print('TRAIN:', x.shape)
+                  #print('TRAIN:', x.shape)
           if quantize: 
             x_hat, vq_loss, perplexity = model(x)
             recon_error = calculate_recon_error(x_hat, x, lossfunc=lossfunc, lam=lam)
             loss = recon_error + vq_loss # will be 0 if no quantization
           else:
-            print("Running VAE model!")
             x_hat, mean, log_var = model(x)
-            print("Ran model")
             recon_error = calculate_recon_error(x_hat, x, lossfunc=lossfunc, lam=lam) 
             loss = recon_error +  kld(mean, log_var)
-            print("Calculated loss")
 
           loss.backward()
-          print("backpropagated")
           torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
-          print("clipped gradient")
           optimizer.step()
-          print("Optimizer stepped")
           
           ### RECORD LOSSES ###
           train_res_total_loss.append(loss.item())
@@ -217,8 +207,8 @@ if __name__ == "__main__":
     prog_start = time.time()
     parser = argparse.ArgumentParser(description='Arguments for running VQ-VAE')
     #parser.add_argument('-l','--lossfunc', help='Choose loss function.', default=True)
-    parser.add_argument('-d', '--datadir', help='Path to training tensor data.', default=datpath)
-    parser.add_argument('-m', '--modeldir', help='desired model subdirectory name', default=modpath)
+    parser.add_argument('-d', '--datadir', help='Path to training tensor data.', default=datadir)
+    parser.add_argument('-m', '--modeldir', help='desired model subdirectory name', required=True) # default=modeldir)
     parser.add_argument('-r', '--resname', help='Result and model stub', default="VQ_VAE_training")
     parser.add_argument('-b', '--batchsize', help='Number of songs in a batch', default=5)
     parser.add_argument('-a', '--batchlength', help='Length of midi object', default=256) # want to change to 384 eventually
@@ -251,7 +241,7 @@ if __name__ == "__main__":
     lr = 1e-3
 
     # create directory for models and results
-    modeldir = modpath / modelsubdir
+    modeldir = modelupperdir / modelsubdir
     if not os.path.isdir(modeldir):
         os.mkdir(modeldir)
 
@@ -271,6 +261,28 @@ if __name__ == "__main__":
 
     print("Chosen hyperparameters:")
     print(hyperparameters)
+
+    model_hyperparameters = {
+        "datadir": datadir, 
+        "modeldir": modeldir,
+        "fstub": fstub,
+        "quantize": quantize,
+        "batchsize": batchsize,
+        "batchlength": batchlength,
+        "embeddingdim": embeddim,
+        "numembed": numembed,
+        "lossfunc": loss,
+        "learningrate": lr, 
+        "lambda": lam
+    }
+
+    # save hyperparameters to YAML file in folder
+    param_file = modeldir / "MODEL_PARAMS.yaml"
+    try:
+        with open(str(param_file), 'w') as outfile: 
+            yaml.dump(model_hyperparameters, outfile)
+    except Exception as e: 
+        print(e)
 
     #####################
     #### Train model ####
@@ -293,14 +305,14 @@ if __name__ == "__main__":
     ########################
     # Reconstruct tensors! #
     ######################## 
-    recon_tensor_dir = datadir
-    recon_res_dir = Path(modeldir) / 'final_recons'
-    if not os.path.isdir(recon_res_dir):
-        os.mkdir(recon_res_dir)
+    recontensordir = Path('../new_recon_tensors/train_set_tensors/')
+    reconresdir = Path(modeldir) / 'final_recons'
+    if not os.path.isdir(reconresdir):
+        os.mkdir(reconresdir)
 
     # reconstruct midis
-    reconstruct_songs(str(recon_tensor_dir), str(recon_res_dir), str(recon_res_dir), final_model_name, clip_val=0, batchlength=batchlength, quantize=quantize, embedding_dim=embeddim)
+    reconstruct_songs(model_hyperparameters, reconresdir, recontensordir, final_model_name, clip_val=0.5)
     # Save pianorolls
-    save_midi_graphs(str(recon_res_dir),str(recon_res_dir))
+    save_midi_graphs(str(reconresdir),str(reconresdir))
 
     # python3 train_vqvae.py -d '../mini_data' -m '../models/mini_test_models' -r "tiny_test" -l "bce"

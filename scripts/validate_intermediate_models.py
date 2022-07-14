@@ -112,13 +112,38 @@ def validate_model(model, data_path, batchlength= 256, batchsize=5, lossfunc='ms
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Arguments for running VQ-VAE')
     parser.add_argument('-m', '--modeldir', help='desired model subdirectory name', default='model')
+    parser.add_argument('-d', '--datadir', help='desired model subdirectory name', default='../data/ttv/validate/')
+    parser.add_argument('-q', '--quantize', dest='quant', action='store_const', const=True,
+                        default=False, help="True=VQVAE, false=VAE")
+
     args = vars(parser.parse_args())
 
     modelsubdir = args['modeldir']
+    datadir = args['datadir']
+    quantize = args['quant']
 
     modeldir = Path('../models') / modelsubdir
+
+    try: 
+        with open(str(modeldir / "MODEL_PARAMS.yaml")) as file: 
+            model_hyperparams = yaml.load(file, Loader=yaml.FullLoader)
+    except Exception as e: 
+        print(e)
+
+
+
+    if quantize:
+        model = VQVAE_Model(num_embeddings=model_hyperparams["numembed"], embedding_dim=model_hyperparams["embeddingdim"], commitment_cost=0.5)
+    else: 
+        model = VAE_Model(in_channels=1, hidden_dim=128*155, latent_dim=model_hyperparams["embeddingdim"])
 
     for file in os.listdir(modeldir):
     # check only text files
         if file.endswith('.pt'):
-            print(str(modeldir) + file)
+            print(str(modeldir) + '/' + file)
+            stat_dictionary = torch.load(str(modeldir) + '/' + file, map_location=torch.device(DEVICE))
+            model_params = stat_dictionary["model_state_dict"]
+            model.load_state_dict(model_params)
+            model.to(DEVICE)
+            #model.eval()
+            #validate_model(model, datadir, batchlength= 256, batchsize=5, lossfunc='mse', lam=1, quantize=False)

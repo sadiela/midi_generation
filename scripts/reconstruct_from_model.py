@@ -29,15 +29,14 @@ from loss_functions import *
 maxlength = 16*32
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu") # pick device
 
-
-def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path, clip_val=0, norm=False, batchlength=256, num_embed=1024, quantize=False, embedding_dim=128):
+def reconstruct_songs(model_hyperparams, resultdir, tensordir, model_path, clip_val=0.5):
     res_string = "MODEL FILE NAME" + str(model_path) + "\nRECON ERRORS!\n"
-    file_list = os.listdir(orig_tensor_dir)
+    file_list = os.listdir(tensordir)
 
-    if quantize:
-        model = VQVAE_Model(num_embeddings=num_embed, embedding_dim=embedding_dim, commitment_cost=0.5)
+    if model_hyperparams["quantize"]:
+        model = VQVAE_Model(num_embeddings=model_hyperparams["numembed"], embedding_dim=model_hyperparams["embeddingdim"], commitment_cost=0.5)
     else: 
-        model = VAE_Model(in_channels=1, hidden_dim=128*155, latent_dim=embedding_dim)
+        model = VAE_Model(in_channels=1, hidden_dim=128*155, latent_dim=model_hyperparams["embeddingdim"])
 
     res_string += "number of parameters in initialized model:" + str(sum(p.numel() for p in model.parameters())) + '\n'
     stat_dictionary = torch.load(model_path, map_location=torch.device(DEVICE))
@@ -49,25 +48,25 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
 
     for file in file_list:
         print(file) # perform reconstruction
-        cur_tensor, loss = reconstruct_song(Path(orig_tensor_dir) / file, model, clip_val=clip_val, norm=norm, batchlength=batchlength, quantize=quantize)
+        cur_tensor, loss = reconstruct_song(Path(tensordir) / file, model, clip_val=clip_val, batchlength=model_hyperparams["batchlength"], quantize=model_hyperparams["quantize"])
         # record info IF RECONSTRUCTION NOT ALL 0s
         if (cur_tensor > 0).sum() > 0: 
             print(cur_tensor[:,:10])
             #input("Continue")
-            res_string += stppr(file) + ' loss: ' + str(loss.item()) # + ' zero loss:' + str(zero_loss.item()) + '\n'
+            res_string += str(file) + ' loss: ' + str(loss.item()) # + ' zero loss:' + str(zero_loss.item()) + '\n'
             # save tensor
             sparse_arr = sparse.csr_matrix(cur_tensor) # save sparse!!!
-            with open(str(Path(new_tensor_dir) / str(file.split('.')[0] + '_conv.p')), 'wb') as outfile:
+            with open(str(Path(resultdir) / str(file.split('.')[0] + '_conv.p')), 'wb') as outfile:
                 pickle.dump(sparse_arr, outfile)
             # convert to midi and save midi 
             print("entering tensor to midi")
-            tensor_to_midi_2(cur_tensor, Path(new_midi_dir) / str(file.split('.')[0] + '.mid'))
+            tensor_to_midi_2(cur_tensor, Path(resultdir) / str(file.split('.')[0] + '.mid'))
         else:
             print(file, "reconstruction is all 0s")
-    with open(Path(new_midi_dir) / 'recon_info.txt', 'w') as outfile:
+    with open(Path(resultdir) / 'recon_info.txt', 'w') as outfile:
         outfile.write(res_string)
 
-def reconstruct_song(orig_tensor_path, model, clip_val=0.5, norm=False, batchlength=256, quantize=False):
+def reconstruct_song(orig_tensor_path, model, clip_val=0.5, batchlength=256, quantize=False):
     with open(orig_tensor_path,'rb') as f: 
         pickled_tensor = pickle.load(f)
     data = pickled_tensor.toarray()
