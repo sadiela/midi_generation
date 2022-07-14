@@ -106,31 +106,38 @@ def collate_fn(data, collate_shuffle=True):
   else:
     return full_list
 
-def validate_model(model, data_path, batchlength= 256, batchsize=5, num_embeddings=1024, lossfunc='mse', lam=1):
+def validate_model(model, data_path, batchlength= 256, batchsize=5, lossfunc='mse', lam=1, quantize=False):
     midi_tensor_validation = MidiDataset(data_path, l=batchlength) 
     validation_data = DataLoader(midi_tensor_validation, collate_fn=collate_fn, batch_size=batchsize, shuffle=True, num_workers=2)
 
     model.eval()
 
     validation_recon_error = []
+    validation_total_error = []
 
-    for i, v_x in enumerate(validation_data):
-      v_x = v_x.to(DEVICE)
-      vq_loss, x_hat, perplexity = model(v_x)
-      if lossfunc=='mse':
-        recon_error = F.mse_loss(x_hat, v_x)
-      elif lossfunc=='l1reg':
-        recon_error = F.mse_loss(x_hat, v_x) + (1.0/v_x.shape[0])*lam*torch.norm(x_hat, p=1) # +  ADD L1 norm
-      elif lossfunc=='bce':
-        recon_error==bce_loss(x_hat, v_x)
-      else: # loss function = mae
-        recon_error = F.l1_loss(x_hat, v_x)
-      validation_recon_error.append(recon_error)
+    for i, x in enumerate(validation_data):
+      x = x.to(DEVICE)
+
+      if quantize: 
+            x_hat, vq_loss, perplexity = model(x)
+            recon_error = calculate_recon_error(x_hat, x, lossfunc=lossfunc, lam=lam)
+            loss = recon_error + vq_loss # will be 0 if no quantization
+      else:
+            x_hat, mean, log_var = model(x)
+            recon_error = calculate_recon_error(x_hat, x, lossfunc=lossfunc, lam=lam) 
+            loss = recon_error +  kld(mean, log_var)
+
+
+      validation_recon_error.append(recon_error.item())
+      validation_total_error.append(loss.item())
       if (i+1) % 10 == 0:
         print("Val recon:", recon_error)
         #logging.info('validation recon_error: %.3f' % np.mean(validation_recon_error[-1]))
 
     model.train()
+    print(np.mean(validation_recon_error), np.mean(validation_total_error))
+
+    return validation_recon_error, validation_total_error
 
 
 def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=128, learning_rate=1e-3, lossfunc='mse', batchsize=10, batchlength=256, normalize=False, quantize=True, lam=1):
@@ -155,7 +162,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     model.train() # training mode
     train_res_recon_error = []
     train_res_perplexity = []
-    total_loss = []
+    train_res_total_loss = []
 
     training_data = DataLoader(midi_tensor_dataset, collate_fn=collate_fn, batch_size=batchsize, shuffle=True, num_workers=2)
     print("SET UP DATA LOADER")
@@ -184,23 +191,15 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
           print("Choosing loss:", lossfunc, quantize)
           #print('TRAIN:', x.shape)
           if quantize: 
-            vq_loss, x_hat, perplexity = model(x)
-            if lossfunc=='mse':
-                recon_error = F.mse_loss(x_hat, x) #/ data_variance
-            #elif lossfunc=='dyn':
-            #  recon_error = dynamic_loss(x_hat, x, device) #X_hat, then X!!!
-            elif lossfunc=='l1reg':
-                recon_error = F.mse_loss(x_hat, x) + (1.0/x.shape[0])*lam*torch.norm(x_hat, p=1) # +  ADD L1 norm
-            elif lossfunc=='bce':
-                recon_error = nn.functional.binary_cross_entropy(x_hat, x, reduction='mean')
-            else: # loss function = mae
-                recon_error = F.l1_loss(x_hat, x)
+            x_hat, vq_loss, perplexity = model(x)
+            recon_error = calculate_recon_error(x_hat, x, lossfunc=lossfunc, lam=lam)
             loss = recon_error + vq_loss # will be 0 if no quantization
           else:
             print("Running VAE model!")
             x_hat, mean, log_var = model(x)
             print("Ran model")
-            loss = bce_loss(x_hat, x, mean, log_var)
+            recon_error = calculate_recon_error(x_hat, x, lossfunc=lossfunc, lam=lam) 
+            loss = recon_error +  kld(mean, log_var)
             print("Calculated loss")
 
           loss.backward()
@@ -211,13 +210,9 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
           print("Optimizer stepped")
           
           ### RECORD LOSSES ###
-          total_loss.append(loss.item())
-          if quantize:
-            train_res_recon_error.append(recon_error.item())
-            #train_res_perplexity.append(perplexity.item())
-          else:
-            train_res_recon_error.append(loss.item())
-            #train_res_perplexity.append(0)
+          train_res_total_loss.append(loss.item())
+          train_res_recon_error.append(recon_error.item())
+
 
           if (i) % 5000 == 0:
             # new save path
@@ -228,7 +223,8 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
                         'iteration': i,
                         'model_state_dict': model.state_dict(),
                         'optimizer_state_dict': optimizer.state_dict(),
-                        'loss': np.mean(train_res_recon_error[-5000:]),
+                        'recon_loss': np.mean(train_res_recon_error[-5000:]),
+                        'total_loss': np.mean(train_res_total_loss[-5000:])
                         }, cur_model_file) # incremental saves
             logging.info('%d iterations' % (i+1))
             logging.info('recon_error: %.3f' % np.mean(train_res_recon_error[-5000:]))
@@ -246,7 +242,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
                 'optimizer_state_dict': optimizer.state_dict(),
                 'loss': np.mean(train_res_recon_error[-5000:]),
                 }, final_model_file) 
-    return train_res_recon_error, train_res_perplexity, final_model_file
+    return train_res_recon_error, train_res_total_loss, train_res_perplexity, final_model_file
 
 
 if __name__ == "__main__":
@@ -312,11 +308,11 @@ if __name__ == "__main__":
     #### Train model ####
     #####################
 
-    recon_error, perplex, final_model_name = train_model(datadir, modeldir, num_embeddings=numembed, embedding_dim=embeddim, lossfunc=loss, learning_rate=lr, batchsize=batchsize, batchlength=batchlength, quantize=quantize, lam=lam)
+    recon_error, total_loss, perplex, final_model_name = train_model(datadir, modeldir, num_embeddings=numembed, embedding_dim=embeddim, lossfunc=loss, learning_rate=lr, batchsize=batchsize, batchlength=batchlength, quantize=quantize, lam=lam)
     logging.info("All done training! TOTAL TIME: %s", str(time.time()-prog_start))
 
     # save losses to file and plot graph!
-    results={"reconstruction_error": recon_error, "perplexity": perplex}
+    results={"reconstruction_error": recon_error, "total_loss": total_loss, "perplexity": perplex}
     savefile = get_free_filename('recon_error_and_perplexity_' + fstub, modeldir, suffix='.yaml')
     logging.info("SAVING FILE TO: %s", savefile)
     try: 
@@ -339,4 +335,4 @@ if __name__ == "__main__":
     # Save pianorolls
     save_midi_graphs(str(recon_res_dir),str(recon_res_dir))
 
-    # python3 train_vqvae.py -d '../mini_data' -m '../models/mini_test_models' -r "tiny_test" 
+    # python3 train_vqvae.py -d '../mini_data' -m '../models/mini_test_models' -r "tiny_test" -l "bce"

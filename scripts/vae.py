@@ -17,7 +17,6 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu") # pick dev
 # Run w/ more data
 # Increase # of embedding vectors? 
 
-
 class VAE_Encoder(nn.Module):
   def __init__(self, in_channels, hidden_dim, latent_dim):
     super(VAE_Encoder, self).__init__()

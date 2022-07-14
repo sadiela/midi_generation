@@ -147,4 +147,4 @@ class VQVAE_Model(nn.Module):
       loss, quantized, perplexity, _ = self._vq_vae(z)
       x_recon = self._decoder(quantized)
 
-      return loss, x_recon, perplexity
+      return x_recon, loss, perplexity

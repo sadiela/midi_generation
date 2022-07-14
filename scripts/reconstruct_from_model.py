@@ -130,6 +130,14 @@ def save_result_graph(yaml_file, plot_dir):
 
     plt.clf()
 
+    plt.plot(res_dic['total_loss'])
+    plt.title("Total Loss")
+    plt.xlabel("Iteration")
+    #plt.show()
+    print("SAVING")
+    plt.savefig(str(plot_dir / "total_loss.png"))
+    plt.clf()
+
 def save_midi_graphs(midi_path, save_path):
     print('saving pianoroll images')
     file_list = os.listdir(midi_path)
