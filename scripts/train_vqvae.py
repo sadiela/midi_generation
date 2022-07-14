@@ -140,7 +140,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     max_tensor_size= 0 
     #dynamic_loss = SpeedySparseDynamicLoss.apply
     model_number = 1
-    for e in range(2):
+    for e in range(10):
       # train loop
       for i, x in tqdm(enumerate(training_data)):
           print(i)
@@ -311,7 +311,7 @@ if __name__ == "__main__":
         os.mkdir(reconresdir)
 
     # reconstruct midis
-    #reconstruct_songs(model_hyperparameters, reconresdir, recontensordir, final_model_name, clip_val=0.5)
+    reconstruct_songs(model_hyperparameters, reconresdir, recontensordir, final_model_name, clip_val=0.5)
     # Save pianorolls
     save_midi_graphs(str(reconresdir),str(reconresdir))
 
