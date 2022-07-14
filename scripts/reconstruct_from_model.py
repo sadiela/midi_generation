@@ -44,6 +44,7 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
     model_params = stat_dictionary["model_state_dict"]
     res_string += "number of parameters in state dictionary:" + str(sum(p.numel() for p in model_params.values())) + '\n'
     model.load_state_dict(model_params)
+    model.to(DEVICE)
     model.eval()
 
     for file in file_list:

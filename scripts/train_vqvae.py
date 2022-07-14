@@ -151,13 +151,14 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
 
     ### Declare model ### 
     if quantize:
-        model = VQVAE_Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5).to(DEVICE) 
+        model = VQVAE_Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5)
     else: 
-        model = VAE_Model(in_channels=1, hidden_dim=PITCH_DIM*155, latent_dim=embedding_dim).to(DEVICE)
+        model = VAE_Model(in_channels=1, hidden_dim=PITCH_DIM*155, latent_dim=embedding_dim)
 
     ### Declare optimizer ###
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, amsgrad=False) # optimizer declaration
 
+    model.to(DEVICE)
     model.float()
     model.train() # training mode
     train_res_recon_error = []
