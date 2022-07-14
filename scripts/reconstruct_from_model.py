@@ -114,7 +114,7 @@ def reconstruct_song(orig_tensor_path, model, clip_val=0.5, norm=False, batchlen
     unchunked_recon[unchunked_recon < clip_val] = 0
     unchunked_recon[unchunked_recon >= clip_val] = 1
 
-    print(np.sum(unchunked_recon), np.sum(data.numpy()))
+    print(np.sum(unchunked_recon), np.sum(data.cpu().numpy()))
 
     return unchunked_recon, loss #, zero_loss
 
