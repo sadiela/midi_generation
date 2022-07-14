@@ -311,7 +311,7 @@ if __name__ == "__main__":
         os.mkdir(reconresdir)
 
     # reconstruct midis
-    reconstruct_songs(model_hyperparameters, reconresdir, recontensordir, final_model_name, clip_val=0.5)
+    #reconstruct_songs(model_hyperparameters, reconresdir, recontensordir, final_model_name, clip_val=0.5)
     # Save pianorolls
     save_midi_graphs(str(reconresdir),str(reconresdir))
 

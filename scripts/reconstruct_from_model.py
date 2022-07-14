@@ -147,7 +147,7 @@ def save_midi_graphs(midi_path, save_path):
             recon = pypianoroll.read(Path(midi_path) / file)
             print("Done reading")
             recon.binarize()
-            print("Empty beat rate and number of pitches used", recon.empty_beat_rate(), recon.n_pitches_used())
+            print("Empty beat rate and number of pitches used", pypianoroll.empty_beat_ratio(recon), pypianoroll.n_pitches_used(recon))
             print(recon.get_length())
             if recon.get_length() > 64*recon.resolution: # trim only if long
                 recon.trim(0, 64*recon.resolution)
