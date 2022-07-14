@@ -54,7 +54,7 @@ def reconstruct_songs(orig_tensor_dir, new_tensor_dir, new_midi_dir, model_path,
         if (cur_tensor > 0).sum() > 0: 
             print(cur_tensor[:,:10])
             #input("Continue")
-            res_string += str(file) + ' loss: ' + str(loss.item()) # + ' zero loss:' + str(zero_loss.item()) + '\n'
+            res_string += stppr(file) + ' loss: ' + str(loss.item()) # + ' zero loss:' + str(zero_loss.item()) + '\n'
             # save tensor
             sparse_arr = sparse.csr_matrix(cur_tensor) # save sparse!!!
             with open(str(Path(new_tensor_dir) / str(file.split('.')[0] + '_conv.p')), 'wb') as outfile:
@@ -144,7 +144,11 @@ def save_midi_graphs(midi_path, save_path):
     file_list = os.listdir(midi_path)
     for file in tqdm(file_list):
         try:
+            print("READING")
             recon = pypianoroll.read(Path(midi_path) / file)
+            print("Done reading")
+            recon.binarize()
+            print("Empty beat rate and number of pitches used", recon.empty_beat_rate(), recon.n_pitches_used())
             print(recon.get_length())
             if recon.get_length() > 64*recon.resolution: # trim only if long
                 recon.trim(0, 64*recon.resolution)

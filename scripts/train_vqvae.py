@@ -97,7 +97,7 @@ def collate_fn(data, collate_shuffle=True):
   # data is a list of tensors; concatenate and shuffle all list items
   #print(len(data), type(data))
   #print(data)
-  #data = list(filter(lambda x: x is not None, data))
+  data = list(filter(lambda x: x is not None, data))
   #print(len(data))
   full_list = torch.cat(data, 0) # concatenate all data along the first axis
   if collate_shuffle:
