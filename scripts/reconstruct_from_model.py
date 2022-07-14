@@ -149,6 +149,11 @@ def save_midi_graphs(midi_path, save_path):
 
 if __name__ == "__main__":
     # Default paths:
+    print("GRAPHING!")
+    yaml_file = '/Users/sadiela/Documents/phd/research/music/midi_generation/results/recon_error_and_perplexity_vqvae_bce_test-2022-07-09-0.yaml'
+    plot_dir = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/results/')
+    save_result_graph(yaml_file, plot_dir)
+    '''
     tensor_dir = '/projectnb/textconv/sadiela/midi_generation/new_recon_tensors/train_recons/'
     recon_res_dir = '/projectnb/textconv/sadiela/midi_generation/models/new_rep_vae_overhaul/final_recons/'
     final_model_name = '/projectnb/textconv/sadiela/midi_generation/models/new_rep_vae_overhaul/model_FINAL-2022-07-09-0.pt'
@@ -159,7 +164,7 @@ if __name__ == "__main__":
     reconstruct_songs(str(tensor_dir), str(recon_res_dir), str(recon_res_dir), final_model_name, device=device, clip_val=0, batchlength=batchlength, quantize=quantize, embedding_dim=embeddim)
     # Save pianorolls
     save_midi_graphs(str(recon_res_dir),str(recon_res_dir))
-    '''
+    
     original_tensors = PROJECT_DIRECTORY / "recon_tensors"
     model_path = PROJECT_DIRECTORY / "models"
     results_folder = PROJECT_DIRECTORY / "results"

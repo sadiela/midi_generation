@@ -100,12 +100,15 @@ class VAE_Model(nn.Module):
     self.Decoder = VAE_Decoder(in_channels, hidden_dim, latent_dim) 
 
   def reparameterization(self, mean, var):
+    print("Device:", DEVICE)
     epsilon = torch.randn_like(var).to(DEVICE)
     z = mean + var * epsilon
     return z
   
   def forward(self, x):
+    print("In forward")
     mean, log_var = self.Encoder(x)
+    print("encoder ran")
     z = self.reparameterization(mean, torch.exp(0.5 * log_var))
     x_hat = self.Decoder(z)
     return x_hat, mean, log_var

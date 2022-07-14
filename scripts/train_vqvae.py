@@ -58,27 +58,34 @@ class MidiDataset(Dataset):
         
     def __getitem__(self, index):
         # choose random file path from directory (not already chosen), chunk it 
-        #print(str(self.paths[index]))
-        # load in tensor
+        #cur_data = torch.load(self.paths[index])
+        print(self.paths[index])
         with open(self.paths[index], 'rb') as f:
           pickled_tensor = pickle.load(f)
-        cur_tensor = pickled_tensor.toarray()
-        cur_data = torch.tensor(cur_tensor)
+        cur_data = torch.tensor(pickled_tensor.toarray()).float()
+
         p, l_i = cur_data.shape
         
         # make sure divisible by l
         # CHUNK! 
         #print("DATA SHAPE:", cur_data.shape)
         if l_i // self.l == 0: 
-          padded = torch.zeros((p, self.l))
-          padded[:,0:l_i] = cur_data
+          padded_data = torch.zeros((p, self.l))
+          padded_data[:,0:l_i] = cur_data
           l_i=self.l
         else: 
-          padded = cur_data[:,:(cur_data.shape[1]-(cur_data.shape[1]%self.l))]
-        padded = padded.float()
-        cur_chunked = torch.reshape(padded, (l_i//self.l, 1, p, self.l)) 
+          padded_data = cur_data[:,:(cur_data.shape[1]-(cur_data.shape[1]%self.l))]
         
-        return cur_chunked # 3d tensor: l_i\\l x p x l
+        chunked = torch.reshape(padded_data, (l_i//self.l,1, p, self.l)) 
+        # Remove empty areas
+        chunked = chunked[chunked.sum(dim=(2,3)) != 0]
+        chunked = torch.reshape(chunked, (chunked.shape[0], 1, p, self.l)) 
+
+        if chunked.shape[0] != 0:
+            return chunked # 3d tensor: l_i\\l x p x l
+        else:
+            return None
+        return padded
 
     def __getname__(self, index):
         return self.paths[index]
@@ -88,7 +95,11 @@ class MidiDataset(Dataset):
 
 def collate_fn(data, collate_shuffle=True):
   # data is a list of tensors; concatenate and shuffle all list items
-  full_list = torch.cat(data, 0)
+  #print(len(data), type(data))
+  #print(data)
+  #data = list(filter(lambda x: x is not None, data))
+  #print(len(data))
+  full_list = torch.cat(data, 0) # concatenate all data along the first axis
   if collate_shuffle:
     idx = torch.randperm(full_list.shape[0])
     return  full_list[idx].view(full_list.size())
@@ -129,6 +140,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     logging.info("Models will be saved in the directory: %s", model_save_path)
 
     midi_tensor_dataset = MidiDataset(Path(datapath) / "train", l=batchlength) # dataset declaration
+    print("GRABBED DATA")
 
     ### Declare model ### 
     if quantize:
@@ -146,6 +158,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     total_loss = []
 
     training_data = DataLoader(midi_tensor_dataset, collate_fn=collate_fn, batch_size=batchsize, shuffle=True, num_workers=2)
+    print("SET UP DATA LOADER")
     # Let # of tensors = n
     # each tensor is pxl_i, where l_i is the length of the nth tensor
     # when we chunk the data, it becomes (l_i//l = s_i) x 1 x p x l 
@@ -157,8 +170,9 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     for e in range(2):
       # train loop
       for i, x in tqdm(enumerate(training_data)):
+          print(i)
           #name = midi_tensor_xset.__getname__(i)
-          optimizer.zero_grad() # yes? 
+          #optimizer.zero_grad() # yes? 
           # s x p x 1 x l
           x = x.to(DEVICE)
           cursize = torch.numel(x)
@@ -166,6 +180,8 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
             max_tensor_size = cursize
             logging.info("NEW MAX BATCH SIZE: %d", max_tensor_size)
 
+        
+          print("Choosing loss:", lossfunc, quantize)
           #print('TRAIN:', x.shape)
           if quantize: 
             vq_loss, x_hat, perplexity = model(x)
@@ -181,12 +197,18 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
                 recon_error = F.l1_loss(x_hat, x)
             loss = recon_error + vq_loss # will be 0 if no quantization
           else:
+            print("Running VAE model!")
             x_hat, mean, log_var = model(x)
+            print("Ran model")
             loss = bce_loss(x_hat, x, mean, log_var)
+            print("Calculated loss")
 
           loss.backward()
+          print("backpropagated")
           torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
+          print("clipped gradient")
           optimizer.step()
+          print("Optimizer stepped")
           
           ### RECORD LOSSES ###
           total_loss.append(loss.item())
@@ -307,13 +329,13 @@ if __name__ == "__main__":
     ########################
     # Reconstruct tensors! #
     ######################## 
-    tensor_dir = Path('..') / 'new_recon_tensors'/ 'train_set_tensors'
+    recon_tensor_dir = datadir
     recon_res_dir = Path(modeldir) / 'final_recons'
     if not os.path.isdir(recon_res_dir):
         os.mkdir(recon_res_dir)
 
     # reconstruct midis
-    reconstruct_songs(str(tensor_dir), str(recon_res_dir), str(recon_res_dir), final_model_name, device=DEVICE, clip_val=0, batchlength=batchlength, quantize=quantize, embedding_dim=embeddim)
+    reconstruct_songs(str(recon_tensor_dir), str(recon_res_dir), str(recon_res_dir), final_model_name, clip_val=0, batchlength=batchlength, quantize=quantize, embedding_dim=embeddim)
     # Save pianorolls
     save_midi_graphs(str(recon_res_dir),str(recon_res_dir))
 
