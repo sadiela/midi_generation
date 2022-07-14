@@ -107,7 +107,7 @@ def reconstruct_song(orig_tensor_path, model, clip_val=0.5, norm=False, batchlen
         print(torch.max(x_hat[i,:,:,:]).item())
     print('Loss:', loss.item())#, '\Perplexity:', perplexity.item())
 
-    unchunked_recon = x_hat.view(p, n_2).detach().numpy()
+    unchunked_recon = x_hat.view(p, n_2).detach().cpu().numpy()
     # Turn all negative values to 0 
     #unchunked_recon = unchunked_recon.clip(min=clip_val) # min note length that should count
     print(unchunked_recon)
