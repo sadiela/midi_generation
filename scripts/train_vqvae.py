@@ -106,39 +106,6 @@ def collate_fn(data, collate_shuffle=True):
   else:
     return full_list
 
-def validate_model(model, data_path, batchlength= 256, batchsize=5, lossfunc='mse', lam=1, quantize=False):
-    midi_tensor_validation = MidiDataset(data_path, l=batchlength) 
-    validation_data = DataLoader(midi_tensor_validation, collate_fn=collate_fn, batch_size=batchsize, shuffle=True, num_workers=2)
-
-    model.eval()
-
-    validation_recon_error = []
-    validation_total_error = []
-
-    for i, x in enumerate(validation_data):
-      x = x.to(DEVICE)
-
-      if quantize: 
-            x_hat, vq_loss, perplexity = model(x)
-            recon_error = calculate_recon_error(x_hat, x, lossfunc=lossfunc, lam=lam)
-            loss = recon_error + vq_loss # will be 0 if no quantization
-      else:
-            x_hat, mean, log_var = model(x)
-            recon_error = calculate_recon_error(x_hat, x, lossfunc=lossfunc, lam=lam) 
-            loss = recon_error +  kld(mean, log_var)
-
-
-      validation_recon_error.append(recon_error.item())
-      validation_total_error.append(loss.item())
-      if (i+1) % 10 == 0:
-        print("Val recon:", recon_error)
-        #logging.info('validation recon_error: %.3f' % np.mean(validation_recon_error[-1]))
-
-    model.train()
-    print(np.mean(validation_recon_error), np.mean(validation_total_error))
-
-    return validation_recon_error, validation_total_error
-
 
 def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=128, learning_rate=1e-3, lossfunc='mse', batchsize=10, batchlength=256, normalize=False, quantize=True, lam=1):
     print("DEVICE:", DEVICE)
