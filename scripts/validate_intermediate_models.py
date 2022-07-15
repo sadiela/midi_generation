@@ -103,13 +103,13 @@ def validate_model(model, data_path, batchlength= 256, batchsize=5, lossfunc='ms
         print("Val recon:", recon_error)
         #logging.info('validation recon_error: %.3f' % np.mean(validation_recon_error[-1]))
 
-    print(np.mean(validation_recon_error), np.mean(validation_total_error))
+    print(np.mean(validation_recon_error).item(), np.mean(validation_total_error).item())
 
     cur_val_results = {
                 "val_recon_error": validation_recon_error,
                 "val_total_error": validation_total_error,
-                "val_recon_error_avg": np.mean(validation_recon_error),
-                "val_total_error_avg": np.mean(validation_total_error)
+                "val_recon_error_avg": np.mean(validation_recon_error).item(),
+                "val_total_error_avg": np.mean(validation_total_error).item()
             }
 
     return cur_val_results
