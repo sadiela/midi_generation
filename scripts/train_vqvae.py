@@ -140,7 +140,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     max_tensor_size= 0 
     #dynamic_loss = SpeedySparseDynamicLoss.apply
     model_number = 1
-    for e in range(10):
+    for e in range(2):
       # train loop
       for i, x in tqdm(enumerate(training_data)):
           print(i)
@@ -263,8 +263,8 @@ if __name__ == "__main__":
     print(hyperparameters)
 
     model_hyperparameters = {
-        "datadir": datadir, 
-        "modeldir": modeldir,
+        "datadir": str(datadir), 
+        "modeldir": str(modeldir),
         "fstub": fstub,
         "quantize": quantize,
         "batchsize": batchsize,
