@@ -27,7 +27,7 @@ class MidiDataset(Dataset):
     def __getitem__(self, index):
         # choose random file path from directory (not already chosen), chunk it 
         #cur_data = torch.load(self.paths[index])
-        print(self.paths[index])
+        #print(self.paths[index])
         with open(self.paths[index], 'rb') as f:
           pickled_tensor = pickle.load(f)
         cur_data = torch.tensor(pickled_tensor.toarray()).float()
@@ -157,7 +157,7 @@ if __name__ == "__main__":
             val_results[file] = cur_val_results
 
     try:
-        with open(str(modeldir / "VALIDATION_RESULTS.yaml")) as outfile:
+        with open(str(modeldir / "VALIDATION_RESULTS.yaml"), 'w') as outfile:
             yaml.dump(val_results, outfile)
         print("SAVED VALIDATION RESULTS")
     except Exception as e:
