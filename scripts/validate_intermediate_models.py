@@ -156,3 +156,10 @@ if __name__ == "__main__":
 
             val_results[file] = cur_val_results
 
+    try:
+        with open(str(modeldir / "VALIDATION_RESULTS.yaml")) as outfile:
+            yaml.dump(val_results, outfile)
+        print("SAVED VALIDATION RESULTS")
+    except Exception as e:
+        print(e)
+
