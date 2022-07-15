@@ -130,7 +130,7 @@ class Decoder(nn.Module):
           #x = self.pool(x)
           x = F.relu(x)
           x = self._conv_trans_3(x)
-          return x
+          return torch.sigmoid(x)
 
 class VQVAE_Model(nn.Module):
     def __init__(self, num_embeddings, embedding_dim, commitment_cost, decay=0):
