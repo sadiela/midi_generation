@@ -238,7 +238,7 @@ if __name__ == "__main__":
     batchlength = int(args['batchlength'])
     embeddim = int(args['embeddim'])
     numembed = int(args['numembed'])
-    lam = int(args["lambda"])
+    lam = float(args["lambda"])
     epochs = int(args['epochs'])
     lr = 1e-3
 
@@ -320,3 +320,4 @@ if __name__ == "__main__":
     # python3 train_vqvae.py -d '../mini_data' -m 'mini_vq_mse' -r "mini_vq_mse" -l "mse" -q
     # python3 train_vqvae.py -d '../mini_data' -m 'mini_vq_bce' -r "mini_vq_bce" -l "bce" -q
     # python3 train_vqvae.py -d '../mini_data' -m 'mini_vae_bce' -r "mini_vae_bce" -l "bce"
+    # python3 train_vqvae.py -d '../mini_data' -m 'mini_vq_l1reg' -r "mini_vq_l1reg" -l "l1reg" -t 20 -q
