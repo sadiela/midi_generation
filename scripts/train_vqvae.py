@@ -140,7 +140,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     max_tensor_size= 0 
     #dynamic_loss = SpeedySparseDynamicLoss.apply
     model_number = 1
-    for e in range(5):
+    for e in range(20):
       # train loop
       for i, x in tqdm(enumerate(training_data)):
           #print(i)
