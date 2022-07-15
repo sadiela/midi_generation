@@ -107,7 +107,7 @@ def collate_fn(data, collate_shuffle=True):
     return full_list
 
 
-def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=128, learning_rate=1e-3, lossfunc='mse', batchsize=10, batchlength=256, normalize=False, quantize=True, lam=1):
+def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=128, learning_rate=1e-3, lossfunc='mse', batchsize=10, batchlength=256, normalize=False, quantize=True, lam=1, epochs=1):
     print("DEVICE:", DEVICE)
     ### Declare model ###
     #model = Model(num_embeddings=num_embeddings, embedding_dim=embedding_dim, commitment_cost=0.5, quantize=quantize).to(device) #num_embeddings, embedding_dim, commitment_cost).to(device)
@@ -140,7 +140,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     max_tensor_size= 0 
     #dynamic_loss = SpeedySparseDynamicLoss.apply
     model_number = 1
-    for e in range(20):
+    for e in range(epochs):
       # train loop
       for i, x in tqdm(enumerate(training_data)):
           #print(i)
@@ -214,6 +214,7 @@ if __name__ == "__main__":
     parser.add_argument('-a', '--batchlength', help='Length of midi object', default=256) # want to change to 384 eventually
     parser.add_argument('-u', '--numembed', help='Number of embeddings', default=1024)
     parser.add_argument('-e', '--embeddim', help='Embedding dimension', default=128)
+    parser.add_argument('-t', '--epochs', help='Number of training epochs', default=1)
 
     # run a single label experiment by default, if --multi flag is added, run a multilabel experiment!
     parser.add_argument('-l','--lossfunc', help='loss function to use', default='mse')
@@ -238,6 +239,7 @@ if __name__ == "__main__":
     embeddim = int(args['embeddim'])
     numembed = int(args['numembed'])
     lam = int(args["lambda"])
+    epochs = int(args['epochs'])
     lr = 1e-3
 
     # create directory for models and results
@@ -288,7 +290,7 @@ if __name__ == "__main__":
     #### Train model ####
     #####################
 
-    recon_error, total_loss, perplex, final_model_name = train_model(datadir, modeldir, num_embeddings=numembed, embedding_dim=embeddim, lossfunc=loss, learning_rate=lr, batchsize=batchsize, batchlength=batchlength, quantize=quantize, lam=lam)
+    recon_error, total_loss, perplex, final_model_name = train_model(datadir, modeldir, num_embeddings=numembed, embedding_dim=embeddim, lossfunc=loss, learning_rate=lr, batchsize=batchsize, batchlength=batchlength, quantize=quantize, lam=lam, epochs=epochs)
     logging.info("All done training! TOTAL TIME: %s", str(time.time()-prog_start))
 
     # save losses to file and plot graph!
