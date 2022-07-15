@@ -59,7 +59,7 @@ class MidiDataset(Dataset):
     def __getitem__(self, index):
         # choose random file path from directory (not already chosen), chunk it 
         #cur_data = torch.load(self.paths[index])
-        print(self.paths[index])
+        #print(self.paths[index])
         with open(self.paths[index], 'rb') as f:
           pickled_tensor = pickle.load(f)
         cur_data = torch.tensor(pickled_tensor.toarray()).float()
@@ -143,7 +143,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     for e in range(2):
       # train loop
       for i, x in tqdm(enumerate(training_data)):
-          print(i)
+          #print(i)
           #name = midi_tensor_xset.__getname__(i)
           #optimizer.zero_grad() # yes? 
           # s x p x 1 x l

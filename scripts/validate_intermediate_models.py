@@ -103,24 +103,27 @@ def validate_model(model, data_path, batchlength= 256, batchsize=5, lossfunc='ms
         print("Val recon:", recon_error)
         #logging.info('validation recon_error: %.3f' % np.mean(validation_recon_error[-1]))
 
-    model.train()
     print(np.mean(validation_recon_error), np.mean(validation_total_error))
 
-    return validation_recon_error, validation_total_error
+    cur_val_results = {
+                "val_recon_error": validation_recon_error,
+                "val_total_error": validation_total_error,
+                "val_recon_error_avg": np.mean(validation_recon_error),
+                "val_total_error_avg": np.mean(validation_total_error)
+            }
+
+    return cur_val_results
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Arguments for running VQ-VAE')
     parser.add_argument('-m', '--modeldir', help='desired model subdirectory name', default='model')
     parser.add_argument('-d', '--datadir', help='desired model subdirectory name', default='../data/ttv/validate/')
-    parser.add_argument('-q', '--quantize', dest='quant', action='store_const', const=True,
-                        default=False, help="True=VQVAE, false=VAE")
 
     args = vars(parser.parse_args())
 
     modelsubdir = args['modeldir']
     datadir = args['datadir']
-    quantize = args['quant']
 
     modeldir = Path('../models') / modelsubdir
 
@@ -130,12 +133,12 @@ if __name__ == "__main__":
     except Exception as e: 
         print(e)
 
-
-
-    if quantize:
+    if model_hyperparams["quantize"]:
         model = VQVAE_Model(num_embeddings=model_hyperparams["numembed"], embedding_dim=model_hyperparams["embeddingdim"], commitment_cost=0.5)
     else: 
         model = VAE_Model(in_channels=1, hidden_dim=128*155, latent_dim=model_hyperparams["embeddingdim"])
+
+    val_results = {}
 
     for file in os.listdir(modeldir):
     # check only text files
@@ -145,5 +148,11 @@ if __name__ == "__main__":
             model_params = stat_dictionary["model_state_dict"]
             model.load_state_dict(model_params)
             model.to(DEVICE)
-            #model.eval()
-            #validate_model(model, datadir, batchlength= 256, batchsize=5, lossfunc='mse', lam=1, quantize=False)
+            model.eval()
+            cur_val_results = validate_model(model, datadir, batchlength=model_hyperparams["batchlength"], 
+                            batchsize=model_hyperparams["batchsize"], lossfunc=model_hyperparams["lossfunc"], 
+                            lam=model_hyperparams["lambda"], quantize=model_hyperparams["quantize"])
+            
+
+            val_results[file] = cur_val_results
+

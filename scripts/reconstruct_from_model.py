@@ -51,7 +51,7 @@ def reconstruct_songs(model_hyperparams, resultdir, tensordir, model_path, clip_
         cur_tensor, loss = reconstruct_song(Path(tensordir) / file, model, clip_val=clip_val, batchlength=model_hyperparams["batchlength"], quantize=model_hyperparams["quantize"])
         # record info IF RECONSTRUCTION NOT ALL 0s
         if (cur_tensor > 0).sum() > 0: 
-            print(cur_tensor[:,:10])
+            #print(cur_tensor[:,:10])
             #input("Continue")
             res_string += str(file) + ' loss: ' + str(loss.item()) # + ' zero loss:' + str(zero_loss.item()) + '\n'
             # save tensor
@@ -87,11 +87,11 @@ def reconstruct_song(orig_tensor_path, model, clip_val=0.5, batchlength=256, qua
     data = torch.tensor(data).float()
 
     x = data.view((n//l, 1, p, l))
-    print("chunked data shape", x.shape)
+    #print("chunked data shape", x.shape)
     #print(data)
     
     if quantize: 
-        vq_loss, x_hat = model(x)
+        x_hat, vq_loss, perp = model(x)
         recon_error = F.mse_loss(x_hat, x) #/ data_variance
         #zero_loss = F.mse_loss(torch.zeros(n//l, 1, p, l), x) + vq_loss
         loss = recon_error + vq_loss
@@ -102,14 +102,15 @@ def reconstruct_song(orig_tensor_path, model, clip_val=0.5, batchlength=256, qua
 
     #print("recon data shape:", data_recon.shape)
     #print(data_recon)
-    for i in range(x_hat.shape[0]):
-        print(torch.max(x_hat[i,:,:,:]).item())
-    print('Loss:', loss.item())#, '\Perplexity:', perplexity.item())
+    #for i in range(x_hat.shape[0]):
+        #print(torch.max(x_hat[i,:,:,:]).item())
+    #print('Loss:', loss.item())#, '\Perplexity:', perplexity.item())
 
     unchunked_recon = x_hat.view(p, n_2).detach().cpu().numpy()
     # Turn all negative values to 0 
     #unchunked_recon = unchunked_recon.clip(min=clip_val) # min note length that should count
     print(unchunked_recon)
+    print(np.var(unchunked_recon))
     unchunked_recon[unchunked_recon < clip_val] = 0
     unchunked_recon[unchunked_recon >= clip_val] = 1
 
@@ -161,10 +162,26 @@ def save_midi_graphs(midi_path, save_path):
 
 if __name__ == "__main__":
     # Default paths:
-    print("GRAPHING!")
     yaml_file = '/Users/sadiela/Documents/phd/research/music/midi_generation/results/recon_error_and_perplexity_vqvae_bce_test-2022-07-09-0.yaml'
     plot_dir = Path('/Users/sadiela/Documents/phd/research/music/midi_generation/results/')
-    save_result_graph(yaml_file, plot_dir)
+    model_dir = '/Users/sadiela/Documents/phd/research/music/midi_generation/models/mse_vqvae_models'
+    model_path = '/Users/sadiela/Documents/phd/research/music/midi_generation/models/mse_vqvae_models/model_1-2022-07-14-0.pt'
+    hyper_path = '/Users/sadiela/Documents/phd/research/music/midi_generation/models/mse_vqvae_models/MODEL_PARAMS.yaml'
+
+    with open(hyper_path) as file: 
+        model_hyperparams = yaml.load(file, Loader=yaml.FullLoader)
+
+    recontensordir = Path('../new_recon_tensors/train_set_tensors/')
+    reconresdir = Path(model_dir) / 'final_recons'
+    if not os.path.isdir(reconresdir):
+        os.mkdir(reconresdir)
+
+    reconstruct_songs(model_hyperparams, reconresdir, recontensordir, model_path, clip_val=0.5)
+    save_midi_graphs(reconresdir, reconresdir)
+
+    #print("GRAPHING!")
+    
+    #save_result_graph(yaml_file, plot_dir)
     '''
     tensor_dir = '/projectnb/textconv/sadiela/midi_generation/new_recon_tensors/train_recons/'
     recon_res_dir = '/projectnb/textconv/sadiela/midi_generation/models/new_rep_vae_overhaul/final_recons/'
