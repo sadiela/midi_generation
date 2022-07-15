@@ -118,25 +118,25 @@ def reconstruct_song(orig_tensor_path, model, clip_val=0.5, batchlength=256, qua
 
     return unchunked_recon, loss #, zero_loss
 
-def save_result_graph(yaml_file, plot_dir):
+def save_result_graph(stub, yaml_file, plot_dir):
     #root_name = yaml_name.split(".")[0]
     with open(yaml_file) as file: 
         res_dic = yaml.load(file, Loader=yaml.FullLoader)
     plt.plot(res_dic['reconstruction_error'])
-    plt.title("Reconstruction Error")
+    plt.title(stub + "Reconstruction Error")
     plt.xlabel("Iteration")
     #plt.show()
     print("SAVING")
-    plt.savefig(str(plot_dir / "recon_error.png"))
+    plt.savefig(str(plot_dir / str(stub+"recon_error.png")))
 
     plt.clf()
 
     plt.plot(res_dic['total_loss'])
-    plt.title("Total Loss")
+    plt.title(stub+"Total Loss")
     plt.xlabel("Iteration")
     #plt.show()
     print("SAVING")
-    plt.savefig(str(plot_dir / "total_loss.png"))
+    plt.savefig(str(plot_dir / str(stub+"total_loss.png")))
     plt.clf()
 
 def save_midi_graphs(midi_path, save_path):

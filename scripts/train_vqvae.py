@@ -140,7 +140,7 @@ def train_model(datapath, model_save_path, num_embeddings=1024, embedding_dim=12
     max_tensor_size= 0 
     #dynamic_loss = SpeedySparseDynamicLoss.apply
     model_number = 1
-    for e in range(2):
+    for e in range(5):
       # train loop
       for i, x in tqdm(enumerate(training_data)):
           #print(i)
@@ -298,7 +298,7 @@ if __name__ == "__main__":
     try: 
         with open(savefile, 'w') as outfile:
             yaml.dump(results, outfile, default_flow_style=False)
-        save_result_graph(savefile, modeldir)
+        save_result_graph(fstub, savefile, modeldir)
     except Exception as e: 
         print(e)
 
@@ -315,4 +315,6 @@ if __name__ == "__main__":
     # Save pianorolls
     save_midi_graphs(str(reconresdir),str(reconresdir))
 
-    # python3 train_vqvae.py -d '../mini_data' -m '../models/mini_test_models' -r "tiny_test" -l "bce"
+    # python3 train_vqvae.py -d '../mini_data' -m 'mini_vq_mse' -r "mini_vq_mse" -l "mse" -q
+    # python3 train_vqvae.py -d '../mini_data' -m 'mini_vq_bce' -r "mini_vq_bce" -l "bce" -q
+    # python3 train_vqvae.py -d '../mini_data' -m 'mini_vae_bce' -r "mini_vae_bce" -l "bce"
