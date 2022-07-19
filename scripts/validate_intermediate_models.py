@@ -127,6 +127,8 @@ if __name__ == "__main__":
 
     modeldir = Path('../models') / modelsubdir
 
+    recontensordir = Path('../new_recon_tensors/train_set_tensors/')
+
     try: 
         with open(str(modeldir / "MODEL_PARAMS.yaml")) as file: 
             model_hyperparams = yaml.load(file, Loader=yaml.FullLoader)
@@ -143,8 +145,8 @@ if __name__ == "__main__":
     for file in os.listdir(modeldir):
     # check only text files
         if file.endswith('.pt'):
-            print(str(modeldir) + '/' + file)
-            stat_dictionary = torch.load(str(modeldir) + '/' + file, map_location=torch.device(DEVICE))
+            cur_model_name = modeldir + '/' + file
+            stat_dictionary = torch.load(cur_model_name, map_location=torch.device(DEVICE))
             model_params = stat_dictionary["model_state_dict"]
             model.load_state_dict(model_params)
             model.to(DEVICE)
@@ -152,8 +154,14 @@ if __name__ == "__main__":
             cur_val_results = validate_model(model, datadir, batchlength=model_hyperparams["batchlength"], 
                             batchsize=model_hyperparams["batchsize"], lossfunc=model_hyperparams["lossfunc"], 
                             lam=model_hyperparams["lambda"], quantize=model_hyperparams["quantize"])
-            
+            # reconstructions from model
+            if not os.path.isdir(cur_model_name[:-3]):
+                os.mkdir(cur_model_name[:-3])
 
+            # SAVE RECONSTRUCTIONS & PIANOROLLS FOR CURRENT MODEL
+            reconstruct_songs(model_hyperparams, cur_model_name[:-3], recontensordir, cur_model_name, clip_val=0.5)
+            save_midi_graphs(cur_model_name[:-3],cur_model_name[:-3])
+            
             val_results[file] = cur_val_results
 
     try:
